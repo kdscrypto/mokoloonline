@@ -12,21 +12,15 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to dashboard if user is already logged in
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
-
-    // Listen for auth errors
     const {
       data: { subscription },
-    } = supabase.auth.onError((error) => {
-      if (error.message.includes("Invalid login credentials")) {
-        toast.error("Email ou mot de passe incorrect");
-      } else {
-        toast.error("Une erreur est survenue lors de la connexion");
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate("/dashboard");
+      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        navigate("/auth");
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
       }
     });
 
@@ -70,13 +64,26 @@ export default function Auth() {
                   email_label: 'Adresse email',
                   password_label: 'Mot de passe',
                   button_label: 'Se connecter',
+                  email_input_placeholder: 'Votre adresse email',
+                  password_input_placeholder: 'Votre mot de passe',
+                  link_text: 'Déjà inscrit ? Connectez-vous',
                 },
                 sign_up: {
                   email_label: 'Adresse email',
                   password_label: 'Mot de passe',
                   button_label: "S'inscrire",
+                  email_input_placeholder: 'Votre adresse email',
+                  password_input_placeholder: 'Choisissez un mot de passe',
+                  link_text: 'Pas encore de compte ? Inscrivez-vous',
                 },
               },
+            }}
+            onError={(error) => {
+              if (error.message.includes("Invalid login credentials")) {
+                toast.error("Email ou mot de passe incorrect");
+              } else {
+                toast.error("Une erreur est survenue lors de la connexion");
+              }
             }}
           />
         </Card>
