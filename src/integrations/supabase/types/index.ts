@@ -1,7 +1,7 @@
 import { Listing } from './listing';
 import { SecurityLog } from './security-log';
-export * from './listing';
-export * from './security-log';
+
+export type { Listing, SecurityLog };
 
 export type Json =
   | string
