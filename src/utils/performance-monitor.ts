@@ -1,17 +1,32 @@
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types/database";
 
-interface PerformanceMetrics {
+interface ResourceTiming {
+  name: string;
+  duration: number;
+  type: string;
+}
+
+interface PerformanceMetricsData {
   pageLoadTime: number;
   timeToFirstByte: number;
   timeToFirstPaint: number;
   timeToFirstContentfulPaint: number;
   domContentLoaded: number;
-  resourceLoadTimes: {
-    name: string;
-    duration: number;
-    type: string;
-  }[];
+  resourceLoadTimes: ResourceTiming[];
 }
+
+const serializeMetrics = (metrics: PerformanceMetricsData): Json => {
+  return {
+    pageLoadTime: metrics.pageLoadTime,
+    timeToFirstByte: metrics.timeToFirstByte,
+    timeToFirstPaint: metrics.timeToFirstPaint,
+    timeToFirstContentfulPaint: metrics.timeToFirstContentfulPaint,
+    domContentLoaded: metrics.domContentLoaded,
+    resourceLoadTimes: metrics.resourceLoadTimes
+  };
+};
 
 export const capturePerformanceMetrics = async (pageName: string): Promise<void> => {
   try {
@@ -22,7 +37,7 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
     const paintTiming = performance.getEntriesByType("paint");
     
     // Calculate key metrics
-    const metrics: PerformanceMetrics = {
+    const metrics: PerformanceMetricsData = {
       pageLoadTime: navigationTiming.loadEventEnd - navigationTiming.startTime,
       timeToFirstByte: navigationTiming.responseStart - navigationTiming.requestStart,
       timeToFirstPaint: (paintTiming.find(entry => entry.name === "first-paint")?.startTime || 0),
@@ -31,7 +46,7 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
       resourceLoadTimes: performance.getEntriesByType("resource").map(resource => ({
         name: resource.name,
         duration: resource.duration,
-        type: resource.initiatorType
+        type: (resource as PerformanceResourceTiming).initiatorType
       }))
     };
 
@@ -41,10 +56,10 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
       description: `Performance metrics captured for ${pageName}`,
       metadata: {
         page: pageName,
-        metrics,
+        metrics: serializeMetrics(metrics),
         userAgent: navigator.userAgent,
         timestamp: new Date().toISOString()
-      }
+      } as Json
     });
 
     // Clear the performance entries to avoid memory leaks
@@ -56,7 +71,7 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
 };
 
 export const usePerformanceMonitoring = (pageName: string) => {
-  React.useEffect(() => {
+  useEffect(() => {
     // Wait for the page to fully load
     window.addEventListener('load', () => {
       // Delay the capture slightly to ensure all metrics are available
