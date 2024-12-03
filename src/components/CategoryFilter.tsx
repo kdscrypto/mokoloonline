@@ -9,7 +9,11 @@ const categories = [
   "Services",
 ];
 
-export function CategoryFilter() {
+interface CategoryFilterProps {
+  onCategoryChange: (category: string) => void;
+}
+
+export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
   return (
     <div className="relative w-full">
       <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide snap-x snap-mandatory">
@@ -18,6 +22,7 @@ export function CategoryFilter() {
             key={category}
             variant="outline"
             className="whitespace-nowrap rounded-full snap-start shrink-0"
+            onClick={() => onCategoryChange(category)}
           >
             {category}
           </Button>

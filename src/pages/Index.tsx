@@ -7,35 +7,39 @@ import { Link } from "react-router-dom";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
-
-// Données de test
-const listings = [
-  {
-    id: "1",
-    title: "iPhone 12 Pro Max - Excellent état",
-    price: 350000,
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    location: "Douala, Littoral",
-  },
-  {
-    id: "2",
-    title: "Appartement 3 pièces - Bastos",
-    price: 150000,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-    location: "Yaoundé, Centre",
-  },
-  {
-    id: "3",
-    title: "Honda Civic 2019 - Automatique",
-    price: 4500000,
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    location: "Bafoussam, Ouest",
-  },
-];
-
-const recentListings = listings.slice(0, 2);
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export default function Index() {
+  const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: listings = [], isLoading } = useQuery({
+    queryKey: ['listings', selectedCategory, searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from('listings')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (selectedCategory !== "Tous") {
+        query = query.eq('category', selectedCategory);
+      }
+
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const recentListings = listings.slice(0, 2);
+
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow">
@@ -64,28 +68,34 @@ export default function Index() {
               </div>
             </header>
             
-            <SearchBar />
-            <CategoryFilter />
+            <SearchBar onSearch={setSearchQuery} />
+            <CategoryFilter onCategoryChange={setSelectedCategory} />
 
-            {/* Section des dernières annonces */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                {recentListings.map((listing) => (
-                  <ListingCard key={listing.id} {...listing} />
-                ))}
-              </div>
-            </section>
-            
-            {/* Section principale des annonces */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {listings.map((listing) => (
-                  <ListingCard key={listing.id} {...listing} />
-                ))}
-              </div>
-            </section>
+            {isLoading ? (
+              <div className="text-center py-8">Chargement des annonces...</div>
+            ) : (
+              <>
+                {/* Section des dernières annonces */}
+                <section>
+                  <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {recentListings.map((listing) => (
+                      <ListingCard key={listing.id} {...listing} />
+                    ))}
+                  </div>
+                </section>
+                
+                {/* Section principale des annonces */}
+                <section>
+                  <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {listings.map((listing) => (
+                      <ListingCard key={listing.id} {...listing} />
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
           </div>
         </div>
 

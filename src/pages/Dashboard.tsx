@@ -7,44 +7,85 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Plus, Pencil, Trash2, LogOut } from "lucide-react";
 import { toast } from "sonner";
-
-// Données de test (à remplacer par les vraies données de l'utilisateur)
-const userListings = [
-  {
-    id: "1",
-    title: "iPhone 12 Pro Max - Excellent état",
-    price: 350000,
-    status: "active",
-    createdAt: "2024-02-20",
-  },
-  {
-    id: "2",
-    title: "Appartement 3 pièces - Bastos",
-    price: 150000,
-    status: "pending",
-    createdAt: "2024-02-19",
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export default function Dashboard() {
-  const handleDelete = (id: string) => {
-    // Simulation de suppression
-    toast.success("Annonce supprimée avec succès");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is authenticated
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate("/auth");
+        toast.error("Vous devez être connecté pour accéder au tableau de bord");
+      }
+    });
+  }, [navigate]);
+
+  const { data: listings = [], refetch } = useQuery({
+    queryKey: ['user-listings'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success("Annonce supprimée avec succès");
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Une erreur est survenue");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/");
+      toast.success("Déconnexion réussie");
+    } catch (error: any) {
+      toast.error(error.message || "Une erreur est survenue");
+    }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <Link to="/create">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouvelle annonce
+        <div className="flex gap-4">
+          <Link to="/create">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle annonce
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
           </Button>
-        </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -61,7 +102,7 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {userListings.map((listing) => (
+              {listings.map((listing) => (
                 <TableRow key={listing.id}>
                   <TableCell className="font-medium">{listing.title}</TableCell>
                   <TableCell>{listing.price.toLocaleString()} FCFA</TableCell>
@@ -76,7 +117,7 @@ export default function Dashboard() {
                       {listing.status === "active" ? "Active" : "En attente"}
                     </span>
                   </TableCell>
-                  <TableCell>{listing.createdAt}</TableCell>
+                  <TableCell>{new Date(listing.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon">
