@@ -18,12 +18,10 @@ export default function Index() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est connecté et admin
     const checkAdminStatus = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsAuthenticated(true);
-        // Vérifier si l'utilisateur est admin
         const { data: adminData } = await supabase
           .from("admin_users")
           .select("*")
@@ -37,7 +35,6 @@ export default function Index() {
     checkAdminStatus();
   }, []);
 
-  // Requête pour toutes les annonces
   const { data: listings = [], isLoading } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery],
     queryFn: async () => {
@@ -61,7 +58,6 @@ export default function Index() {
     },
   });
 
-  // Requête séparée pour les dernières annonces
   const { data: latestListings = [] } = useQuery({
     queryKey: ['latest-listings'],
     queryFn: async () => {
@@ -129,7 +125,6 @@ export default function Index() {
               <div className="text-center py-8">Chargement des annonces...</div>
             ) : (
               <>
-                {/* Section des dernières annonces */}
                 <section>
                   <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -139,7 +134,6 @@ export default function Index() {
                   </div>
                 </section>
                 
-                {/* Section principale des annonces */}
                 <section>
                   <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

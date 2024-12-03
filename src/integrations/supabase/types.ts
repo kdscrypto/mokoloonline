@@ -26,6 +26,7 @@ export type Database = {
       }
       listings: {
         Row: {
+          category: string
           created_at: string
           description: string | null
           id: string
@@ -38,6 +39,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          category: string
           created_at?: string
           description?: string | null
           id?: string
@@ -50,6 +52,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
           id?: string
