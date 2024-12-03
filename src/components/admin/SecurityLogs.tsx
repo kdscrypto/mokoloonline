@@ -9,16 +9,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, Shield } from "lucide-react";
-
-interface SecurityLog {
-  id: string;
-  event_type: 'auth' | 'api' | 'suspicious_activity';
-  description: string;
-  user_id?: string;
-  ip_address?: string;
-  metadata?: Record<string, unknown>;
-  created_at: string;
-}
+import type { SecurityLog } from "@/integrations/supabase/types";
 
 export function SecurityLogs() {
   const { data: logs, isLoading } = useQuery({

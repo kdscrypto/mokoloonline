@@ -1,5 +1,7 @@
 import { Listing } from './listing';
+import { SecurityLog } from './security-log';
 export * from './listing';
+export * from './security-log';
 
 export type Json =
   | string
@@ -16,7 +18,12 @@ export interface Database {
         Row: Listing;
         Insert: Omit<Listing, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Listing, 'id' | 'created_at' | 'updated_at'>>;
-      }
+      };
+      security_logs: {
+        Row: SecurityLog;
+        Insert: Omit<SecurityLog, 'id' | 'created_at'>;
+        Update: Partial<Omit<SecurityLog, 'id' | 'created_at'>>;
+      };
       Mokolo: {
         Row: {
           created_at: string

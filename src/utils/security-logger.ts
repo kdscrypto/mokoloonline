@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { SecurityLog } from "@/integrations/supabase/types";
 
 interface LogEvent {
-  event_type: 'auth' | 'api' | 'suspicious_activity';
+  event_type: SecurityLog['event_type'];
   description: string;
   user_id?: string;
   ip_address?: string;
