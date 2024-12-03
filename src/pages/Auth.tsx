@@ -3,16 +3,23 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isLogin && !captchaValue) {
+      alert("Veuillez valider le captcha");
+      return;
+    }
     // TODO: Implémenter la logique d'authentification
-    console.log("Form submitted:", { email, password });
+    console.log("Form submitted:", { email, password, username, captchaValue });
   };
 
   return (
@@ -37,6 +44,24 @@ export default function Auth() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                  Nom d'utilisateur
+                </label>
+                <div className="mt-1">
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Adresse email
@@ -71,6 +96,15 @@ export default function Auth() {
               </div>
             </div>
 
+            {!isLogin && (
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                  onChange={(value) => setCaptchaValue(value)}
+                />
+              </div>
+            )}
+
             <div>
               <Button type="submit" className="w-full">
                 {isLogin ? "Se connecter" : "S'inscrire"}
@@ -82,7 +116,10 @@ export default function Auth() {
             <Button
               variant="ghost"
               className="w-full"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setCaptchaValue(null);
+              }}
             >
               {isLogin
                 ? "Pas encore de compte ? S'inscrire"
