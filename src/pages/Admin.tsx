@@ -27,15 +27,11 @@ export default function Admin() {
     const { data: adminData, error } = await supabase
       .from("admin_users")
       .select("*")
-      .eq("user_id", session.user.id);
+      .eq("user_id", session.user.id)
+      .single();
 
-    if (error) {
-      toast.error("Erreur lors de la vérification des droits d'accès");
-      navigate("/");
-      return;
-    }
-
-    if (!adminData || adminData.length === 0) {
+    if (error || !adminData) {
+      console.error("Admin access error:", error);
       toast.error("Accès non autorisé");
       navigate("/");
       return;
@@ -50,6 +46,7 @@ export default function Admin() {
         .order("created_at", { ascending: false });
 
       if (error) {
+        console.error("Error fetching listings:", error);
         toast.error("Erreur lors du chargement des annonces");
         return;
       }
@@ -70,11 +67,14 @@ export default function Admin() {
 
   const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
     try {
-      const { error } = await supabase
+      console.log("Updating status for listing:", id, "to:", newStatus);
+      
+      const { data, error } = await supabase
         .from("listings")
         .update({ status: newStatus })
         .eq("id", id)
-        .select();
+        .select()
+        .single();
 
       if (error) {
         console.error("Error updating status:", error);
@@ -82,6 +82,7 @@ export default function Admin() {
         return;
       }
 
+      console.log("Status update successful:", data);
       toast.success(newStatus === 'approved' ? "Annonce approuvée" : "Annonce rejetée");
       await fetchListings();
     } catch (error) {
