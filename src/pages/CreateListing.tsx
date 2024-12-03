@@ -3,12 +3,22 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ImagePlus } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
+
+const categories = [
+  "Véhicules",
+  "Immobilier",
+  "Électronique",
+  "Mode",
+  "Services",
+  "Autres",
+];
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -18,6 +28,7 @@ export default function CreateListing() {
     price: "",
     location: "",
     description: "",
+    category: "",
     image: null as File | null,
   });
 
@@ -34,6 +45,10 @@ export default function CreateListing() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setFormData(prev => ({ ...prev, category: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +89,8 @@ export default function CreateListing() {
         description: formData.description,
         image_url,
         user_id: user.id,
-        status: 'pending'
+        status: 'pending',
+        category: formData.category || 'Autres' // Add default category if none selected
       });
 
       if (error) throw error;
@@ -104,6 +120,26 @@ export default function CreateListing() {
               onChange={handleInputChange}
               required
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="category">Catégorie</Label>
+            <Select
+              value={formData.category}
+              onValueChange={handleCategoryChange}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="space-y-2">
