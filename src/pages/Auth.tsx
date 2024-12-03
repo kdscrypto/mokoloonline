@@ -42,12 +42,12 @@ export default function Auth() {
         // Simulation d'une requête d'inscription
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast.success("Inscription réussie !");
-        navigate("/");
+        navigate("/dashboard");
       } else {
         // Simulation d'une requête de connexion
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast.success("Connexion réussie !");
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {
       toast.error("Une erreur est survenue");
@@ -57,21 +57,16 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="absolute top-8 left-8 text-gray-600 hover:text-gray-900">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-        </Link>
-        
-        <img 
-          src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png"
-          alt="Mokolo Online Logo"
-          className="mx-auto h-16 w-auto"
-        />
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {isLogin ? "Connexion à votre compte" : "Créer un compte"}
+        <div className="flex items-center justify-center mb-6">
+          <Link to="/" className="flex items-center text-gray-500 hover:text-gray-700">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour à l'accueil
+          </Link>
+        </div>
+        <h2 className="text-center text-3xl font-extrabold text-gray-900">
+          {isLogin ? "Connexion" : "Créer un compte"}
         </h2>
       </div>
 
@@ -80,7 +75,10 @@ export default function Auth() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {!isLogin && (
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Nom d'utilisateur
                 </label>
                 <div className="mt-1">
@@ -97,7 +95,10 @@ export default function Auth() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Adresse email
               </label>
               <div className="mt-1">
@@ -114,7 +115,10 @@ export default function Auth() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Mot de passe
               </label>
               <div className="mt-1">
@@ -131,7 +135,7 @@ export default function Auth() {
             </div>
 
             {!isLogin && (
-              <div className="flex justify-center">
+              <div>
                 <ReCAPTCHA
                   sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
                   onChange={(value) => setCaptchaValue(value)}
@@ -151,18 +155,15 @@ export default function Auth() {
           </form>
 
           <div className="mt-6">
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setCaptchaValue(null);
-              }}
+            <button
+              type="button"
+              className="text-sm text-blue-600 hover:text-blue-500"
+              onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin
-                ? "Pas encore de compte ? S'inscrire"
-                : "Déjà un compte ? Se connecter"}
-            </Button>
+                ? "Pas encore de compte ? Inscrivez-vous"
+                : "Déjà un compte ? Connectez-vous"}
+            </button>
           </div>
         </div>
       </div>
