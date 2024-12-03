@@ -70,6 +70,11 @@ export default function Dashboard() {
     }
   };
 
+  // Calculate statistics
+  const totalListings = listings.length;
+  const activeListings = listings.filter(listing => listing.status === "active").length;
+  const pendingListings = listings.filter(listing => listing.status === "pending").length;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -91,6 +96,21 @@ export default function Dashboard() {
             <LogOut className="mr-2 h-4 w-4" />
             Déconnexion
           </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Total des annonces</h3>
+          <p className="text-3xl font-bold text-primary">{totalListings}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Annonces actives</h3>
+          <p className="text-3xl font-bold text-green-600">{activeListings}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Annonces en attente</h3>
+          <p className="text-3xl font-bold text-yellow-600">{pendingListings}</p>
         </div>
       </div>
 
