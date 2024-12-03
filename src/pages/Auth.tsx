@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { AuthError } from "@supabase/supabase-js";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Auth() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
-      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT') {
         navigate("/auth");
       } else if (event === 'PASSWORD_RECOVERY') {
         toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
@@ -28,6 +29,14 @@ export default function Auth() {
       subscription.unsubscribe();
     };
   }, [navigate]);
+
+  const handleError = (error: AuthError) => {
+    if (error.message.includes("Invalid login credentials")) {
+      toast.error("Email ou mot de passe incorrect");
+    } else {
+      toast.error("Une erreur est survenue lors de la connexion");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -78,13 +87,7 @@ export default function Auth() {
                 },
               },
             }}
-            onError={(error) => {
-              if (error.message.includes("Invalid login credentials")) {
-                toast.error("Email ou mot de passe incorrect");
-              } else {
-                toast.error("Une erreur est survenue lors de la connexion");
-              }
-            }}
+            theme="light"
           />
         </Card>
       </div>
