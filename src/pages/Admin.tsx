@@ -44,19 +44,19 @@ export default function Admin() {
   const { data: listings = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-listings'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
         .from("listings")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        toast.error("Erreur lors du chargement des annonces");
-        throw error;
-      }
-
+      if (error) throw error;
       return data as Listing[];
     },
-    enabled: isAdmin, // Only fetch when user is confirmed as admin
+    enabled: isAdmin,
+    retry: 1,
   });
 
   const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
@@ -67,12 +67,13 @@ export default function Admin() {
         .eq("id", id);
 
       if (error) {
+        console.error("Status update error:", error);
         toast.error("Erreur lors de la mise à jour du statut");
         return;
       }
 
       toast.success(newStatus === 'approved' ? "Annonce approuvée" : "Annonce rejetée");
-      refetch(); // Refresh the listings after update
+      refetch();
     } catch (error) {
       console.error("Error in handleStatusUpdate:", error);
       toast.error("Une erreur est survenue lors de la mise à jour");
