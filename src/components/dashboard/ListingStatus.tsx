@@ -4,11 +4,11 @@ import { ListingStatus as Status } from "@/integrations/supabase/types/listing";
 const statusConfig = {
   pending: {
     label: "En attente",
-    variant: "warning" as const
+    variant: "secondary" as const
   },
   approved: {
     label: "Approuvée",
-    variant: "success" as const
+    variant: "default" as const
   },
   rejected: {
     label: "Rejetée",

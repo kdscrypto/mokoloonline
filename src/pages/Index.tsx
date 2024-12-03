@@ -21,7 +21,7 @@ export default function Index() {
       let query = supabase
         .from('listings')
         .select('*')
-        .eq('status', 'approved')
+        .eq('status', 'approved')  // Ne sélectionner que les annonces approuvées
         .order('created_at', { ascending: false });
 
       if (selectedCategory !== "Tous") {

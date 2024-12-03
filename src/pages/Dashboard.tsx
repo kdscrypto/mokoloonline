@@ -54,16 +54,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate("/");
-      toast.success("Déconnexion réussie");
-    } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue");
-    }
-  };
-
   // Calculate statistics
   const totalListings = listings.length;
   const pendingListings = listings.filter(l => l.status === 'pending').length;
