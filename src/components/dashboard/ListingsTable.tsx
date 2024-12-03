@@ -29,7 +29,8 @@ export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
       if (error) throw error;
       
       toast.success("Annonce marquée comme vendue");
-      // L'annonce sera automatiquement supprimée après 24h
+      // Refresh the page to show updated status
+      window.location.reload();
     } catch (error: any) {
       toast.error("Erreur lors du marquage de l'annonce comme vendue");
       console.error("Error marking listing as sold:", error);
