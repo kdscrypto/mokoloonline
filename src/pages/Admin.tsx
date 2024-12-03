@@ -61,9 +61,8 @@ export default function Admin() {
     },
     enabled: isAdmin,
     retry: 1,
-    onError: (error) => {
-      console.error("Query error:", error);
-      toast.error("Erreur lors du chargement des annonces");
+    meta: {
+      errorMessage: "Erreur lors du chargement des annonces"
     }
   });
 
