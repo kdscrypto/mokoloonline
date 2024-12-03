@@ -1,4 +1,5 @@
 import type { SecurityLog } from './security-log';
+import type { Listing } from './listing';
 
 export type Json =
   | string

@@ -1,5 +1,3 @@
-import { ListingStatus } from './listing-status';
-
 export interface Listing {
   id: string;
   title: string;
@@ -7,7 +5,7 @@ export interface Listing {
   price: number;
   location: string;
   image_url: string | null;
-  status: ListingStatus;
+  status: 'pending' | 'approved' | 'rejected' | 'sold';
   user_id: string | null;
   created_at: string;
   updated_at: string;
