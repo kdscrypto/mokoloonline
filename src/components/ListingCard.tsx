@@ -5,17 +5,17 @@ interface ListingCardProps {
   id: string;
   title: string;
   price: number;
-  image: string;
+  image_url: string;
   location: string;
 }
 
-export function ListingCard({ id, title, price, image, location }: ListingCardProps) {
+export function ListingCard({ id, title, price, image_url, location }: ListingCardProps) {
   return (
     <Link to={`/listing/${id}`}>
       <Card className="listing-card">
         <CardContent className="p-0">
           <img
-            src={image}
+            src={image_url || '/placeholder.svg'}
             alt={title}
             className="w-full h-48 object-cover rounded-t-lg"
           />
