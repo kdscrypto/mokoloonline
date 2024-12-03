@@ -43,23 +43,29 @@ export default function Admin() {
   };
 
   const fetchListings = async () => {
-    const { data, error } = await supabase
-      .from("listings")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      toast.error("Erreur lors du chargement des annonces");
-      return;
+      if (error) {
+        toast.error("Erreur lors du chargement des annonces");
+        return;
+      }
+
+      const typedListings = (data || []).map(listing => ({
+        ...listing,
+        status: (listing.status || 'pending') as Listing['status']
+      }));
+
+      setListings(typedListings);
+    } catch (error) {
+      console.error("Error in fetchListings:", error);
+      toast.error("Une erreur est survenue lors du chargement des annonces");
+    } finally {
+      setIsLoading(false);
     }
-
-    const typedListings = (data || []).map(listing => ({
-      ...listing,
-      status: (listing.status || 'pending') as Listing['status']
-    }));
-
-    setListings(typedListings);
-    setIsLoading(false);
   };
 
   const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
@@ -67,7 +73,8 @@ export default function Admin() {
       const { error } = await supabase
         .from("listings")
         .update({ status: newStatus })
-        .eq("id", id);
+        .eq("id", id)
+        .select();
 
       if (error) {
         console.error("Error updating status:", error);
