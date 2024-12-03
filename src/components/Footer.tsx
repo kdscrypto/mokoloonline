@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">MarketCam</h3>
+            <h3 className="font-bold text-lg mb-4">Mokolo Online</h3>
             <p className="text-muted-foreground">
               La première plateforme de petites annonces au Cameroun.
             </p>
@@ -50,7 +50,7 @@ export function Footer() {
         </div>
         <div className="border-t pt-8">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MarketCam. Tous droits réservés.
+            © {new Date().getFullYear()} Mokolo Online. Tous droits réservés.
           </p>
         </div>
       </div>

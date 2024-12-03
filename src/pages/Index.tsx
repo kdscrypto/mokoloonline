@@ -42,7 +42,7 @@ export default function Index() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col gap-8">
             <header className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">MarketCam</h1>
+              <h1 className="text-3xl font-bold">Mokolo Online</h1>
               <div className="flex items-center gap-4">
                 <Link to="/auth">
                   <Button variant="outline" className="rounded-full">
