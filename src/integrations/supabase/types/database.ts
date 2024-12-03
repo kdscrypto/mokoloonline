@@ -1,5 +1,4 @@
 import type { SecurityLog } from './security-log';
-import type { Listing } from './listing';
 
 export type Json =
   | string
@@ -60,9 +59,9 @@ export interface Database {
         }
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
-    Enums: Record<string, never>
-    CompositeTypes: Record<string, never>
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   }
 }
