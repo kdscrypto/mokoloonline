@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ListingsTable } from "@/components/admin/ListingsTable";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import type { Listing } from "@/integrations/supabase/types/listing";
 
 export default function Admin() {
@@ -44,7 +46,6 @@ export default function Admin() {
       return;
     }
 
-    // Ensure the status is properly typed
     const typedListings = (data || []).map(listing => ({
       ...listing,
       status: (listing.status || 'pending') as Listing['status']
@@ -75,7 +76,17 @@ export default function Admin() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Administration des annonces</h1>
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="hover:bg-gray-100"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour
+        </Button>
+        <h1 className="text-2xl font-bold">Administration des annonces</h1>
+      </div>
       <ListingsTable 
         listings={listings}
         onApprove={(id) => handleStatusUpdate(id, 'approved')}
