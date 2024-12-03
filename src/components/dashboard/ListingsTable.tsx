@@ -23,17 +23,21 @@ export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
     try {
       const { error } = await supabase
         .from('listings')
-        .update({ status: 'sold', updated_at: new Date().toISOString() })
-        .eq('id', id);
+        .update({ 
+          status: 'sold', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) throw error;
       
       toast.success("Annonce marquée comme vendue");
-      // Refresh the page to show updated status
       window.location.reload();
     } catch (error: any) {
-      toast.error("Erreur lors du marquage de l'annonce comme vendue");
       console.error("Error marking listing as sold:", error);
+      toast.error("Erreur lors du marquage de l'annonce comme vendue");
     }
   };
 
