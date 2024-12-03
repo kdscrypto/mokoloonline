@@ -1,3 +1,4 @@
+import { Listing } from './listing';
 export * from './listing';
 
 export type Json =
