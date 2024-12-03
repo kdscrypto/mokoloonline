@@ -3,21 +3,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const testimonials = [
   {
-    name: "Sophie M.",
-    role: "Acheteuse",
-    content: "J'ai trouvé exactement ce que je cherchais en quelques clics. Le processus était simple et rapide !",
+    name: "Maman Bamiléké",
+    role: "Commerçante",
+    content: "Grâce à MarketCam, je peux vendre mes produits même quand je ne suis pas au marché. C'est vraiment pratique !",
     avatar: "https://i.pravatar.cc/150?img=1"
   },
   {
-    name: "Thomas K.",
-    role: "Vendeur vérifié",
-    content: "Grâce à MarketCam, j'ai pu développer mon activité et toucher plus de clients. Une excellente plateforme !",
+    name: "Papa Douala",
+    role: "Vendeur de voitures",
+    content: "Je trouve facilement des clients sérieux pour mes véhicules. La plateforme est simple à utiliser même pour nous les moins jeunes.",
     avatar: "https://i.pravatar.cc/150?img=2"
   },
   {
-    name: "Marie L.",
-    role: "Cliente régulière",
-    content: "Je recommande vivement cette plateforme. Les vendeurs sont sérieux et les prix sont transparents.",
+    name: "Tantine Yaoundé",
+    role: "Cliente fidèle",
+    content: "Je fais toutes mes courses ici maintenant. Les prix sont bons et on peut négocier directement avec les vendeurs.",
     avatar: "https://i.pravatar.cc/150?img=3"
   }
 ];
