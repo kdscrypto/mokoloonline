@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 
 interface ListingCardProps {
   id: string;

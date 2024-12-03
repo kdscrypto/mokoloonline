@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -17,6 +18,21 @@ export default function Auth() {
         navigate("/dashboard");
       }
     });
+
+    // Listen for auth errors
+    const {
+      data: { subscription },
+    } = supabase.auth.onError((error) => {
+      if (error.message.includes("Invalid login credentials")) {
+        toast.error("Email ou mot de passe incorrect");
+      } else {
+        toast.error("Une erreur est survenue lors de la connexion");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   return (
