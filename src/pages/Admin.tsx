@@ -24,14 +24,21 @@ export default function Admin() {
       return;
     }
 
-    const { data: adminData } = await supabase
+    const { data: adminData, error } = await supabase
       .from("admin_users")
       .select("*")
-      .single();
+      .eq("user_id", session.user.id);
 
-    if (!adminData) {
+    if (error) {
+      toast.error("Erreur lors de la vérification des droits d'accès");
+      navigate("/");
+      return;
+    }
+
+    if (!adminData || adminData.length === 0) {
       toast.error("Accès non autorisé");
       navigate("/");
+      return;
     }
   };
 
