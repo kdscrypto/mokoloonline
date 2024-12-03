@@ -1,57 +1,118 @@
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function Footer() {
   return (
-    <footer className="bg-secondary/20 pt-16 pb-8">
-      <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h3 className="font-bold text-lg mb-4">Mokolo Online</h3>
-            <p className="text-muted-foreground">
-              La première plateforme de petites annonces au Cameroun.
+    <footer className="bg-gradient-to-b from-secondary/5 to-secondary/20 pt-16 pb-8">
+      <div className="container mx-auto px-4">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Brand Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-6">
+              <img 
+                src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png" 
+                alt="Mokolo Online Logo" 
+                className="w-10 h-10"
+              />
+              <h3 className="font-bold text-xl">Mokolo Online</h3>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              La première plateforme de petites annonces au Cameroun. Trouvez et publiez facilement des annonces.
             </p>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Mail className="h-4 w-4" />
+              <span>contact@mokolo-online.com</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Phone className="h-4 w-4" />
+              <span>+237 6XX XXX XXX</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <MapPin className="h-4 w-4" />
+              <span>Yaoundé, Cameroun</span>
+            </div>
           </div>
+
+          {/* Quick Links */}
           <div>
-            <h4 className="font-bold mb-4">Liens rapides</h4>
-            <ul className="space-y-2 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">À propos</a></li>
-              <li><a href="#" className="hover:text-primary">Comment ça marche</a></li>
-              <li><a href="#" className="hover:text-primary">Sécurité</a></li>
-              <li><a href="#" className="hover:text-primary">Contact</a></li>
+            <h4 className="font-bold text-lg mb-6">Liens rapides</h4>
+            <ul className="space-y-3">
+              {["À propos", "Comment ça marche", "Sécurité", "Contact"].map((item) => (
+                <li key={item}>
+                  <a 
+                    href="#" 
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <span className="h-1 w-1 rounded-full bg-primary/60"></span>
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Categories */}
           <div>
-            <h4 className="font-bold mb-4">Catégories</h4>
-            <ul className="space-y-2 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">Véhicules</a></li>
-              <li><a href="#" className="hover:text-primary">Immobilier</a></li>
-              <li><a href="#" className="hover:text-primary">Électronique</a></li>
-              <li><a href="#" className="hover:text-primary">Services</a></li>
+            <h4 className="font-bold text-lg mb-6">Catégories</h4>
+            <ul className="space-y-3">
+              {["Véhicules", "Immobilier", "Électronique", "Services", "Mode", "Emploi"].map((item) => (
+                <li key={item}>
+                  <a 
+                    href="#" 
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <span className="h-1 w-1 rounded-full bg-primary/60"></span>
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
-          <div>
-            <h4 className="font-bold mb-4">Suivez-nous</h4>
-            <div className="flex gap-4">
-              <Button variant="ghost" size="icon">
-                <Facebook className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Twitter className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Instagram className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Youtube className="h-5 w-5" />
-              </Button>
+
+          {/* Newsletter */}
+          <div className="space-y-6">
+            <h4 className="font-bold text-lg">Newsletter</h4>
+            <p className="text-muted-foreground">
+              Restez informé de nos dernières actualités et offres.
+            </p>
+            <div className="flex flex-col gap-3">
+              <input 
+                type="email" 
+                placeholder="Votre email" 
+                className="px-4 py-2 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200"
+              />
+              <Button className="w-full">S'abonner</Button>
+            </div>
+            <div className="flex gap-4 pt-4">
+              {[
+                { icon: Facebook, label: "Facebook" },
+                { icon: Twitter, label: "Twitter" },
+                { icon: Instagram, label: "Instagram" },
+                { icon: Youtube, label: "Youtube" }
+              ].map(({ icon: Icon, label }) => (
+                <Button 
+                  key={label}
+                  variant="ghost" 
+                  size="icon"
+                  className="hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                >
+                  <Icon className="h-5 w-5" />
+                </Button>
+              ))}
             </div>
           </div>
         </div>
-        <div className="border-t pt-8">
-          <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Mokolo Online. Tous droits réservés.
-          </p>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-border/40 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <p>© {new Date().getFullYear()} Mokolo Online. Tous droits réservés.</p>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-primary transition-colors duration-200">Conditions d'utilisation</a>
+              <a href="#" className="hover:text-primary transition-colors duration-200">Politique de confidentialité</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
