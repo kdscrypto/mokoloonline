@@ -7,8 +7,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, Eye } from "lucide-react";
 import { ListingStatus } from "@/components/dashboard/ListingStatus";
+import { Link } from "react-router-dom";
 import type { Listing } from "@/integrations/supabase/types/listing";
 
 interface AdminListingsTableProps {
@@ -42,6 +43,15 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
             <TableCell>{new Date(listing.created_at).toLocaleDateString()}</TableCell>
             <TableCell>
               <div className="flex gap-2">
+                <Link to={`/listing/${listing.id}`} target="_blank">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-blue-50"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   size="icon"
