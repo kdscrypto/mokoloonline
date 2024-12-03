@@ -74,69 +74,96 @@ export default function Index() {
   });
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
       <div className="flex-grow">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col gap-8">
-            <header className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png" 
-                  alt="Mokolo Online Logo" 
-                  className="w-12 h-12"
-                />
-                <h1 className="text-3xl font-bold">Mokolo Online</h1>
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col gap-10">
+            <header className="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img 
+                    src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png" 
+                    alt="Mokolo Online Logo" 
+                    className="w-14 h-14 object-contain"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full animate-pulse" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                    Mokolo Online
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    La marketplace camerounaise
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-4">
                 {isAuthenticated ? (
                   <>
                     {isAdmin && (
                       <Link to="/admin">
-                        <Button variant="outline" className="rounded-full">
+                        <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
                           <Settings className="mr-2 h-4 w-4" /> Administration
                         </Button>
                       </Link>
                     )}
                     <Link to="/dashboard">
-                      <Button variant="outline" className="rounded-full">
+                      <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
                         <Settings className="mr-2 h-4 w-4" /> Tableau de bord
                       </Button>
                     </Link>
                   </>
                 ) : (
                   <Link to="/auth">
-                    <Button variant="outline" className="rounded-full">
+                    <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
                       <LogIn className="mr-2 h-4 w-4" /> Connexion
                     </Button>
                   </Link>
                 )}
                 <Link to="/create">
-                  <Button className="rounded-full">
+                  <Button className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg">
                     <Plus className="mr-2 h-4 w-4" /> Publier une annonce
                   </Button>
                 </Link>
               </div>
             </header>
             
-            <SearchBar onSearch={setSearchQuery} />
-            <CategoryFilter onCategoryChange={setSelectedCategory} />
+            <div className="space-y-8">
+              <div className="max-w-2xl mx-auto">
+                <SearchBar onSearch={setSearchQuery} />
+              </div>
+              <CategoryFilter onCategoryChange={setSelectedCategory} />
+            </div>
 
             {isLoading ? (
-              <div className="text-center py-8">Chargement des annonces...</div>
+              <div className="text-center py-12">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Chargement des annonces...</p>
+              </div>
             ) : (
               <>
-                <section>
-                  <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <section className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                      Nos dernières annonces
+                    </h2>
+                    <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {latestListings.map((listing) => (
                       <ListingCard key={listing.id} {...listing} />
                     ))}
                   </div>
                 </section>
                 
-                <section>
-                  <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <section className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                      Toutes les annonces
+                    </h2>
+                    <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {listings.map((listing) => (
                       <ListingCard key={listing.id} {...listing} />
                     ))}
