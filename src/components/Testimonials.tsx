@@ -3,19 +3,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const testimonials = [
   {
-    name: "Maman Bamiléké",
+    name: "Mama Esther Ngandjou",
     role: "Commerçante",
     content: "Grâce à MarketCam, je peux vendre mes produits même quand je ne suis pas au marché. C'est vraiment pratique !",
     avatar: "https://i.pravatar.cc/150?img=1"
   },
   {
-    name: "Papa Douala",
+    name: "Pierre Ewane",
     role: "Vendeur de voitures",
     content: "Je trouve facilement des clients sérieux pour mes véhicules. La plateforme est simple à utiliser même pour nous les moins jeunes.",
     avatar: "https://i.pravatar.cc/150?img=2"
   },
   {
-    name: "Tantine Yaoundé",
+    name: "Florence Atangana",
     role: "Cliente fidèle",
     content: "Je fais toutes mes courses ici maintenant. Les prix sont bons et on peut négocier directement avec les vendeurs.",
     avatar: "https://i.pravatar.cc/150?img=3"
