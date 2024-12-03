@@ -17,16 +17,20 @@ interface PerformanceMetricsData {
   resourceLoadTimes: ResourceTiming[];
 }
 
-const serializeMetrics = (metrics: PerformanceMetricsData): Json => {
-  return {
-    pageLoadTime: metrics.pageLoadTime,
-    timeToFirstByte: metrics.timeToFirstByte,
-    timeToFirstPaint: metrics.timeToFirstPaint,
-    timeToFirstContentfulPaint: metrics.timeToFirstContentfulPaint,
-    domContentLoaded: metrics.domContentLoaded,
-    resourceLoadTimes: metrics.resourceLoadTimes
-  };
-};
+const serializeResourceTiming = (timing: ResourceTiming): { [key: string]: Json } => ({
+  name: timing.name,
+  duration: timing.duration,
+  type: timing.type
+});
+
+const serializeMetrics = (metrics: PerformanceMetricsData): { [key: string]: Json } => ({
+  pageLoadTime: metrics.pageLoadTime,
+  timeToFirstByte: metrics.timeToFirstByte,
+  timeToFirstPaint: metrics.timeToFirstPaint,
+  timeToFirstContentfulPaint: metrics.timeToFirstContentfulPaint,
+  domContentLoaded: metrics.domContentLoaded,
+  resourceLoadTimes: metrics.resourceLoadTimes.map(serializeResourceTiming)
+});
 
 export const capturePerformanceMetrics = async (pageName: string): Promise<void> => {
   try {
