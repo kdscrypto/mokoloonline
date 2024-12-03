@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { ListingStatus as Status } from "@/integrations/supabase/types/listing";
+import { ListingStatus as Status } from "@/integrations/supabase/types/listing-status";
 
 const statusConfig = {
   pending: {

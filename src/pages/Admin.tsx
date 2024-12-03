@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import type { Listing } from "@/integrations/supabase/types/listing";
+import type { ListingStatus } from "@/integrations/supabase/types/listing-status";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Admin() {
@@ -66,7 +67,7 @@ export default function Admin() {
     }
   });
 
-  const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
+  const handleStatusUpdate = async (id: string, newStatus: ListingStatus) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {

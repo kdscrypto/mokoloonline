@@ -1,4 +1,4 @@
-export type ListingStatus = 'pending' | 'approved' | 'rejected';
+import { ListingStatus } from './listing-status';
 
 export interface Listing {
   id: string;
