@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="bg-gradient-to-b from-secondary/5 to-secondary/20 pt-16 pb-8">
       <div className="container mx-auto px-4">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-6">
@@ -31,6 +31,23 @@ export function Footer() {
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4" />
               <span>Yaoundé, Cameroun</span>
+            </div>
+            <div className="flex gap-4 pt-4">
+              {[
+                { icon: Facebook, label: "Facebook" },
+                { icon: Twitter, label: "Twitter" },
+                { icon: Instagram, label: "Instagram" },
+                { icon: Youtube, label: "Youtube" }
+              ].map(({ icon: Icon, label }) => (
+                <Button 
+                  key={label}
+                  variant="ghost" 
+                  size="icon"
+                  className="hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                >
+                  <Icon className="h-5 w-5" />
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -68,39 +85,6 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div className="space-y-6">
-            <h4 className="font-bold text-lg">Newsletter</h4>
-            <p className="text-muted-foreground">
-              Restez informé de nos dernières actualités et offres.
-            </p>
-            <div className="flex flex-col gap-3">
-              <input 
-                type="email" 
-                placeholder="Votre email" 
-                className="px-4 py-2 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200"
-              />
-              <Button className="w-full">S'abonner</Button>
-            </div>
-            <div className="flex gap-4 pt-4">
-              {[
-                { icon: Facebook, label: "Facebook" },
-                { icon: Twitter, label: "Twitter" },
-                { icon: Instagram, label: "Instagram" },
-                { icon: Youtube, label: "Youtube" }
-              ].map(({ icon: Icon, label }) => (
-                <Button 
-                  key={label}
-                  variant="ghost" 
-                  size="icon"
-                  className="hover:bg-primary/10 hover:text-primary transition-colors duration-200"
-                >
-                  <Icon className="h-5 w-5" />
-                </Button>
-              ))}
-            </div>
           </div>
         </div>
 
