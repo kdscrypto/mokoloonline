@@ -12,10 +12,14 @@ import { Plus, Pencil, Trash2, LogOut, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Tables } from "@/integrations/supabase/types";
+
+type Listing = Tables<"listings">;
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [listings, setListings] = useState<Listing[]>([]);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -27,11 +31,11 @@ export default function Dashboard() {
     });
   }, [navigate]);
 
-  const { data: listings = [], refetch } = useQuery({
-    queryKey: ['user-listings'],
-    queryFn: async () => {
+  // Initial fetch of listings
+  useEffect(() => {
+    const fetchListings = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
+      if (!user) return;
 
       const { data, error } = await supabase
         .from('listings')
@@ -39,10 +43,54 @@ export default function Dashboard() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data;
-    },
-  });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      setListings(data || []);
+    };
+
+    fetchListings();
+  }, []);
+
+  // Subscribe to real-time changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('listings_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'listings',
+        },
+        async (payload) => {
+          // Refresh the listings when changes occur
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          const { data, error } = await supabase
+            .from('listings')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
+
+          setListings(data || []);
+          toast.success("Les données ont été mises à jour en temps réel");
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleDelete = async (id: string) => {
     try {
@@ -54,7 +102,6 @@ export default function Dashboard() {
       if (error) throw error;
       
       toast.success("Annonce supprimée avec succès");
-      refetch();
     } catch (error: any) {
       toast.error(error.message || "Une erreur est survenue");
     }
