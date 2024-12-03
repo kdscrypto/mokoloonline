@@ -10,14 +10,7 @@ import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { ListingsPagination } from "@/components/ListingsPagination";
 import { 
   Carousel,
   CarouselContent,
@@ -80,20 +73,6 @@ export default function Index() {
   });
 
   const totalPages = Math.ceil((paginatedData?.total || 0) / ITEMS_PER_PAGE);
-  const canGoPrevious = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
-
-  const handlePreviousPage = () => {
-    if (canGoPrevious) {
-      setCurrentPage(p => p - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (canGoNext) {
-      setCurrentPage(p => p + 1);
-    }
-  };
 
   const { data: latestListings = [] } = useQuery({
     queryKey: ['latest-listings'],
@@ -226,34 +205,11 @@ export default function Index() {
                     ))}
                   </div>
 
-                  {totalPages > 1 && (
-                    <Pagination className="mt-8">
-                      <PaginationContent>
-                        {canGoPrevious && (
-                          <PaginationItem>
-                            <PaginationPrevious onClick={handlePreviousPage} />
-                          </PaginationItem>
-                        )}
-                        
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(page)}
-                              isActive={currentPage === page}
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        ))}
-                        
-                        {canGoNext && (
-                          <PaginationItem>
-                            <PaginationNext onClick={handleNextPage} />
-                          </PaginationItem>
-                        )}
-                      </PaginationContent>
-                    </Pagination>
-                  )}
+                  <ListingsPagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
                 </section>
               </>
             )}
