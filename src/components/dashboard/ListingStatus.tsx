@@ -13,6 +13,10 @@ const statusConfig = {
   rejected: {
     label: "Rejetée",
     variant: "destructive" as const
+  },
+  sold: {
+    label: "Vendue",
+    variant: "outline" as const
   }
 };
 

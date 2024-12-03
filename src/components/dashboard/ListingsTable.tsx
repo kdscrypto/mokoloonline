@@ -7,9 +7,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, CheckSquare } from "lucide-react";
 import { ListingStatus } from "./ListingStatus";
 import type { Listing } from "@/integrations/supabase/types/listing";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ListingsTableProps {
   listings: Listing[];
@@ -17,6 +19,23 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
+  const handleMarkAsSold = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .update({ status: 'sold', updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success("Annonce marquée comme vendue");
+      // L'annonce sera automatiquement supprimée après 24h
+    } catch (error: any) {
+      toast.error("Erreur lors du marquage de l'annonce comme vendue");
+      console.error("Error marking listing as sold:", error);
+    }
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -42,6 +61,16 @@ export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
                 <Button variant="outline" size="icon">
                   <Pencil className="h-4 w-4" />
                 </Button>
+                {listing.status === 'approved' && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleMarkAsSold(listing.id)}
+                    className="hover:bg-green-50"
+                  >
+                    <CheckSquare className="h-4 w-4 text-green-600" />
+                  </Button>
+                )}
                 <Button
                   variant="destructive"
                   size="icon"
