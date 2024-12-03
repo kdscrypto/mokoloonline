@@ -1,25 +1,59 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
+import { toast } from "sonner";
 
 export default function Auth() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLogin && !captchaValue) {
-      alert("Veuillez valider le captcha");
-      return;
+    setIsLoading(true);
+
+    try {
+      if (!isLogin) {
+        // Vérification pour l'inscription
+        if (!captchaValue) {
+          toast.error("Veuillez valider le captcha");
+          return;
+        }
+        if (password.length < 6) {
+          toast.error("Le mot de passe doit contenir au moins 6 caractères");
+          return;
+        }
+        if (!username) {
+          toast.error("Le nom d'utilisateur est requis");
+          return;
+        }
+        if (!email) {
+          toast.error("L'email est requis");
+          return;
+        }
+
+        // Simulation d'une requête d'inscription
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast.success("Inscription réussie !");
+        navigate("/");
+      } else {
+        // Simulation d'une requête de connexion
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast.success("Connexion réussie !");
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Une erreur est survenue");
+    } finally {
+      setIsLoading(false);
     }
-    // TODO: Implémenter la logique d'authentification
-    console.log("Form submitted:", { email, password, username, captchaValue });
   };
 
   return (
@@ -106,8 +140,12 @@ export default function Auth() {
             )}
 
             <div>
-              <Button type="submit" className="w-full">
-                {isLogin ? "Se connecter" : "S'inscrire"}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  "Chargement..."
+                ) : (
+                  isLogin ? "Se connecter" : "S'inscrire"
+                )}
               </Button>
             </div>
           </form>
