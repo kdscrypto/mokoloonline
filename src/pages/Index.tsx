@@ -19,7 +19,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { getFromCache, setInCache, generateCacheKey } from "@/utils/cache";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -52,20 +51,6 @@ export default function Index() {
   const { data: paginatedData, isLoading } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery, currentPage],
     queryFn: async () => {
-      // Generate cache key based on query parameters
-      const cacheKey = generateCacheKey('listings', {
-        category: selectedCategory,
-        search: searchQuery,
-        page: currentPage,
-      });
-
-      // Try to get data from cache first
-      const cachedData = await getFromCache<{ listings: any[], total: number }>({ key: cacheKey });
-      if (cachedData) {
-        return cachedData;
-      }
-
-      // If not in cache, fetch from Supabase
       let query = supabase
         .from('listings')
         .select('*', { count: 'exact' })
@@ -83,18 +68,8 @@ export default function Index() {
 
       const { data, count, error } = await query;
       if (error) throw error;
-
-      const result = { listings: data, total: count || 0 };
-
-      // Store in cache for 5 minutes
-      await setInCache(result, { 
-        key: cacheKey,
-        ttl: 300 // 5 minutes
-      });
-
-      return result;
+      return { listings: data, total: count || 0 };
     },
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
   const totalPages = Math.ceil((paginatedData?.total || 0) / ITEMS_PER_PAGE);
