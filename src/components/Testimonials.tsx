@@ -6,19 +6,19 @@ const testimonials = [
     name: "Mama Esther Ngandjou",
     role: "Commerçante",
     content: "Grâce à MarketCam, je peux vendre mes produits même quand je ne suis pas au marché. C'est vraiment pratique !",
-    avatar: "/lovable-uploads/testimonial-1.jpg"
+    avatar: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     name: "Pierre Ewane",
     role: "Vendeur de voitures",
     content: "Je trouve facilement des clients sérieux pour mes véhicules. La plateforme est simple à utiliser même pour nous les moins jeunes.",
-    avatar: "/lovable-uploads/testimonial-2.jpg"
+    avatar: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&q=80&w=200&h=200"
   },
   {
     name: "Florence Atangana",
     role: "Cliente fidèle",
     content: "Je fais toutes mes courses ici maintenant. Les prix sont bons et on peut négocier directement avec les vendeurs.",
-    avatar: "/lovable-uploads/testimonial-3.jpg"
+    avatar: "https://images.unsplash.com/photo-1523824921871-d6f1a15151f1?auto=format&fit=crop&q=80&w=200&h=200"
   }
 ];
 
