@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types/database";
 
@@ -8,7 +8,7 @@ interface ResourceTiming {
   type: string;
 }
 
-interface PerformanceMetricsData {
+interface PerformanceMetrics {
   pageLoadTime: number;
   timeToFirstByte: number;
   timeToFirstPaint: number;
@@ -23,7 +23,7 @@ const serializeResourceTiming = (timing: ResourceTiming): { [key: string]: Json 
   type: timing.type
 });
 
-const serializeMetrics = (metrics: PerformanceMetricsData): { [key: string]: Json } => ({
+const serializeMetrics = (metrics: PerformanceMetrics): { [key: string]: Json } => ({
   pageLoadTime: metrics.pageLoadTime,
   timeToFirstByte: metrics.timeToFirstByte,
   timeToFirstPaint: metrics.timeToFirstPaint,
@@ -41,7 +41,7 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
     const paintTiming = performance.getEntriesByType("paint");
     
     // Calculate key metrics
-    const metrics: PerformanceMetricsData = {
+    const metrics: PerformanceMetrics = {
       pageLoadTime: navigationTiming.loadEventEnd - navigationTiming.startTime,
       timeToFirstByte: navigationTiming.responseStart - navigationTiming.requestStart,
       timeToFirstPaint: (paintTiming.find(entry => entry.name === "first-paint")?.startTime || 0),
@@ -63,7 +63,7 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
         metrics: serializeMetrics(metrics),
         userAgent: navigator.userAgent,
         timestamp: new Date().toISOString()
-      } as Json
+      }
     });
 
     // Clear the performance entries to avoid memory leaks
