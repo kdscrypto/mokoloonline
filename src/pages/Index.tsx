@@ -19,10 +19,13 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function Index() {
+  usePerformanceMonitoring("home");
+
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);

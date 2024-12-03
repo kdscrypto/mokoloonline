@@ -15,8 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 
 export default function Dashboard() {
+  usePerformanceMonitoring("dashboard");
+
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
