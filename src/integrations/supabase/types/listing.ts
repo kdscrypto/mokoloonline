@@ -11,4 +11,7 @@ export interface Listing {
   user_id: string | null;
   created_at: string;
   updated_at: string;
+  category: string;
+  phone: string | null;
+  whatsapp: string | null;
 }
