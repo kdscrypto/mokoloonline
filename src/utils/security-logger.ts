@@ -30,12 +30,10 @@ export async function logSecurityEvent(event: LogEvent) {
     return await response.json();
   } catch (error) {
     console.error('Error logging security event:', error);
-    // Ne pas propager l'erreur pour ne pas perturber l'expérience utilisateur
     return null;
   }
 }
 
-// Exemple d'utilisation pour les tentatives de connexion échouées
 export async function logFailedLoginAttempt(userId: string, ipAddress: string) {
   return logSecurityEvent({
     event_type: 'auth',
@@ -49,7 +47,6 @@ export async function logFailedLoginAttempt(userId: string, ipAddress: string) {
   });
 }
 
-// Fonction utilitaire pour compter les tentatives de connexion échouées
 async function getFailedLoginAttempts(userId: string): Promise<number> {
   const { count } = await supabase
     .from('security_logs')
@@ -57,7 +54,7 @@ async function getFailedLoginAttempts(userId: string): Promise<number> {
     .eq('user_id', userId)
     .eq('event_type', 'auth')
     .eq('description', 'Failed login attempt')
-    .gte('created_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()); // 30 minutes
+    .gte('created_at', new Date(Date.now() - 30 * 60 * 1000).toISOString());
 
   return count || 0;
 }
