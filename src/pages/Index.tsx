@@ -10,6 +10,14 @@ import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
@@ -66,12 +74,14 @@ export default function Index() {
         .select('*')
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
-        .limit(2);
+        .limit(4);  // Increased to 4 for better carousel effect
 
       if (error) throw error;
       return data;
     },
   });
+
+  const autoplayPlugin = Autoplay({ delay: 4000, stopOnInteraction: false });
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
@@ -149,11 +159,24 @@ export default function Index() {
                     </h2>
                     <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {latestListings.map((listing) => (
-                      <ListingCard key={listing.id} {...listing} />
-                    ))}
-                  </div>
+                  <Carousel
+                    plugins={[autoplayPlugin]}
+                    className="w-full"
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                  >
+                    <CarouselContent>
+                      {latestListings.map((listing) => (
+                        <CarouselItem key={listing.id} className="md:basis-1/2">
+                          <ListingCard {...listing} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
                 </section>
                 
                 <section className="space-y-6">
