@@ -74,12 +74,12 @@ export default function CreateListing() {
         description: formData.description,
         image_url,
         user_id: user.id,
-        status: 'active'
+        status: 'pending'
       });
 
       if (error) throw error;
 
-      toast.success("Annonce créée avec succès !");
+      toast.success("Annonce créée avec succès ! Elle sera visible après validation.");
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Une erreur est survenue");

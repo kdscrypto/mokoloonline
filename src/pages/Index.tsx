@@ -21,7 +21,7 @@ export default function Index() {
       let query = supabase
         .from('listings')
         .select('*')
-        .eq('status', 'active')
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (selectedCategory !== "Tous") {
