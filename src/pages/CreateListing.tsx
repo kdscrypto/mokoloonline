@@ -1,24 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImagePlus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useEffect } from "react";
-
-const categories = [
-  "Véhicules",
-  "Immobilier",
-  "Électronique",
-  "Mode",
-  "Services",
-  "Autres",
-];
+import { ListingFormFields } from "@/components/listing/ListingFormFields";
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -29,11 +15,12 @@ export default function CreateListing() {
     location: "",
     description: "",
     category: "",
+    phone: "",
+    whatsapp: "",
     image: null as File | null,
   });
 
   useEffect(() => {
-    // Check if user is authenticated
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
@@ -90,7 +77,9 @@ export default function CreateListing() {
         image_url,
         user_id: user.id,
         status: 'pending',
-        category: formData.category || 'Autres' // Add default category if none selected
+        category: formData.category || 'Autres',
+        phone: formData.phone || null,
+        whatsapp: formData.whatsapp || null
       });
 
       if (error) throw error;
@@ -110,102 +99,12 @@ export default function CreateListing() {
         <form className="p-6 space-y-6" onSubmit={handleSubmit}>
           <h1 className="text-2xl font-bold">Publier une annonce</h1>
           
-          <div className="space-y-2">
-            <Label htmlFor="title">Titre de l'annonce</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Ex: iPhone 12 Pro Max - Excellent état"
-              value={formData.title}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="category">Catégorie</Label>
-            <Select
-              value={formData.category}
-              onValueChange={handleCategoryChange}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez une catégorie" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="price">Prix (FCFA)</Label>
-            <Input
-              id="price"
-              name="price"
-              type="number"
-              placeholder="Ex: 350000"
-              value={formData.price}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="location">Localisation</Label>
-            <Input
-              id="location"
-              name="location"
-              placeholder="Ex: Douala, Littoral"
-              value={formData.location}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Décrivez votre article en détail..."
-              className="h-32"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Photos</Label>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                id="image-upload"
-              />
-              <label
-                htmlFor="image-upload"
-                className="cursor-pointer flex flex-col items-center"
-              >
-                <ImagePlus className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-500">
-                  Cliquez ou glissez-déposez vos photos ici
-                </p>
-                {formData.image && (
-                  <p className="mt-2 text-sm text-green-500">
-                    Image sélectionnée: {formData.image.name}
-                  </p>
-                )}
-              </label>
-            </div>
-          </div>
+          <ListingFormFields
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleCategoryChange={handleCategoryChange}
+            handleImageChange={handleImageChange}
+          />
           
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Publication en cours..." : "Publier l'annonce"}

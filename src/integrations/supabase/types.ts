@@ -32,11 +32,13 @@ export type Database = {
           id: string
           image_url: string | null
           location: string
+          phone: string | null
           price: number
           status: string | null
           title: string
           updated_at: string
           user_id: string | null
+          whatsapp: string | null
         }
         Insert: {
           category: string
@@ -45,11 +47,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           location: string
+          phone?: string | null
           price: number
           status?: string | null
           title: string
           updated_at?: string
           user_id?: string | null
+          whatsapp?: string | null
         }
         Update: {
           category?: string
@@ -58,11 +62,13 @@ export type Database = {
           id?: string
           image_url?: string | null
           location?: string
+          phone?: string | null
           price?: number
           status?: string | null
           title?: string
           updated_at?: string
           user_id?: string | null
+          whatsapp?: string | null
         }
         Relationships: [
           {
