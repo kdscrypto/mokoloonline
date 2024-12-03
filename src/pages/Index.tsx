@@ -11,6 +11,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { 
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -19,11 +27,14 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
+const ITEMS_PER_PAGE = 12;
+
 export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -43,14 +54,16 @@ export default function Index() {
     checkAdminStatus();
   }, []);
 
-  const { data: listings = [], isLoading } = useQuery({
-    queryKey: ['listings', selectedCategory, searchQuery],
+  // Query for paginated listings
+  const { data: paginatedData, isLoading } = useQuery({
+    queryKey: ['listings', selectedCategory, searchQuery, currentPage],
     queryFn: async () => {
       let query = supabase
         .from('listings')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('status', 'approved')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
 
       if (selectedCategory !== "Tous") {
         query = query.eq('category', selectedCategory);
@@ -60,12 +73,15 @@ export default function Index() {
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
-      const { data, error } = await query;
+      const { data, count, error } = await query;
       if (error) throw error;
-      return data;
+      return { listings: data, total: count || 0 };
     },
   });
 
+  const totalPages = Math.ceil((paginatedData?.total || 0) / ITEMS_PER_PAGE);
+
+  // Query for latest listings carousel
   const { data: latestListings = [] } = useQuery({
     queryKey: ['latest-listings'],
     queryFn: async () => {
@@ -74,7 +90,7 @@ export default function Index() {
         .select('*')
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
-        .limit(4);  // Increased to 4 for better carousel effect
+        .limit(4);
 
       if (error) throw error;
       return data;
@@ -82,6 +98,11 @@ export default function Index() {
   });
 
   const autoplayPlugin = Autoplay({ delay: 4000, stopOnInteraction: false });
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
@@ -187,10 +208,41 @@ export default function Index() {
                     <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {listings.map((listing) => (
+                    {paginatedData?.listings.map((listing) => (
                       <ListingCard key={listing.id} {...listing} />
                     ))}
                   </div>
+
+                  {totalPages > 1 && (
+                    <Pagination className="mt-8">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
                 </section>
               </>
             )}
