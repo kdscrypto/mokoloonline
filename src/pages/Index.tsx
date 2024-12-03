@@ -37,6 +37,7 @@ export default function Index() {
     checkAdminStatus();
   }, []);
 
+  // Requête pour toutes les annonces
   const { data: listings = [], isLoading } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery],
     queryFn: async () => {
@@ -60,7 +61,21 @@ export default function Index() {
     },
   });
 
-  const recentListings = listings.slice(0, 2);
+  // Requête séparée pour les dernières annonces
+  const { data: latestListings = [] } = useQuery({
+    queryKey: ['latest-listings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(2);
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -118,7 +133,7 @@ export default function Index() {
                 <section>
                   <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {recentListings.map((listing) => (
+                    {latestListings.map((listing) => (
                       <ListingCard key={listing.id} {...listing} />
                     ))}
                   </div>
