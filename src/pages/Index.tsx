@@ -33,7 +33,7 @@ const listings = [
   },
 ];
 
-const recentListings = listings.slice(0, 2); // Prendre les 2 dernières annonces
+const recentListings = listings.slice(0, 2);
 
 export default function Index() {
   return (
@@ -42,7 +42,14 @@ export default function Index() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col gap-8">
             <header className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">Mokolo Online</h1>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png" 
+                  alt="Mokolo Online Logo" 
+                  className="w-12 h-12"
+                />
+                <h1 className="text-3xl font-bold">Mokolo Online</h1>
+              </div>
               <div className="flex items-center gap-4">
                 <Link to="/auth">
                   <Button variant="outline" className="rounded-full">
