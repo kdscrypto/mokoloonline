@@ -3,19 +3,16 @@ interface CacheOptions {
   key: string;
 }
 
+import { supabase } from '@/integrations/supabase/client';
+
 export async function getFromCache<T>(options: CacheOptions): Promise<T | null> {
   try {
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cache`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ key: options.key }),
+    const { data, error } = await supabase.functions.invoke('cache', {
+      body: { key: options.key }
     });
 
-    const data = await response.json();
-    return data.data;
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error('Cache error:', error);
     return null;
@@ -24,18 +21,15 @@ export async function getFromCache<T>(options: CacheOptions): Promise<T | null> 
 
 export async function setInCache<T>(data: T, options: CacheOptions): Promise<void> {
   try {
-    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cache`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({
+    const { error } = await supabase.functions.invoke('cache', {
+      body: {
         key: options.key,
         data,
         ttl: options.ttl,
-      }),
+      }
     });
+
+    if (error) throw error;
   } catch (error) {
     console.error('Cache error:', error);
   }

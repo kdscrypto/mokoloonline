@@ -1,8 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-import { Redis } from 'ioredis';
-import { corsHeaders } from '../_shared/cors';
+import { Redis } from 'https://deno.land/x/redis@v0.29.0/mod.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
-const redis = new Redis(Deno.env.get('REDIS_URL') || '');
+const redis = await new Redis({
+  hostname: Deno.env.get('REDIS_HOST') || 'localhost',
+  port: parseInt(Deno.env.get('REDIS_PORT') || '6379'),
+  password: Deno.env.get('REDIS_PASSWORD'),
+});
+
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
