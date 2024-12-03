@@ -63,19 +63,24 @@ export default function Admin() {
   };
 
   const handleStatusUpdate = async (id: string, status: Listing['status']) => {
-    const { error } = await supabase
-      .from("listings")
-      .update({ status })
-      .eq("id", id);
+    try {
+      const { error } = await supabase
+        .from("listings")
+        .update({ status })
+        .eq("id", id);
 
-    if (error) {
-      console.error("Error updating status:", error);
-      toast.error("Erreur lors de la mise à jour du statut");
-      return;
+      if (error) {
+        console.error("Error updating status:", error);
+        toast.error("Erreur lors de la mise à jour du statut");
+        return;
+      }
+
+      toast.success(`Annonce ${status === 'approved' ? 'approuvée' : 'rejetée'}`);
+      fetchListings();
+    } catch (error) {
+      console.error("Error in handleStatusUpdate:", error);
+      toast.error("Une erreur est survenue lors de la mise à jour");
     }
-
-    toast.success(`Annonce ${status === 'approved' ? 'approuvée' : 'rejetée'}`);
-    fetchListings();
   };
 
   if (isLoading) {
