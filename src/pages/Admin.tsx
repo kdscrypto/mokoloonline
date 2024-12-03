@@ -62,12 +62,16 @@ export default function Admin() {
     setIsLoading(false);
   };
 
-  const handleStatusUpdate = async (id: string, status: Listing['status']) => {
+  const handleStatusUpdate = async (id: string, status: 'pending' | 'approved' | 'rejected') => {
     try {
-      const { error } = await supabase
+      console.log('Updating status:', { id, status }); // Debug log
+      
+      const { data, error } = await supabase
         .from("listings")
         .update({ status })
-        .eq("id", id);
+        .eq("id", id)
+        .select()
+        .single();
 
       if (error) {
         console.error("Error updating status:", error);
@@ -75,8 +79,10 @@ export default function Admin() {
         return;
       }
 
+      console.log('Update response:', data); // Debug log
+      
       toast.success(`Annonce ${status === 'approved' ? 'approuvée' : 'rejetée'}`);
-      fetchListings();
+      await fetchListings();
     } catch (error) {
       console.error("Error in handleStatusUpdate:", error);
       toast.error("Une erreur est survenue lors de la mise à jour");
