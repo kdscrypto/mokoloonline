@@ -4,6 +4,9 @@ import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { Plus, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { StatsBar } from "@/components/StatsBar";
+import { Testimonials } from "@/components/Testimonials";
+import { Footer } from "@/components/Footer";
 
 // Données de test
 const listings = [
@@ -34,47 +37,55 @@ const recentListings = listings.slice(0, 2); // Prendre les 2 dernières annonce
 
 export default function Index() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col gap-8">
-        <header className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">MarketCam</h1>
-          <div className="flex items-center gap-4">
-            <Link to="/auth">
-              <Button variant="outline" className="rounded-full">
-                <LogIn className="mr-2 h-4 w-4" /> Connexion
-              </Button>
-            </Link>
-            <Link to="/create">
-              <Button className="rounded-full">
-                <Plus className="mr-2 h-4 w-4" /> Publier une annonce
-              </Button>
-            </Link>
-          </div>
-        </header>
-        
-        <SearchBar />
-        <CategoryFilter />
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col gap-8">
+            <header className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">MarketCam</h1>
+              <div className="flex items-center gap-4">
+                <Link to="/auth">
+                  <Button variant="outline" className="rounded-full">
+                    <LogIn className="mr-2 h-4 w-4" /> Connexion
+                  </Button>
+                </Link>
+                <Link to="/create">
+                  <Button className="rounded-full">
+                    <Plus className="mr-2 h-4 w-4" /> Publier une annonce
+                  </Button>
+                </Link>
+              </div>
+            </header>
+            
+            <SearchBar />
+            <CategoryFilter />
 
-        {/* Section des dernières annonces */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {recentListings.map((listing) => (
-              <ListingCard key={listing.id} {...listing} />
-            ))}
+            {/* Section des dernières annonces */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Nos dernières annonces</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                {recentListings.map((listing) => (
+                  <ListingCard key={listing.id} {...listing} />
+                ))}
+              </div>
+            </section>
+            
+            {/* Section principale des annonces */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {listings.map((listing) => (
+                  <ListingCard key={listing.id} {...listing} />
+                ))}
+              </div>
+            </section>
           </div>
-        </section>
-        
-        {/* Section principale des annonces */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Toutes les annonces</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} {...listing} />
-            ))}
-          </div>
-        </section>
+        </div>
+
+        <StatsBar />
+        <Testimonials />
       </div>
+      <Footer />
     </div>
   );
 }
