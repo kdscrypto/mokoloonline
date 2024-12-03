@@ -1,5 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useResizeObserver } from "@/hooks/use-resize-observer";
+import { useRef, useCallback } from "react";
 
 interface ListingCardProps {
   id: string;
@@ -10,9 +12,30 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ id, title, price, image_url, location }: ListingCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
+    // Handle resize if needed
+  }, []);
+
+  const observerRef = useResizeObserver(handleResize);
+
+  // Attach observer when component mounts
+  useEffect(() => {
+    if (cardRef.current && observerRef.current) {
+      observerRef.current.observe(cardRef.current);
+    }
+    
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
   return (
     <Link to={`/listing/${id}`}>
-      <Card className="listing-card">
+      <Card className="listing-card" ref={cardRef}>
         <CardContent className="p-0">
           <img
             src={image_url || '/placeholder.svg'}
