@@ -52,28 +52,65 @@ export default function Admin() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching listings:", error);
+        throw error;
+      }
+
       return data as Listing[];
     },
     enabled: isAdmin,
     retry: 1,
+    onError: (error) => {
+      console.error("Query error:", error);
+      toast.error("Erreur lors du chargement des annonces");
+    }
   });
 
   const handleStatusUpdate = async (id: string, newStatus: 'approved' | 'rejected') => {
     try {
-      const { error } = await supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Session expirée");
+        navigate("/auth");
+        return;
+      }
+
+      // First check if the listing exists and get its current status
+      const { data: listing, error: fetchError } = await supabase
         .from("listings")
-        .update({ status: newStatus })
+        .select("status")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching listing:", fetchError);
+        toast.error("Erreur lors de la vérification de l'annonce");
+        return;
+      }
+
+      if (!listing) {
+        toast.error("Annonce introuvable");
+        return;
+      }
+
+      // Proceed with status update
+      const { error: updateError } = await supabase
+        .from("listings")
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq("id", id);
 
-      if (error) {
-        console.error("Status update error:", error);
+      if (updateError) {
+        console.error("Status update error:", updateError);
         toast.error("Erreur lors de la mise à jour du statut");
         return;
       }
 
       toast.success(newStatus === 'approved' ? "Annonce approuvée" : "Annonce rejetée");
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Error in handleStatusUpdate:", error);
       toast.error("Une erreur est survenue lors de la mise à jour");
