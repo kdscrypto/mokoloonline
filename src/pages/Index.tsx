@@ -2,18 +2,40 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { ListingCard } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn } from "lucide-react";
+import { Plus, LogIn, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si l'utilisateur est connecté et admin
+    const checkAdminStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+        // Vérifier si l'utilisateur est admin
+        const { data: adminData } = await supabase
+          .from("admin_users")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        
+        setIsAdmin(!!adminData);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
 
   const { data: listings = [], isLoading } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery],
@@ -21,7 +43,7 @@ export default function Index() {
       let query = supabase
         .from('listings')
         .select('*')
-        .eq('status', 'approved')  // Ne sélectionner que les annonces approuvées
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (selectedCategory !== "Tous") {
@@ -55,11 +77,28 @@ export default function Index() {
                 <h1 className="text-3xl font-bold">Mokolo Online</h1>
               </div>
               <div className="flex items-center gap-4">
-                <Link to="/auth">
-                  <Button variant="outline" className="rounded-full">
-                    <LogIn className="mr-2 h-4 w-4" /> Connexion
-                  </Button>
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    {isAdmin && (
+                      <Link to="/admin">
+                        <Button variant="outline" className="rounded-full">
+                          <Settings className="mr-2 h-4 w-4" /> Administration
+                        </Button>
+                      </Link>
+                    )}
+                    <Link to="/dashboard">
+                      <Button variant="outline" className="rounded-full">
+                        <Settings className="mr-2 h-4 w-4" /> Tableau de bord
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Link to="/auth">
+                    <Button variant="outline" className="rounded-full">
+                      <LogIn className="mr-2 h-4 w-4" /> Connexion
+                    </Button>
+                  </Link>
+                )}
                 <Link to="/create">
                   <Button className="rounded-full">
                     <Plus className="mr-2 h-4 w-4" /> Publier une annonce
