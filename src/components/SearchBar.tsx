@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
+import DOMPurify from 'dompurify';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -10,9 +11,11 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    onSearch(value);
+    const rawValue = e.target.value;
+    // Sanitize input to prevent XSS
+    const sanitizedValue = DOMPurify.sanitize(rawValue).trim();
+    setQuery(sanitizedValue);
+    onSearch(sanitizedValue);
   };
 
   return (
@@ -23,6 +26,8 @@ export function SearchBar({ onSearch }: SearchBarProps) {
         placeholder="Rechercher une annonce..."
         value={query}
         onChange={handleSearch}
+        maxLength={100}
+        aria-label="Rechercher une annonce"
       />
     </div>
   );
