@@ -38,7 +38,7 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
             <TableCell>{listing.price.toLocaleString()} FCFA</TableCell>
             <TableCell>{listing.location}</TableCell>
             <TableCell>
-              <ListingStatus status={listing.status} />
+              <ListingStatus status={listing.status || 'pending'} />
             </TableCell>
             <TableCell>{new Date(listing.created_at).toLocaleDateString()}</TableCell>
             <TableCell>

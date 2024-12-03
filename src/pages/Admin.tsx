@@ -69,6 +69,7 @@ export default function Admin() {
       .eq("id", id);
 
     if (error) {
+      console.error("Error updating status:", error);
       toast.error("Erreur lors de la mise à jour du statut");
       return;
     }
