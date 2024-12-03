@@ -7,6 +7,7 @@ const categories = [
   "Électronique",
   "Mode",
   "Services",
+  "Emploi",
 ];
 
 interface CategoryFilterProps {
