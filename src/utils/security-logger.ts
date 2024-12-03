@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { SecurityLog } from "@/integrations/supabase/types";
+import type { SecurityLog } from "@/integrations/supabase/types/security-log";
 
 interface LogEvent {
   event_type: SecurityLog['event_type'];
