@@ -80,8 +80,21 @@ export default function Index() {
   });
 
   const totalPages = Math.ceil((paginatedData?.total || 0) / ITEMS_PER_PAGE);
+  const canGoPrevious = currentPage > 1;
+  const canGoNext = currentPage < totalPages;
 
-  // Query for latest listings carousel
+  const handlePreviousPage = () => {
+    if (canGoPrevious) {
+      setCurrentPage(p => p - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (canGoNext) {
+      setCurrentPage(p => p + 1);
+    }
+  };
+
   const { data: latestListings = [] } = useQuery({
     queryKey: ['latest-listings'],
     queryFn: async () => {
@@ -216,12 +229,11 @@ export default function Index() {
                   {totalPages > 1 && (
                     <Pagination className="mt-8">
                       <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            disabled={currentPage === 1}
-                          />
-                        </PaginationItem>
+                        {canGoPrevious && (
+                          <PaginationItem>
+                            <PaginationPrevious onClick={handlePreviousPage} />
+                          </PaginationItem>
+                        )}
                         
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                           <PaginationItem key={page}>
@@ -234,12 +246,11 @@ export default function Index() {
                           </PaginationItem>
                         ))}
                         
-                        <PaginationItem>
-                          <PaginationNext
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            disabled={currentPage === totalPages}
-                          />
-                        </PaginationItem>
+                        {canGoNext && (
+                          <PaginationItem>
+                            <PaginationNext onClick={handleNextPage} />
+                          </PaginationItem>
+                        )}
                       </PaginationContent>
                     </Pagination>
                   )}
