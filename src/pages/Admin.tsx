@@ -44,11 +44,17 @@ export default function Admin() {
       return;
     }
 
-    setListings(data || []);
+    // Ensure the status is properly typed
+    const typedListings = (data || []).map(listing => ({
+      ...listing,
+      status: (listing.status || 'pending') as Listing['status']
+    }));
+
+    setListings(typedListings);
     setIsLoading(false);
   };
 
-  const handleStatusUpdate = async (id: string, status: 'approved' | 'rejected') => {
+  const handleStatusUpdate = async (id: string, status: Listing['status']) => {
     const { error } = await supabase
       .from("listings")
       .update({ status })
