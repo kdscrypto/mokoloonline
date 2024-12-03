@@ -76,7 +76,7 @@ export default function Index() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
       <div className="flex-grow">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col gap-10">
             <header className="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-4">
