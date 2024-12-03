@@ -6,19 +6,19 @@ const testimonials = [
     name: "Mama Esther Ngandjou",
     role: "Commerçante",
     content: "Grâce à MarketCam, je peux vendre mes produits même quand je ne suis pas au marché. C'est vraiment pratique !",
-    avatar: "https://i.pravatar.cc/150?img=1"
+    avatar: "/lovable-uploads/testimonial-1.jpg"
   },
   {
     name: "Pierre Ewane",
     role: "Vendeur de voitures",
     content: "Je trouve facilement des clients sérieux pour mes véhicules. La plateforme est simple à utiliser même pour nous les moins jeunes.",
-    avatar: "https://i.pravatar.cc/150?img=2"
+    avatar: "/lovable-uploads/testimonial-2.jpg"
   },
   {
     name: "Florence Atangana",
     role: "Cliente fidèle",
     content: "Je fais toutes mes courses ici maintenant. Les prix sont bons et on peut négocier directement avec les vendeurs.",
-    avatar: "https://i.pravatar.cc/150?img=3"
+    avatar: "/lovable-uploads/testimonial-3.jpg"
   }
 ];
 
