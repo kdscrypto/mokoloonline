@@ -43,7 +43,7 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
             <TableCell>{new Date(listing.created_at).toLocaleDateString()}</TableCell>
             <TableCell>
               <div className="flex gap-2">
-                <Link to={`/listing/${listing.id}`} target="_blank">
+                <Link to={`/listing/${listing.id}`}>
                   <Button
                     variant="outline"
                     size="icon"
