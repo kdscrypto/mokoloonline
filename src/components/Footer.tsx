@@ -66,7 +66,7 @@ export function Footer() {
             <ul className="space-y-3">
               {[
                 { label: "À propos", to: "/about" },
-                { label: "Comment ça marche", to: "#" },
+                { label: "Comment ça marche", to: "/how-it-works" },
                 { label: "Sécurité", to: "#" },
                 { label: "Contact", to: "#" }
               ].map((item) => (
