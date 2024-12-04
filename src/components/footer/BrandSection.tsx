@@ -31,7 +31,7 @@ function ContactInfo() {
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
         <Phone className="h-4 w-4" />
-        <span>+237 6XX XXX XXX</span>
+        <span>+237 670 381 624</span>
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
         <MapPin className="h-4 w-4" />
