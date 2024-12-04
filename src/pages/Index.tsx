@@ -21,6 +21,8 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 
+// Note: This file is quite long (229 lines). Consider asking me to refactor it into smaller components after fixing the current issue.
+
 const ITEMS_PER_PAGE = 12;
 
 export default function Index() {
@@ -149,6 +151,11 @@ export default function Index() {
                 <Link to="/create">
                   <Button className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg">
                     <Plus className="mr-2 h-4 w-4" /> Publier une annonce
+                  </Button>
+                </Link>
+                <Link to="/about" className="ml-4">
+                  <Button variant="ghost" className="rounded-full">
+                    À propos
                   </Button>
                 </Link>
               </div>
