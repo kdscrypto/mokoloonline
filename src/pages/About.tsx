@@ -59,8 +59,8 @@ export default function About() {
               </div>
               <div className="relative">
                 <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80" 
-                  alt="Entrepreneur camerounais" 
+                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80" 
+                  alt="Équipe Mokolo Online" 
                   className="rounded-lg shadow-xl"
                 />
                 <div className="absolute -bottom-6 -right-6 h-24 w-24 bg-primary rounded-full flex items-center justify-center text-white font-bold">
