@@ -67,7 +67,7 @@ export function Footer() {
               {[
                 { label: "À propos", to: "/about" },
                 { label: "Comment ça marche", to: "/how-it-works" },
-                { label: "Sécurité", to: "#" },
+                { label: "Sécurité", to: "/security" },
                 { label: "Contact", to: "#" }
               ].map((item) => (
                 <li key={item.label}>
