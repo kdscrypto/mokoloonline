@@ -1,5 +1,6 @@
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -63,15 +64,20 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-6">Liens rapides</h4>
             <ul className="space-y-3">
-              {["À propos", "Comment ça marche", "Sécurité", "Contact"].map((item) => (
-                <li key={item}>
-                  <a 
-                    href="#" 
+              {[
+                { label: "À propos", to: "/about" },
+                { label: "Comment ça marche", to: "#" },
+                { label: "Sécurité", to: "#" },
+                { label: "Contact", to: "#" }
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link 
+                    to={item.to}
                     className="text-muted-foreground hover:text-primary transition-colors duration-200 flex items-center gap-2"
                   >
                     <span className="h-1 w-1 rounded-full bg-primary/60"></span>
-                    {item}
-                  </a>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
