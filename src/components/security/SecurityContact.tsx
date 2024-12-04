@@ -12,7 +12,10 @@ export function SecurityContact() {
           vous aider en cas de problème.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button className="flex items-center gap-2">
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => window.location.href = 'mailto:237mokoloonline@proton.me'}
+          >
             <Mail className="h-4 w-4" />
             Nous contacter
           </Button>
