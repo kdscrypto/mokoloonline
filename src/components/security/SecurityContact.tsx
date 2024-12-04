@@ -18,7 +18,7 @@ export function SecurityContact() {
           </Button>
           <Button variant="outline" className="flex items-center gap-2">
             <Phone className="h-4 w-4" />
-            +237 6XX XXX XXX
+            +237 670 381 624
           </Button>
         </div>
       </div>
