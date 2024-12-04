@@ -27,7 +27,7 @@ function ContactInfo() {
     <>
       <div className="flex items-center gap-2 text-muted-foreground">
         <Mail className="h-4 w-4" />
-        <span>contact@mokolo-online.com</span>
+        <span>237mokoloonline@proton.me</span>
       </div>
       <div className="flex items-center gap-2 text-muted-foreground">
         <Phone className="h-4 w-4" />
