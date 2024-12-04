@@ -9,6 +9,7 @@ import CreateListing from "./pages/CreateListing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/about" element={<About />} />
           </Routes>
           <Toaster />
           <Sonner />
