@@ -89,6 +89,7 @@ export default function Auth() {
               },
             }}
             theme="light"
+            onError={handleError}
           />
         </Card>
       </div>
