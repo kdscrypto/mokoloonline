@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
+import { ContactDialog } from "../contact/ContactDialog";
 
 export function QuickLinks() {
   const links = [
     { label: "À propos", to: "/about" },
     { label: "Comment ça marche", to: "/how-it-works" },
-    { label: "Sécurité", to: "/security" },
-    { label: "Contact", to: "#" }
+    { label: "Sécurité", to: "/security" }
   ];
 
   return (
@@ -23,6 +23,9 @@ export function QuickLinks() {
             </Link>
           </li>
         ))}
+        <li>
+          <ContactDialog />
+        </li>
       </ul>
     </div>
   );
