@@ -68,6 +68,8 @@ export default function Auth() {
                   email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Votre mot de passe',
                   link_text: 'Déjà inscrit ? Connectez-vous',
+                  phone_label: 'Numéro de téléphone',
+                  phone_input_placeholder: 'Votre numéro de téléphone',
                 },
                 sign_up: {
                   email_label: 'Email ou téléphone',
@@ -76,6 +78,8 @@ export default function Auth() {
                   email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Choisissez un mot de passe',
                   link_text: 'Pas encore de compte ? Inscrivez-vous',
+                  phone_label: 'Numéro de téléphone',
+                  phone_input_placeholder: 'Votre numéro de téléphone',
                 },
                 forgotten_password: {
                   button_label: 'Envoyer les instructions',
@@ -84,6 +88,8 @@ export default function Auth() {
               },
             }}
             theme="light"
+            view="sign_in"
+            showLinks={true}
           />
         </Card>
       </div>
