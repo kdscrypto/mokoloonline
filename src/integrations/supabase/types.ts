@@ -31,6 +31,7 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          is_vip: boolean | null
           location: string
           phone: string | null
           price: number
@@ -38,6 +39,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string | null
+          vip_until: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -46,6 +48,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_vip?: boolean | null
           location: string
           phone?: string | null
           price: number
@@ -53,6 +56,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id?: string | null
+          vip_until?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -61,6 +65,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_vip?: boolean | null
           location?: string
           phone?: string | null
           price?: number
@@ -68,6 +73,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string | null
+          vip_until?: string | null
           whatsapp?: string | null
         }
         Relationships: [
