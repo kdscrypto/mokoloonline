@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { AuthError } from "@supabase/supabase-js";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -29,14 +28,6 @@ export default function Auth() {
       subscription.unsubscribe();
     };
   }, [navigate]);
-
-  const handleError = (error: AuthError) => {
-    if (error.message.includes("Invalid login credentials")) {
-      toast.error("Email/téléphone ou mot de passe incorrect");
-    } else {
-      toast.error("Une erreur est survenue lors de la connexion");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -76,7 +67,7 @@ export default function Auth() {
                   button_label: 'Se connecter',
                   email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Votre mot de passe',
-                  link_text: 'Déjà inscrit ? Connectez-vous'
+                  link_text: 'Déjà inscrit ? Connectez-vous',
                 },
                 sign_up: {
                   email_label: 'Email ou téléphone',
@@ -84,12 +75,15 @@ export default function Auth() {
                   button_label: "S'inscrire",
                   email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Choisissez un mot de passe',
-                  link_text: 'Pas encore de compte ? Inscrivez-vous'
+                  link_text: 'Pas encore de compte ? Inscrivez-vous',
+                },
+                forgotten_password: {
+                  button_label: 'Envoyer les instructions',
+                  link_text: 'Mot de passe oublié ?',
                 },
               },
             }}
             theme="light"
-            onError={handleError}
           />
         </Card>
       </div>
