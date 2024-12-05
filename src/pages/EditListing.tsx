@@ -60,12 +60,13 @@ export default function EditListing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData) return;
+    if (!formData || !id) return;
     
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      // Mise à jour des données de l'annonce
+      const { error: updateError } = await supabase
         .from('listings')
         .update({
           title: formData.title,
@@ -75,10 +76,36 @@ export default function EditListing() {
           category: formData.category,
           phone: formData.phone,
           whatsapp: formData.whatsapp,
+          is_vip: formData.isVip,
+          vip_until: formData.isVip ? new Date(Date.now() + formData.vipDuration * 24 * 60 * 60 * 1000) : null,
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Si une nouvelle image est sélectionnée, la télécharger
+      if (formData.image) {
+        const fileExt = formData.image.name.split('.').pop();
+        const filePath = `${id}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('listings')
+          .upload(filePath, formData.image, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        // Mettre à jour l'URL de l'image dans la base de données
+        const { data: { publicUrl } } = supabase.storage
+          .from('listings')
+          .getPublicUrl(filePath);
+
+        const { error: imageUpdateError } = await supabase
+          .from('listings')
+          .update({ image_url: publicUrl })
+          .eq('id', id);
+
+        if (imageUpdateError) throw imageUpdateError;
+      }
 
       toast.success("Annonce mise à jour avec succès");
       navigate("/dashboard");
@@ -147,7 +174,7 @@ export default function EditListing() {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold mb-6">Modifier l'annonce</h1>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             <ListingFormFields
               formData={formData}
               handleInputChange={handleInputChange}
@@ -155,7 +182,7 @@ export default function EditListing() {
               handleImageChange={handleImageChange}
               handleVipChange={handleVipChange}
             />
-            <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Mise à jour en cours..." : "Mettre à jour l'annonce"}
             </Button>
           </form>
