@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Facebook, Twitter, MessageCircle, Youtube } from "lucide-react";
 import { Button } from "../ui/button";
 
 export function SocialLinks() {
@@ -13,7 +13,11 @@ export function SocialLinks() {
       label: "Twitter",
       href: "https://x.com/BitcoinCamer?t=LpaC7RAVrGJ0cnMSAv31EQ&s=35"
     },
-    { icon: Instagram, label: "Instagram" },
+    { 
+      icon: MessageCircle, 
+      label: "Telegram",
+      href: "https://t.me/mokoloonline"
+    },
     { icon: Youtube, label: "Youtube" }
   ];
 
