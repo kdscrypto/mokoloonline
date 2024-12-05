@@ -1,19 +1,10 @@
-import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImagePlus } from "lucide-react";
-import { toast } from "sonner";
-
-const categories = [
-  "Véhicules",
-  "Immobilier",
-  "Électronique",
-  "Mode",
-  "Services",
-  "Emploi",
-  "Autres",
-];
+import { BasicInfoFields } from "./BasicInfoFields";
+import { ContactFields } from "./ContactFields";
+import { ImageUploadField } from "./ImageUploadField";
+import { ListingTypeSelector } from "./ListingTypeSelector";
 
 // Add validation rules
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
@@ -29,10 +20,12 @@ interface ListingFormFieldsProps {
     phone: string;
     whatsapp: string;
     image: File | null;
+    isVip: boolean;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleCategoryChange: (value: string) => void;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleVipChange: (value: boolean) => void;
 }
 
 export function ListingFormFields({
@@ -40,6 +33,7 @@ export function ListingFormFields({
   handleInputChange,
   handleCategoryChange,
   handleImageChange,
+  handleVipChange,
 }: ListingFormFieldsProps) {
   // Validate file upload
   const validateFileUpload = (file: File): string | null => {
@@ -95,94 +89,25 @@ export function ListingFormFields({
 
   return (
     <>
-      <div className="space-y-2">
-        <Label htmlFor="title">Titre de l'annonce</Label>
-        <Input
-          id="title"
-          name="title"
-          placeholder="Ex: iPhone 12 Pro Max - Excellent état"
-          value={formData.title}
-          onChange={handleEnhancedInputChange}
-          required
-          minLength={3}
-          maxLength={100}
-        />
-      </div>
+      <BasicInfoFields
+        title={formData.title}
+        category={formData.category}
+        price={formData.price}
+        location={formData.location}
+        handleInputChange={handleEnhancedInputChange}
+        handleCategoryChange={handleCategoryChange}
+      />
       
-      <div className="space-y-2">
-        <Label htmlFor="category">Catégorie</Label>
-        <Select
-          value={formData.category}
-          onValueChange={handleCategoryChange}
-          required
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionnez une catégorie" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="price">Prix (FCFA)</Label>
-        <Input
-          id="price"
-          name="price"
-          type="number"
-          placeholder="Ex: 350000"
-          value={formData.price}
-          onChange={handleEnhancedInputChange}
-          required
-          min="0"
-          max="999999999"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="location">Localisation</Label>
-        <Input
-          id="location"
-          name="location"
-          placeholder="Ex: Douala, Littoral"
-          value={formData.location}
-          onChange={handleEnhancedInputChange}
-          required
-          minLength={2}
-          maxLength={100}
-        />
-      </div>
+      <ListingTypeSelector
+        isVip={formData.isVip}
+        onVipChange={handleVipChange}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="phone">Numéro de téléphone</Label>
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          placeholder="Ex: +237 6XX XX XX XX"
-          value={formData.phone}
-          onChange={handleEnhancedInputChange}
-          pattern="^\+?[0-9\s-]{8,}$"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="whatsapp">Numéro WhatsApp</Label>
-        <Input
-          id="whatsapp"
-          name="whatsapp"
-          type="tel"
-          placeholder="Ex: +237 6XX XX XX XX"
-          value={formData.whatsapp}
-          onChange={handleEnhancedInputChange}
-          pattern="^\+?[0-9\s-]{8,}$"
-        />
-      </div>
+      <ContactFields
+        phone={formData.phone}
+        whatsapp={formData.whatsapp}
+        handleInputChange={handleEnhancedInputChange}
+      />
       
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
@@ -199,35 +124,10 @@ export function ListingFormFields({
         />
       </div>
       
-      <div className="space-y-2">
-        <Label>Photos</Label>
-        <div className="border-2 border-dashed rounded-lg p-8 text-center">
-          <input
-            type="file"
-            accept={ALLOWED_FILE_TYPES.join(',')}
-            onChange={handleEnhancedImageChange}
-            className="hidden"
-            id="image-upload"
-          />
-          <label
-            htmlFor="image-upload"
-            className="cursor-pointer flex flex-col items-center"
-          >
-            <ImagePlus className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-500">
-              Cliquez ou glissez-déposez vos photos ici
-            </p>
-            <p className="mt-1 text-xs text-gray-400">
-              JPG, PNG ou WEBP - Max 5MB
-            </p>
-            {formData.image && (
-              <p className="mt-2 text-sm text-green-500">
-                Image sélectionnée: {formData.image.name}
-              </p>
-            )}
-          </label>
-        </div>
-      </div>
+      <ImageUploadField
+        image={formData.image}
+        handleImageChange={handleEnhancedImageChange}
+      />
     </>
   );
 }
