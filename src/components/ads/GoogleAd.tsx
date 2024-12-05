@@ -27,7 +27,7 @@ export function GoogleAd({ slot, format = 'auto', layout, className = '' }: Goog
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}
-        data-ad-client="ca-pub-VOTRE_ID_CLIENT" // Remplacez par votre ID client AdSense
+        data-ad-client="ca-pub-VOTRE_ID_CLIENT" // Remplacez par votre ID client AdSense obtenu
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive="true"
