@@ -21,11 +21,19 @@ export function ReviewForm({ sellerId, listingId, onSuccess }: ReviewFormProps) 
     setIsSubmitting(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Vous devez être connecté pour laisser un avis");
+        return;
+      }
+
       const { error } = await supabase.from("reviews").insert({
         seller_id: sellerId,
         listing_id: listingId,
         rating,
         comment,
+        reviewer_id: user.id
       });
 
       if (error) throw error;

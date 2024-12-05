@@ -9,7 +9,7 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
-  profiles: {
+  reviewer: {
     full_name: string | null;
   };
 }
@@ -24,12 +24,15 @@ export function ReviewsList({ sellerId }: ReviewsListProps) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reviews")
-        .select("*, profiles:reviewer_id(full_name)")
+        .select(`
+          *,
+          reviewer:profiles!reviews_reviewer_id_fkey(full_name)
+        `)
         .eq("seller_id", sellerId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Review[];
+      return data as unknown as Review[];
     },
   });
 
@@ -60,7 +63,7 @@ export function ReviewsList({ sellerId }: ReviewsListProps) {
                 ))}
               </div>
               <span className="font-medium">
-                {review.profiles.full_name || "Utilisateur anonyme"}
+                {review.reviewer.full_name || "Utilisateur anonyme"}
               </span>
             </div>
             <time className="text-sm text-muted-foreground">
