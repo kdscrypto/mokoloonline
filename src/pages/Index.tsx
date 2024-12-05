@@ -8,6 +8,7 @@ import { VipListings } from "@/components/VipListings";
 import { RegularListings } from "@/components/RegularListings";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 import { Header } from "@/components/header/Header";
+import { GoogleAd } from "@/components/ads/GoogleAd";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -35,21 +36,51 @@ export default function Index() {
               <CategoryFilter onCategoryChange={setSelectedCategory} />
             </div>
 
+            {/* Publicité horizontale en haut */}
+            <div className="w-full flex justify-center my-4">
+              <GoogleAd 
+                slot="1234567890" 
+                className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+              />
+            </div>
+
             <VipListings />
             
-            <RegularListings 
-              selectedCategory={selectedCategory}
-              searchQuery={searchQuery}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              itemsPerPage={ITEMS_PER_PAGE}
-            />
+            {/* Publicité carrée sur le côté */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="lg:col-span-3">
+                <RegularListings 
+                  selectedCategory={selectedCategory}
+                  searchQuery={searchQuery}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                />
+              </div>
+              <div className="hidden lg:block">
+                <div className="sticky top-4">
+                  <GoogleAd 
+                    slot="0987654321" 
+                    className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <StatsBar />
         <Testimonials />
       </div>
+      
+      {/* Publicité horizontale en bas */}
+      <div className="w-full flex justify-center my-8">
+        <GoogleAd 
+          slot="5432109876" 
+          className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+        />
+      </div>
+      
       <Footer />
     </div>
   );
