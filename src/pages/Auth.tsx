@@ -32,7 +32,7 @@ export default function Auth() {
 
   const handleError = (error: AuthError) => {
     if (error.message.includes("Invalid login credentials")) {
-      toast.error("Email ou mot de passe incorrect");
+      toast.error("Email/téléphone ou mot de passe incorrect");
     } else {
       toast.error("Une erreur est survenue lors de la connexion");
     }
@@ -67,23 +67,26 @@ export default function Auth() {
                 },
               },
             }}
+            providers={[]}
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Adresse email',
+                  email_label: 'Email ou numéro de téléphone',
                   password_label: 'Mot de passe',
                   button_label: 'Se connecter',
-                  email_input_placeholder: 'Votre adresse email',
+                  email_input_placeholder: 'Votre email ou numéro de téléphone',
                   password_input_placeholder: 'Votre mot de passe',
                   link_text: 'Déjà inscrit ? Connectez-vous',
+                  phone_label: 'Numéro de téléphone',
                 },
                 sign_up: {
-                  email_label: 'Adresse email',
+                  email_label: 'Email ou numéro de téléphone',
                   password_label: 'Mot de passe',
                   button_label: "S'inscrire",
-                  email_input_placeholder: 'Votre adresse email',
+                  email_input_placeholder: 'Votre email ou numéro de téléphone',
                   password_input_placeholder: 'Choisissez un mot de passe',
                   link_text: 'Pas encore de compte ? Inscrivez-vous',
+                  phone_label: 'Numéro de téléphone',
                 },
               },
             }}
