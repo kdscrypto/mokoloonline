@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ListingFormFields } from "@/components/listing/ListingFormFields";
+import { addDays } from "date-fns";
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function CreateListing() {
     phone: "",
     whatsapp: "",
     image: null as File | null,
+    isVip: false,
   });
 
   useEffect(() => {
@@ -42,6 +44,10 @@ export default function CreateListing() {
     if (e.target.files && e.target.files[0]) {
       setFormData(prev => ({ ...prev, image: e.target.files![0] }));
     }
+  };
+
+  const handleVipChange = (value: boolean) => {
+    setFormData(prev => ({ ...prev, isVip: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,6 +75,9 @@ export default function CreateListing() {
         }
       }
 
+      // Calculate vip_until date if isVip is true (30 days from now)
+      const vip_until = formData.isVip ? addDays(new Date(), 30).toISOString() : null;
+
       const { error } = await supabase.from('listings').insert({
         title: formData.title,
         price: parseInt(formData.price),
@@ -79,7 +88,9 @@ export default function CreateListing() {
         status: 'pending',
         category: formData.category || 'Autres',
         phone: formData.phone || null,
-        whatsapp: formData.whatsapp || null
+        whatsapp: formData.whatsapp || null,
+        is_vip: formData.isVip,
+        vip_until
       });
 
       if (error) throw error;
@@ -88,6 +99,7 @@ export default function CreateListing() {
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Une erreur est survenue");
+      console.error("Error creating listing:", error);
     } finally {
       setIsLoading(false);
     }
@@ -104,6 +116,7 @@ export default function CreateListing() {
             handleInputChange={handleInputChange}
             handleCategoryChange={handleCategoryChange}
             handleImageChange={handleImageChange}
+            handleVipChange={handleVipChange}
           />
           
           <Button type="submit" className="w-full" disabled={isLoading}>
