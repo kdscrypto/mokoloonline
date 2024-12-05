@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ListingCard } from "./ListingCard";
 import { ListingsPagination } from "./ListingsPagination";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Listing } from "@/integrations/supabase/types/listing";
 
 interface RegularListingsProps {
@@ -73,11 +74,13 @@ export function RegularListings({
           </h2>
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {paginatedData.listings.slice(0, 3).map((listing) => (
-            <ListingCard key={listing.id} {...listing} />
-          ))}
-        </div>
+        <ScrollArea className="w-full whitespace-nowrap pb-4">
+          <div className="flex space-x-4">
+            {paginatedData.listings.slice(0, 6).map((listing) => (
+              <ListingCard key={listing.id} {...listing} />
+            ))}
+          </div>
+        </ScrollArea>
       </section>
 
       {/* Section Toutes les Annonces */}
@@ -88,11 +91,13 @@ export function RegularListings({
           </h2>
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {paginatedData.listings.map((listing) => (
-            <ListingCard key={listing.id} {...listing} />
-          ))}
-        </div>
+        <ScrollArea className="w-full whitespace-nowrap pb-4">
+          <div className="flex space-x-4">
+            {paginatedData.listings.map((listing) => (
+              <ListingCard key={listing.id} {...listing} />
+            ))}
+          </div>
+        </ScrollArea>
 
         <ListingsPagination 
           currentPage={currentPage}
