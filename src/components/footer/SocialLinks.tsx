@@ -3,7 +3,11 @@ import { Button } from "../ui/button";
 
 export function SocialLinks() {
   const socialLinks = [
-    { icon: Facebook, label: "Facebook" },
+    { 
+      icon: Facebook, 
+      label: "Facebook",
+      href: "https://www.facebook.com/share/1B9kjmAB1z/?mibextid=LQQJ4d"
+    },
     { icon: Twitter, label: "Twitter" },
     { icon: Instagram, label: "Instagram" },
     { icon: Youtube, label: "Youtube" }
@@ -11,12 +15,13 @@ export function SocialLinks() {
 
   return (
     <div className="flex gap-4 pt-4">
-      {socialLinks.map(({ icon: Icon, label }) => (
+      {socialLinks.map(({ icon: Icon, label, href }) => (
         <Button 
           key={label}
           variant="ghost" 
           size="icon"
           className="hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+          onClick={() => href && window.open(href, '_blank')}
         >
           <Icon className="h-5 w-5" />
         </Button>
