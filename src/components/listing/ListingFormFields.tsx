@@ -21,11 +21,12 @@ interface ListingFormFieldsProps {
     whatsapp: string;
     image: File | null;
     isVip: boolean;
+    vipDuration?: number;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleCategoryChange: (value: string) => void;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleVipChange: (value: boolean) => void;
+  handleVipChange: (value: { isVip: boolean, duration?: number }) => void;
 }
 
 export function ListingFormFields({

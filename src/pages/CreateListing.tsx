@@ -20,6 +20,7 @@ export default function CreateListing() {
     whatsapp: "",
     image: null as File | null,
     isVip: false,
+    vipDuration: 30,
   });
 
   useEffect(() => {
@@ -46,8 +47,12 @@ export default function CreateListing() {
     }
   };
 
-  const handleVipChange = (value: boolean) => {
-    setFormData(prev => ({ ...prev, isVip: value }));
+  const handleVipChange = (value: { isVip: boolean, duration?: number }) => {
+    setFormData(prev => ({
+      ...prev,
+      isVip: value.isVip,
+      vipDuration: value.duration || prev.vipDuration
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,8 +80,8 @@ export default function CreateListing() {
         }
       }
 
-      // Calculate vip_until date if isVip is true (30 days from now)
-      const vip_until = formData.isVip ? addDays(new Date(), 30).toISOString() : null;
+      // Calculate vip_until date based on the selected duration
+      const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
       const { error } = await supabase.from('listings').insert({
         title: formData.title,
