@@ -65,6 +65,11 @@ export default function EditListing() {
     setIsLoading(true);
 
     try {
+      // Calculate vip_until date and convert to ISO string
+      const vipUntilDate = formData.isVip 
+        ? new Date(Date.now() + formData.vipDuration * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+
       // Mise à jour des données de l'annonce
       const { error: updateError } = await supabase
         .from('listings')
@@ -77,7 +82,7 @@ export default function EditListing() {
           phone: formData.phone,
           whatsapp: formData.whatsapp,
           is_vip: formData.isVip,
-          vip_until: formData.isVip ? new Date(Date.now() + formData.vipDuration * 24 * 60 * 60 * 1000) : null,
+          vip_until: vipUntilDate,
         })
         .eq('id', id);
 
