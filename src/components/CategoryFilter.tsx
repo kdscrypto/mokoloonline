@@ -22,14 +22,14 @@ export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
           <Button
             key={category}
             variant="outline"
-            className="whitespace-nowrap rounded-full snap-start shrink-0"
+            className="whitespace-nowrap rounded-full snap-start shrink-0 bg-white/80 backdrop-blur-sm hover:bg-primary/10 hover:text-primary transition-all duration-200 border-gray-200 hover:border-primary/50"
             onClick={() => onCategoryChange(category)}
           >
             {category}
           </Button>
         ))}
       </div>
-      <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-background to-transparent pointer-events-none" />
     </div>
   );
 }
