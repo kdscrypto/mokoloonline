@@ -57,6 +57,30 @@ export default function EditListing() {
     );
   }
 
+  if (!listing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Annonce introuvable</h2>
+          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Retour au tableau de bord
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const formData = {
+    title: listing.title,
+    description: listing.description || "",
+    price: listing.price,
+    location: listing.location,
+    category: listing.category,
+    phone: listing.phone || "",
+    whatsapp: listing.whatsapp || "",
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -69,13 +93,11 @@ export default function EditListing() {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold mb-6">Modifier l'annonce</h1>
-          {listing && (
-            <ListingFormFields
-              initialData={listing}
-              onSubmit={handleSubmit}
-              submitButtonText="Mettre à jour l'annonce"
-            />
-          )}
+          <ListingFormFields
+            defaultValues={formData}
+            onSubmit={handleSubmit}
+            submitButtonText="Mettre à jour l'annonce"
+          />
         </div>
       </div>
     </div>
