@@ -35,10 +35,33 @@ export default function Index() {
           .single();
         
         setIsAdmin(!!adminData);
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     };
 
     checkAdminStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        setIsAuthenticated(true);
+        const { data: adminData } = await supabase
+          .from("admin_users")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        
+        setIsAdmin(!!adminData);
+      } else {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Reset to first page when filters change
