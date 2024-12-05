@@ -8,7 +8,11 @@ export function SocialLinks() {
       label: "Facebook",
       href: "https://www.facebook.com/share/1B9kjmAB1z/?mibextid=LQQJ4d"
     },
-    { icon: Twitter, label: "Twitter" },
+    { 
+      icon: Twitter, 
+      label: "Twitter",
+      href: "https://x.com/BitcoinCamer?t=LpaC7RAVrGJ0cnMSAv31EQ&s=35"
+    },
     { icon: Instagram, label: "Instagram" },
     { icon: Youtube, label: "Youtube" }
   ];
