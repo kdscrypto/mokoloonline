@@ -12,4 +12,6 @@ export interface Listing {
   category: string;
   phone: string | null;
   whatsapp: string | null;
+  is_vip: boolean | null;
+  vip_until: string | null;
 }
