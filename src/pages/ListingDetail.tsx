@@ -1,30 +1,66 @@
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, MapPin } from "lucide-react";
+import { Phone, MapPin, MessageCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function ListingDetail() {
-  // Données de test
-  const listing = {
-    id: "1",
-    title: "iPhone 12 Pro Max - Excellent état",
-    price: 350000,
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-    location: "Douala, Littoral",
-    description: "iPhone 12 Pro Max en excellent état, débloqué tout opérateur. Vendu avec chargeur et boîte d'origine. Batterie à 89% de santé.",
-    seller: "Jean Paul",
-    phone: "+237 6XX XX XX XX"
-  };
+  const { id } = useParams();
+
+  const { data: listing, isLoading } = useQuery({
+    queryKey: ['listing', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*, profiles(full_name)')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        toast.error("Erreur lors du chargement de l'annonce");
+        throw error;
+      }
+
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Annonce introuvable</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-4xl mx-auto">
         <div className="grid md:grid-cols-2 gap-8 p-6">
           <div>
-            <img
-              src={listing.image}
-              alt={listing.title}
-              className="w-full h-[400px] object-cover rounded-lg"
-            />
+            {listing.image_url ? (
+              <img
+                src={listing.image_url}
+                alt={listing.title}
+                className="w-full h-[400px] object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500">Aucune image disponible</p>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col gap-4">
@@ -41,12 +77,28 @@ export default function ListingDetail() {
             
             <p className="text-gray-600">{listing.description}</p>
             
-            <div className="mt-auto">
-              <h3 className="font-semibold mb-2">Vendeur: {listing.seller}</h3>
-              <Button className="w-full">
-                <Phone className="mr-2 h-4 w-4" />
-                Voir le numéro
-              </Button>
+            <div className="mt-auto space-y-4">
+              <h3 className="font-semibold">
+                Vendeur: {listing.profiles?.full_name || "Anonyme"}
+              </h3>
+              
+              {listing.phone && (
+                <Button className="w-full" onClick={() => window.location.href = `tel:${listing.phone}`}>
+                  <Phone className="mr-2 h-4 w-4" />
+                  {listing.phone}
+                </Button>
+              )}
+              
+              {listing.whatsapp && (
+                <Button 
+                  variant="secondary" 
+                  className="w-full"
+                  onClick={() => window.open(`https://wa.me/${listing.whatsapp.replace(/\D/g, '')}`, '_blank')}
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  WhatsApp
+                </Button>
+              )}
             </div>
           </div>
         </div>
