@@ -24,6 +24,54 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_ips: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          id: string
+          ip_address: string
+          reason: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          ip_address: string
+          reason: string
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string
+          reason?: string
+        }
+        Relationships: []
+      }
+      failed_login_attempts: {
+        Row: {
+          attempt_count: number | null
+          id: string
+          ip_address: string
+          last_attempt: string
+          user_id: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          id?: string
+          ip_address: string
+          last_attempt?: string
+          user_id?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          id?: string
+          ip_address?: string
+          last_attempt?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           category: string
@@ -160,7 +208,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_security_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
