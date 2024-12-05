@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import type { ListingStatus } from "@/integrations/supabase/types/listing-status";
 import { useQuery } from "@tanstack/react-query";
+import { addDays } from "date-fns";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ export default function Admin() {
     }
   });
 
-  const handleStatusUpdate = async (id: string, newStatus: ListingStatus) => {
+  const handleStatusUpdate = async (id: string, newStatus: ListingStatus, vipDuration?: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -94,12 +95,17 @@ export default function Admin() {
         return;
       }
 
+      // Calculate VIP expiration date if duration is provided
+      const vip_until = vipDuration ? addDays(new Date(), vipDuration).toISOString() : null;
+
       // Proceed with status update
       const { error: updateError } = await supabase
         .from("listings")
         .update({ 
           status: newStatus,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          is_vip: !!vipDuration,
+          vip_until
         })
         .eq("id", id);
 
@@ -109,7 +115,13 @@ export default function Admin() {
         return;
       }
 
-      toast.success(newStatus === 'approved' ? "Annonce approuvée" : "Annonce rejetée");
+      const message = vipDuration 
+        ? `Annonce approuvée en tant que VIP pour ${vipDuration} jours`
+        : newStatus === 'approved' 
+          ? "Annonce approuvée" 
+          : "Annonce rejetée";
+      
+      toast.success(message);
       await refetch();
     } catch (error) {
       console.error("Error in handleStatusUpdate:", error);
@@ -140,7 +152,7 @@ export default function Admin() {
       </div>
       <ListingsTable 
         listings={listings}
-        onApprove={(id) => handleStatusUpdate(id, 'approved')}
+        onApprove={(id, vipDuration) => handleStatusUpdate(id, 'approved', vipDuration)}
         onReject={(id) => handleStatusUpdate(id, 'rejected')}
       />
     </div>
