@@ -19,18 +19,17 @@ export function RegularListings({
   setCurrentPage,
   itemsPerPage
 }: RegularListingsProps) {
-  const { data: paginatedData, isLoading } = useQuery({
+  const { data: paginatedData, isLoading, error } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery, currentPage],
     queryFn: async () => {
-      console.log('Fetching listings with params:', { selectedCategory, searchQuery, currentPage, itemsPerPage });
+      console.log('Début de la requête Regular listings avec params:', { selectedCategory, searchQuery, currentPage, itemsPerPage });
       
       let query = supabase
         .from('listings')
         .select('*', { count: 'exact' })
         .eq('status', 'approved')
         .eq('is_vip', false)
-        .order('created_at', { ascending: false })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+        .order('created_at', { ascending: false });
 
       if (selectedCategory !== "Tous") {
         query = query.eq('category', selectedCategory);
@@ -40,20 +39,32 @@ export function RegularListings({
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
+      // Ajout de la pagination
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage - 1;
+      query = query.range(start, end);
+
       const { data, count, error } = await query;
       
       if (error) {
-        console.error("Error fetching listings:", error);
+        console.error("Erreur lors de la récupération des listings:", error);
         throw error;
       }
 
-      console.log('Fetched listings:', { data, count });
+      console.log('Regular listings récupérés:', { data, count });
       
       return { listings: data as Listing[], total: count || 0 };
     },
   });
 
-  const totalPages = Math.ceil((paginatedData?.total || 0) / itemsPerPage);
+  if (error) {
+    console.error("Erreur dans le composant RegularListings:", error);
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600">Une erreur est survenue lors du chargement des annonces</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -72,8 +83,7 @@ export function RegularListings({
     );
   }
 
-  const latestListings = paginatedData.listings.slice(0, 6);
-  const allListings = paginatedData.listings;
+  const totalPages = Math.ceil((paginatedData.total || 0) / itemsPerPage);
 
   return (
     <div className="space-y-12">
@@ -86,7 +96,7 @@ export function RegularListings({
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {latestListings.map((listing) => (
+          {paginatedData.listings.slice(0, 6).map((listing) => (
             <ListingCard key={listing.id} {...listing} />
           ))}
         </div>
@@ -101,7 +111,7 @@ export function RegularListings({
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allListings.map((listing) => (
+          {paginatedData.listings.map((listing) => (
             <ListingCard key={listing.id} {...listing} />
           ))}
         </div>

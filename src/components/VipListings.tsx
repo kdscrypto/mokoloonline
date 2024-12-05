@@ -4,10 +4,10 @@ import { ListingCard } from "./ListingCard";
 import type { Listing } from "@/integrations/supabase/types/listing";
 
 export function VipListings() {
-  const { data: vipListings = [], isLoading } = useQuery({
+  const { data: vipListings = [], isLoading, error } = useQuery({
     queryKey: ['vip-listings'],
     queryFn: async () => {
-      console.log('Fetching VIP listings');
+      console.log('Début de la requête VIP listings');
       
       const { data, error } = await supabase
         .from('listings')
@@ -18,15 +18,23 @@ export function VipListings() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching VIP listings:", error);
+        console.error("Erreur lors de la récupération des VIP listings:", error);
         throw error;
       }
       
-      console.log('Fetched VIP listings:', data);
-      
+      console.log('VIP listings récupérés:', data);
       return data as Listing[];
     },
   });
+
+  if (error) {
+    console.error("Erreur dans le composant VipListings:", error);
+    return (
+      <div className="text-center py-4 text-red-600">
+        Une erreur est survenue lors du chargement des annonces VIP
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
