@@ -29,11 +29,6 @@ export default function Auth() {
     };
   }, [navigate]);
 
-  const handleAuthError = (error: Error) => {
-    console.error('Auth error:', error);
-    toast.error("Erreur d'authentification: " + error.message);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -67,20 +62,24 @@ export default function Auth() {
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Email',
+                  email_label: 'Email ou téléphone',
                   password_label: 'Mot de passe',
                   button_label: 'Se connecter',
-                  email_input_placeholder: 'Votre email',
+                  email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Votre mot de passe',
                   link_text: 'Déjà inscrit ? Connectez-vous',
+                  phone_label: 'Numéro de téléphone',
+                  phone_input_placeholder: 'Votre numéro de téléphone',
                 },
                 sign_up: {
-                  email_label: 'Email',
+                  email_label: 'Email ou téléphone',
                   password_label: 'Mot de passe',
                   button_label: "S'inscrire",
-                  email_input_placeholder: 'Votre email',
+                  email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Choisissez un mot de passe',
                   link_text: 'Pas encore de compte ? Inscrivez-vous',
+                  phone_label: 'Numéro de téléphone',
+                  phone_input_placeholder: 'Votre numéro de téléphone',
                 },
                 forgotten_password: {
                   button_label: 'Envoyer les instructions',
