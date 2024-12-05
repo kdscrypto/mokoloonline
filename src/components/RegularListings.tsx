@@ -27,7 +27,7 @@ export function RegularListings({
         .select('*', { count: 'exact' })
         .eq('status', 'approved')
         .eq('is_vip', false)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) // Tri par date de création décroissante
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
       if (selectedCategory !== "Tous") {
@@ -55,16 +55,24 @@ export function RegularListings({
     );
   }
 
+  if (!paginatedData?.listings.length) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Aucune annonce trouvée</p>
+      </div>
+    );
+  }
+
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          Toutes les annonces
+          Dernières annonces
         </h2>
         <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {paginatedData?.listings.map((listing) => (
+        {paginatedData.listings.map((listing) => (
           <ListingCard key={listing.id} {...listing} />
         ))}
       </div>
