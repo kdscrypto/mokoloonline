@@ -12,6 +12,7 @@ import { ListingStatus } from "./ListingStatus";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface ListingsTableProps {
   listings: Listing[];
@@ -19,6 +20,8 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
+  const navigate = useNavigate();
+
   const handleMarkAsSold = async (id: string) => {
     try {
       const { error } = await supabase
@@ -40,6 +43,10 @@ export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
       console.error("Error marking listing as sold:", error);
       toast.error("Erreur lors du marquage de l'annonce comme vendue");
     }
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/edit-listing/${id}`);
   };
 
   return (
@@ -64,7 +71,11 @@ export function ListingsTable({ listings, onDelete }: ListingsTableProps) {
             <TableCell>{new Date(listing.created_at).toLocaleDateString()}</TableCell>
             <TableCell>
               <div className="flex gap-2">
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => handleEdit(listing.id)}
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
                 {listing.status === 'approved' && (
