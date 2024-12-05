@@ -71,22 +71,20 @@ export default function Auth() {
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Email ou numéro de téléphone',
+                  email_label: 'Email ou téléphone',
                   password_label: 'Mot de passe',
                   button_label: 'Se connecter',
-                  email_input_placeholder: 'Votre email ou numéro de téléphone',
+                  email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Votre mot de passe',
-                  link_text: 'Déjà inscrit ? Connectez-vous',
-                  phone_label: 'Numéro de téléphone',
+                  link_text: 'Déjà inscrit ? Connectez-vous'
                 },
                 sign_up: {
-                  email_label: 'Email ou numéro de téléphone',
+                  email_label: 'Email ou téléphone',
                   password_label: 'Mot de passe',
                   button_label: "S'inscrire",
-                  email_input_placeholder: 'Votre email ou numéro de téléphone',
+                  email_input_placeholder: 'Votre email ou téléphone',
                   password_input_placeholder: 'Choisissez un mot de passe',
-                  link_text: 'Pas encore de compte ? Inscrivez-vous',
-                  phone_label: 'Numéro de téléphone',
+                  link_text: 'Pas encore de compte ? Inscrivez-vous'
                 },
               },
             }}
