@@ -7,6 +7,8 @@ export function VipListings() {
   const { data: vipListings = [], isLoading } = useQuery({
     queryKey: ['vip-listings'],
     queryFn: async () => {
+      console.log('Fetching VIP listings');
+      
       const { data, error } = await supabase
         .from('listings')
         .select('*')
@@ -19,6 +21,8 @@ export function VipListings() {
         console.error("Error fetching VIP listings:", error);
         throw error;
       }
+      
+      console.log('Fetched VIP listings:', data);
       
       return data as Listing[];
     },

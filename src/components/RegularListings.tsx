@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ListingCard } from "./ListingCard";
 import { ListingsPagination } from "./ListingsPagination";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Listing } from "@/integrations/supabase/types/listing";
 
 interface RegularListingsProps {
@@ -23,12 +22,15 @@ export function RegularListings({
   const { data: paginatedData, isLoading } = useQuery({
     queryKey: ['listings', selectedCategory, searchQuery, currentPage],
     queryFn: async () => {
+      console.log('Fetching listings with params:', { selectedCategory, searchQuery, currentPage, itemsPerPage });
+      
       let query = supabase
         .from('listings')
         .select('*', { count: 'exact' })
         .eq('status', 'approved')
         .eq('is_vip', false)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
       if (selectedCategory !== "Tous") {
         query = query.eq('category', selectedCategory);
@@ -44,6 +46,8 @@ export function RegularListings({
         console.error("Error fetching listings:", error);
         throw error;
       }
+
+      console.log('Fetched listings:', { data, count });
       
       return { listings: data as Listing[], total: count || 0 };
     },
