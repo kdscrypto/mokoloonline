@@ -28,8 +28,7 @@ export function RegularListings({
         .select('*', { count: 'exact' })
         .eq('status', 'approved')
         .eq('is_vip', false)
-        .order('created_at', { ascending: false })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+        .order('created_at', { ascending: false });
 
       if (selectedCategory !== "Tous") {
         query = query.eq('category', selectedCategory);
@@ -40,7 +39,12 @@ export function RegularListings({
       }
 
       const { data, count, error } = await query;
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching listings:", error);
+        throw error;
+      }
+      
       return { listings: data as Listing[], total: count || 0 };
     },
   });
@@ -64,6 +68,9 @@ export function RegularListings({
     );
   }
 
+  const latestListings = paginatedData.listings.slice(0, 6);
+  const allListings = paginatedData.listings;
+
   return (
     <div className="space-y-12">
       {/* Section Dernières Annonces */}
@@ -74,13 +81,11 @@ export function RegularListings({
           </h2>
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
-        <ScrollArea className="w-full whitespace-nowrap pb-4">
-          <div className="flex space-x-4">
-            {paginatedData.listings.slice(0, 6).map((listing) => (
-              <ListingCard key={listing.id} {...listing} />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {latestListings.map((listing) => (
+            <ListingCard key={listing.id} {...listing} />
+          ))}
+        </div>
       </section>
 
       {/* Section Toutes les Annonces */}
@@ -91,13 +96,11 @@ export function RegularListings({
           </h2>
           <div className="h-1 flex-1 mx-4 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
         </div>
-        <ScrollArea className="w-full whitespace-nowrap pb-4">
-          <div className="flex space-x-4">
-            {paginatedData.listings.map((listing) => (
-              <ListingCard key={listing.id} {...listing} />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allListings.map((listing) => (
+            <ListingCard key={listing.id} {...listing} />
+          ))}
+        </div>
 
         <ListingsPagination 
           currentPage={currentPage}

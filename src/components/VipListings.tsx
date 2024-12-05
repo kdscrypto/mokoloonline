@@ -15,7 +15,11 @@ export function VipListings() {
         .gt('vip_until', new Date().toISOString())
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching VIP listings:", error);
+        throw error;
+      }
+      
       return data as Listing[];
     },
   });
@@ -28,7 +32,7 @@ export function VipListings() {
     );
   }
 
-  if (vipListings.length === 0) {
+  if (!vipListings.length) {
     return null;
   }
 
@@ -42,7 +46,7 @@ export function VipListings() {
           Premium
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {vipListings.map((listing) => (
           <ListingCard key={listing.id} {...listing} />
         ))}
