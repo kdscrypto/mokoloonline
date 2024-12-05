@@ -7,10 +7,24 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 
+interface FormData {
+  title: string;
+  description: string;
+  price: string;
+  location: string;
+  category: string;
+  phone: string;
+  whatsapp: string;
+  image: File | null;
+  isVip: boolean;
+  vipDuration: number;
+}
+
 export default function EditListing() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData | null>(null);
 
   const { data: listing, isLoading: isLoadingListing } = useQuery({
     queryKey: ['listing', id],
@@ -26,8 +40,28 @@ export default function EditListing() {
     },
   });
 
+  // Initialize form data when listing is loaded
+  useEffect(() => {
+    if (listing) {
+      setFormData({
+        title: listing.title,
+        description: listing.description || "",
+        price: listing.price.toString(),
+        location: listing.location,
+        category: listing.category,
+        phone: listing.phone || "",
+        whatsapp: listing.whatsapp || "",
+        image: null,
+        isVip: listing.is_vip || false,
+        vipDuration: 30,
+      });
+    }
+  }, [listing]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData) return;
+    
     setIsLoading(true);
 
     try {
@@ -56,7 +90,7 @@ export default function EditListing() {
     }
   };
 
-  if (isLoadingListing) {
+  if (isLoadingListing || !formData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -78,40 +112,27 @@ export default function EditListing() {
     );
   }
 
-  const formData = {
-    title: listing.title,
-    description: listing.description || "",
-    price: listing.price.toString(),
-    location: listing.location,
-    category: listing.category,
-    phone: listing.phone || "",
-    whatsapp: listing.whatsapp || "",
-    image: null,
-    isVip: listing.is_vip || false,
-    vipDuration: 30,
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => prev ? { ...prev, [name]: value } : null);
   };
 
   const handleCategoryChange = (value: string) => {
-    setFormData(prev => ({ ...prev, category: value }));
+    setFormData(prev => prev ? { ...prev, category: value } : null);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, image: e.target.files![0] }));
+      setFormData(prev => prev ? { ...prev, image: e.target.files![0] } : null);
     }
   };
 
   const handleVipChange = (value: { isVip: boolean, duration?: number }) => {
-    setFormData(prev => ({
+    setFormData(prev => prev ? {
       ...prev,
       isVip: value.isVip,
       vipDuration: value.duration || prev.vipDuration
-    }));
+    } : null);
   };
 
   return (
