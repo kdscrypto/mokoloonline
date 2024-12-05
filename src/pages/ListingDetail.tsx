@@ -1,13 +1,32 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, MapPin, MessageCircle } from "lucide-react";
+import { Phone, MapPin, MessageCircle, Lock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 export default function ListingDetail() {
   const { id } = useParams();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -70,36 +89,57 @@ export default function ListingDetail() {
               <MapPin className="h-5 w-5 text-gray-500" />
               <span className="text-gray-500">{listing.location}</span>
             </div>
-            
-            <span className="price-tag w-fit">
-              {listing.price.toLocaleString()} FCFA
-            </span>
-            
-            <p className="text-gray-600">{listing.description}</p>
-            
-            <div className="mt-auto space-y-4">
-              <h3 className="font-semibold">
-                Vendeur: {listing.profiles?.full_name || "Anonyme"}
-              </h3>
-              
-              {listing.phone && (
-                <Button className="w-full" onClick={() => window.location.href = `tel:${listing.phone}`}>
-                  <Phone className="mr-2 h-4 w-4" />
-                  {listing.phone}
-                </Button>
-              )}
-              
-              {listing.whatsapp && (
-                <Button 
-                  variant="secondary" 
-                  className="w-full"
-                  onClick={() => window.open(`https://wa.me/${listing.whatsapp.replace(/\D/g, '')}`, '_blank')}
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  WhatsApp
-                </Button>
-              )}
-            </div>
+
+            {isAuthenticated ? (
+              <>
+                <span className="price-tag w-fit">
+                  {listing.price.toLocaleString()} FCFA
+                </span>
+                
+                <p className="text-gray-600">{listing.description}</p>
+                
+                <div className="mt-auto space-y-4">
+                  <h3 className="font-semibold">
+                    Vendeur: {listing.profiles?.full_name || "Anonyme"}
+                  </h3>
+                  
+                  {listing.phone && (
+                    <Button className="w-full" onClick={() => window.location.href = `tel:${listing.phone}`}>
+                      <Phone className="mr-2 h-4 w-4" />
+                      {listing.phone}
+                    </Button>
+                  )}
+                  
+                  {listing.whatsapp && (
+                    <Button 
+                      variant="secondary" 
+                      className="w-full"
+                      onClick={() => window.open(`https://wa.me/${listing.whatsapp.replace(/\D/g, '')}`, '_blank')}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      WhatsApp
+                    </Button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="mt-8 text-center space-y-4">
+                <div className="p-6 bg-gray-50 rounded-lg">
+                  <Lock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    Connectez-vous pour voir les détails
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Pour voir le prix et contacter le vendeur, vous devez vous connecter ou créer un compte.
+                  </p>
+                  <Link to="/auth">
+                    <Button className="w-full">
+                      Se connecter / S'inscrire
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
