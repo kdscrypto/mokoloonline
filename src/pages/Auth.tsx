@@ -86,6 +86,26 @@ export default function Auth() {
             theme="light"
             view="sign_in"
             showLinks={true}
+            additionalData={{
+              username: {
+                label: "Nom d'utilisateur",
+                placeholder: "Choisissez un nom d'utilisateur",
+                type: "text",
+                required: true,
+              },
+              full_name: {
+                label: "Nom complet",
+                placeholder: "Votre nom complet",
+                type: "text",
+                required: true,
+              },
+              phone: {
+                label: "Téléphone",
+                placeholder: "Votre numéro de téléphone",
+                type: "tel",
+                required: false,
+              },
+            }}
           />
         </Card>
       </div>
