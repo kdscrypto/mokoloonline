@@ -14,9 +14,27 @@ export default function Auth() {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate("/dashboard");
+        // Vérifier si le profil existe
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Erreur lors de la vérification du profil:', profileError);
+          toast.error("Une erreur est survenue lors de la création de votre profil");
+          return;
+        }
+
+        if (profile) {
+          toast.success("Connexion réussie !");
+          navigate("/dashboard");
+        } else {
+          toast.error("Erreur lors de la création du profil");
+        }
       } else if (event === 'SIGNED_OUT') {
         navigate("/auth");
       } else if (event === 'PASSWORD_RECOVERY') {
@@ -86,26 +104,6 @@ export default function Auth() {
             theme="light"
             view="sign_in"
             showLinks={true}
-            additionalData={{
-              username: {
-                label: "Nom d'utilisateur",
-                placeholder: "Choisissez un nom d'utilisateur",
-                type: "text",
-                required: true,
-              },
-              full_name: {
-                label: "Nom complet",
-                placeholder: "Votre nom complet",
-                type: "text",
-                required: true,
-              },
-              phone: {
-                label: "Téléphone",
-                placeholder: "Votre numéro de téléphone",
-                type: "tel",
-                required: false,
-              },
-            }}
           />
         </Card>
       </div>
