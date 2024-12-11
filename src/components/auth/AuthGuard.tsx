@@ -18,7 +18,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       
       if (requireAuth && !session) {
         toast.error("Vous devez être connecté pour accéder à cette page");
-        navigate('/auth');
+        window.location.href = 'https://mokoloonline.xyz/auth';
         return;
       }
 
@@ -31,7 +31,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
         if (!adminData) {
           toast.error("Accès non autorisé");
-          navigate('/');
+          window.location.href = 'https://mokoloonline.xyz';
           return;
         }
       }
@@ -41,7 +41,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT' && requireAuth) {
-        navigate('/auth');
+        window.location.href = 'https://mokoloonline.xyz/auth';
       }
     });
 
