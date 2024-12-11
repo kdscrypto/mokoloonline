@@ -16,11 +16,19 @@ interface GoogleAdProps {
 export function GoogleAd({ slot, format = 'auto', layout, className = '' }: GoogleAdProps) {
   useEffect(() => {
     try {
+      console.info('Tentative de chargement de la publicité Google AdSense:', {
+        slot,
+        format,
+        layout
+      });
+      
       (window.adsbygoogle = window.adsbygoogle || []).push({});
+      
+      console.info('Push AdSense réussi pour le slot:', slot);
     } catch (err) {
-      console.error('Error loading Google Ad:', err);
+      console.error('Erreur lors du chargement de la publicité Google AdSense:', err);
     }
-  }, []);
+  }, [slot, format, layout]);
 
   return (
     <div className={`google-ad ${className}`}>
