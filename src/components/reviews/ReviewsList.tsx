@@ -16,20 +16,27 @@ interface Review {
 
 interface ReviewsListProps {
   sellerId: string;
+  listingId?: string;
 }
 
-export function ReviewsList({ sellerId }: ReviewsListProps) {
+export function ReviewsList({ sellerId, listingId }: ReviewsListProps) {
   const { data: reviews, isLoading } = useQuery({
-    queryKey: ["reviews", sellerId],
+    queryKey: ["reviews", sellerId, listingId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("reviews")
         .select(`
           *,
           reviewer:profiles!reviews_reviewer_id_fkey(full_name)
         `)
-        .eq("seller_id", sellerId)
-        .order("created_at", { ascending: false });
+        .eq("seller_id", sellerId);
+
+      // Si un listingId est fourni, filtrer les avis pour cet article spécifique
+      if (listingId) {
+        query = query.eq("listing_id", listingId);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as unknown as Review[];

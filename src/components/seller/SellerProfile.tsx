@@ -9,9 +9,10 @@ import { Star } from "lucide-react";
 
 interface SellerProfileProps {
   sellerId: string;
+  listingId?: string;
 }
 
-export function SellerProfile({ sellerId }: SellerProfileProps) {
+export function SellerProfile({ sellerId, listingId }: SellerProfileProps) {
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", sellerId],
     queryFn: async () => {
@@ -27,7 +28,7 @@ export function SellerProfile({ sellerId }: SellerProfileProps) {
   });
 
   const { data: rating } = useQuery({
-    queryKey: ["seller-rating", sellerId],
+    queryKey: ["seller-rating", sellerId, listingId],
     queryFn: async () => {
       const { data, error } = await supabase
         .rpc("get_seller_rating", { seller_id: sellerId });
@@ -68,10 +69,10 @@ export function SellerProfile({ sellerId }: SellerProfileProps) {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="reviews">
-            <ReviewsList sellerId={sellerId} />
+            <ReviewsList sellerId={sellerId} listingId={listingId} />
           </TabsContent>
           <TabsContent value="write-review">
-            <ReviewForm sellerId={sellerId} />
+            <ReviewForm sellerId={sellerId} listingId={listingId} />
           </TabsContent>
         </Tabs>
       </CardContent>
