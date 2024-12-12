@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, LogOut, ArrowLeft, Search } from "lucide-react";
+import { Plus, LogOut, ArrowLeft, Search, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
+import { Card } from "@/components/ui/card";
 
 export default function Dashboard() {
   usePerformanceMonitoring("dashboard");
@@ -24,6 +25,23 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const { data: profile } = useQuery({
+    queryKey: ['user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: listings = [], refetch } = useQuery({
     queryKey: ['my-listings', statusFilter, sortOrder],
@@ -117,6 +135,24 @@ export default function Dashboard() {
           </Button>
         </div>
       </div>
+
+      {profile && (
+        <Card className="p-6 mb-8 bg-white rounded-lg shadow">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+              <User className="h-6 w-6 text-gray-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">{profile.full_name}</h2>
+              <p className="text-gray-600">@{profile.username}</p>
+              <div className="mt-1 text-sm text-gray-500">
+                <span className="mr-4">{profile.city}</span>
+                {profile.phone && <span>📞 {profile.phone}</span>}
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
