@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { checkSession } from '@/services/auth-service';
 import { toast } from 'sonner';
 
 interface AuthGuardProps {
@@ -11,44 +11,50 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, requireAuth = false, requireAdmin = false }: AuthGuardProps) {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (requireAuth && !session) {
-        toast.error("Vous devez être connecté pour accéder à cette page");
-        window.location.href = 'https://mokoloonline.xyz/auth';
-        return;
-      }
-
-      if (requireAdmin && session) {
-        const { data: adminData } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-
-        if (!adminData) {
-          toast.error("Accès non autorisé");
-          window.location.href = 'https://mokoloonline.xyz';
+    const validateAccess = async () => {
+      try {
+        const result = await checkSession();
+        
+        if (requireAuth && !result) {
+          toast.error("Vous devez être connecté pour accéder à cette page");
+          navigate('/auth');
           return;
         }
+
+        if (requireAdmin && result) {
+          const { data: adminData } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', result.session.user.id)
+            .single();
+
+          if (!adminData) {
+            toast.error("Accès non autorisé");
+            navigate('/');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification des droits:", error);
+        navigate('/auth');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT' && requireAuth) {
-        window.location.href = 'https://mokoloonline.xyz/auth';
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    validateAccess();
   }, [navigate, requireAuth, requireAdmin]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }
