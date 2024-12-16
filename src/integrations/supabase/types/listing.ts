@@ -1,3 +1,5 @@
+export type ListingStatus = 'pending' | 'approved' | 'rejected' | 'sold';
+
 export interface Listing {
   id: string;
   title: string;
@@ -5,7 +7,7 @@ export interface Listing {
   price: number;
   location: string;
   image_url: string | null;
-  status: 'pending' | 'approved' | 'rejected' | 'sold';
+  status: ListingStatus;
   user_id: string | null;
   created_at: string;
   updated_at: string;

@@ -1,23 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, LogOut, ArrowLeft, Search } from "lucide-react";
+import { Plus, LogOut, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 import { ProfileCard } from "@/components/dashboard/ProfileCard";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { ListingsFilters } from "@/components/dashboard/ListingsFilters";
+import type { Listing, ListingStatus } from "@/integrations/supabase/types/listing";
 
 export default function Dashboard() {
   usePerformanceMonitoring("dashboard");
@@ -56,14 +49,19 @@ export default function Dashboard() {
         .eq('user_id', user.id);
 
       if (statusFilter !== "all") {
-        query = query.eq('status', statusFilter);
+        query = query.eq('status', statusFilter as ListingStatus);
       }
 
       query = query.order('created_at', { ascending: sortOrder === "asc" });
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      
+      // Assurons-nous que le statut est du bon type
+      return (data as any[]).map(listing => ({
+        ...listing,
+        status: listing.status as ListingStatus
+      })) as Listing[];
     },
   });
 
