@@ -34,7 +34,13 @@ export default function ListingDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('listings')
-        .select('*, profiles(full_name)')
+        .select(`
+          *,
+          profiles:profiles!listings_user_id_fkey (
+            full_name,
+            username
+          )
+        `)
         .eq('id', id)
         .single();
 
@@ -64,6 +70,8 @@ export default function ListingDetail() {
       </div>
     );
   }
+
+  const sellerName = listing.profiles?.username || listing.profiles?.full_name || "Utilisateur inconnu";
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -102,7 +110,7 @@ export default function ListingDetail() {
                   
                   <div className="mt-auto space-y-4">
                     <h3 className="font-semibold">
-                      Vendeur: {listing.profiles?.full_name || "Anonyme"}
+                      Vendeur: {sellerName}
                     </h3>
                     
                     {listing.phone && (
@@ -147,7 +155,7 @@ export default function ListingDetail() {
         </Card>
 
         {isAuthenticated && listing.user_id && (
-          <SellerProfile sellerId={listing.user_id} />
+          <SellerProfile sellerId={listing.user_id} listingId={id} />
         )}
       </div>
     </div>

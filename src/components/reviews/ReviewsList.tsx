@@ -11,6 +11,7 @@ interface Review {
   created_at: string;
   reviewer: {
     full_name: string | null;
+    username: string | null;
   };
 }
 
@@ -27,7 +28,10 @@ export function ReviewsList({ sellerId, listingId }: ReviewsListProps) {
         .from("reviews")
         .select(`
           *,
-          reviewer:profiles!reviews_reviewer_id_fkey(full_name)
+          reviewer:profiles!reviews_reviewer_id_fkey(
+            full_name,
+            username
+          )
         `)
         .eq("seller_id", sellerId);
 
@@ -70,7 +74,7 @@ export function ReviewsList({ sellerId, listingId }: ReviewsListProps) {
                 ))}
               </div>
               <span className="font-medium">
-                {review.reviewer.full_name || "Utilisateur anonyme"}
+                {review.reviewer.username || review.reviewer.full_name || "Utilisateur inconnu"}
               </span>
             </div>
             <time className="text-sm text-muted-foreground">
