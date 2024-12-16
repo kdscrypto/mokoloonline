@@ -12,6 +12,19 @@ export function ContactFields({
   whatsapp,
   handleInputChange,
 }: ContactFieldsProps) {
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digit characters except + sign
+    const cleaned = value.replace(/[^\d+]/g, '');
+    // Ensure only one + at the start
+    return cleaned.replace(/^\++/, '+');
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPhoneNumber(e.target.value);
+    e.target.value = formattedValue;
+    handleInputChange(e);
+  };
+
   return (
     <>
       <div className="space-y-2">
@@ -22,8 +35,9 @@ export function ContactFields({
           type="tel"
           placeholder="Ex: +237 6XX XX XX XX"
           value={phone}
-          onChange={handleInputChange}
-          pattern="^\+?[0-9\s-]{8,}$"
+          onChange={handlePhoneChange}
+          pattern="^\+?[0-9]{8,}$"
+          title="Entrez un numéro de téléphone valide (minimum 8 chiffres)"
         />
       </div>
 
@@ -35,8 +49,9 @@ export function ContactFields({
           type="tel"
           placeholder="Ex: +237 6XX XX XX XX"
           value={whatsapp}
-          onChange={handleInputChange}
-          pattern="^\+?[0-9\s-]{8,}$"
+          onChange={handlePhoneChange}
+          pattern="^\+?[0-9]{8,}$"
+          title="Entrez un numéro de téléphone valide (minimum 8 chiffres)"
         />
       </div>
     </>

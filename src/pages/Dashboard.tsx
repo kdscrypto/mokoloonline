@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, LogOut, ArrowLeft, Search, User } from "lucide-react";
+import { Plus, LogOut, ArrowLeft, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ListingsTable } from "@/components/dashboard/ListingsTable";
-import type { Listing } from "@/integrations/supabase/types/listing";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,7 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
-import { Card } from "@/components/ui/card";
+import { ProfileCard } from "@/components/dashboard/ProfileCard";
+import { DashboardStats } from "@/components/dashboard/DashboardStats";
+import { ListingsFilters } from "@/components/dashboard/ListingsFilters";
 
 export default function Dashboard() {
   usePerformanceMonitoring("dashboard");
@@ -26,7 +27,7 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const { data: profile } = useQuery({
+  const { data: profile, refetch: refetchProfile } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -43,7 +44,7 @@ export default function Dashboard() {
     },
   });
 
-  const { data: listings = [], refetch } = useQuery({
+  const { data: listings = [], refetch: refetchListings } = useQuery({
     queryKey: ['my-listings', statusFilter, sortOrder],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -62,7 +63,7 @@ export default function Dashboard() {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Listing[];
+      return data;
     },
   });
 
@@ -85,7 +86,7 @@ export default function Dashboard() {
       if (error) throw error;
       
       toast.success("Annonce supprimée avec succès");
-      refetch();
+      refetchListings();
     } catch (error: any) {
       toast.error(error.message || "Une erreur est survenue");
     }
@@ -101,16 +102,16 @@ export default function Dashboard() {
     }
   };
 
+  const handlePhotoUpdate = (newUrl: string) => {
+    refetchProfile();
+  };
+
   const filteredListings = listings.filter(listing =>
     listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     listing.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate statistics
-  const totalListings = listings.length;
-  const pendingListings = listings.filter(l => l.status === 'pending').length;
-  const approvedListings = listings.filter(l => l.status === 'approved').length;
-  const rejectedListings = listings.filter(l => l.status === 'rejected').length;
+  if (!profile) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -136,80 +137,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {profile && (
-        <Card className="p-6 mb-8 bg-white rounded-lg shadow">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-              <User className="h-6 w-6 text-gray-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">{profile.full_name}</h2>
-              <p className="text-gray-600">@{profile.username}</p>
-              <div className="mt-1 text-sm text-gray-500">
-                <span className="mr-4">{profile.city}</span>
-                {profile.phone && <span>📞 {profile.phone}</span>}
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Total des annonces</h3>
-          <p className="text-3xl font-bold text-primary">{totalListings}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">En attente</h3>
-          <p className="text-3xl font-bold text-yellow-600">{pendingListings}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Approuvées</h3>
-          <p className="text-3xl font-bold text-green-600">{approvedListings}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Rejetées</h3>
-          <p className="text-3xl font-bold text-red-600">{rejectedListings}</p>
-        </div>
-      </div>
+      <ProfileCard profile={profile} onPhotoUpdate={handlePhotoUpdate} />
+      <DashboardStats listings={listings} />
 
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Mes annonces</h2>
           
-          <div className="flex gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Rechercher par titre ou localisation..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filtrer par statut" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
-                <SelectItem value="approved">Approuvées</SelectItem>
-                <SelectItem value="rejected">Rejetées</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortOrder} onValueChange={(value: "asc" | "desc") => setSortOrder(value)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Trier par date" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="desc">Plus récentes</SelectItem>
-                <SelectItem value="asc">Plus anciennes</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <ListingsFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+          />
 
           <ListingsTable listings={filteredListings} onDelete={handleDelete} />
         </div>
