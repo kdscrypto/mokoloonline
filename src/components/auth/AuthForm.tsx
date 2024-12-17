@@ -11,13 +11,13 @@ export const AuthForm = () => {
     // Écouter les erreurs d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       switch (event) {
-        case 'USER_DELETED':
+        case "USER_DELETED":
           toast.error("Le compte a été supprimé");
           break;
-        case 'PASSWORD_RECOVERY':
+        case "PASSWORD_RECOVERY":
           toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
           break;
-        case 'SIGNED_OUT':
+        case "SIGNED_OUT":
           toast.success("Déconnexion réussie");
           break;
       }
