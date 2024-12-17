@@ -1,15 +1,11 @@
-import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { ProfileForm } from "@/components/auth/ProfileForm";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -56,34 +52,6 @@ export default function Auth() {
     };
   }, [navigate]);
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Erreur d'authentification");
-      return;
-    }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        username: profileData.username,
-        full_name: profileData.full_name,
-        city: profileData.city,
-        phone: profileData.phone,
-      })
-      .eq('id', user.id);
-
-    if (error) {
-      toast.error("Erreur lors de la mise à jour du profil");
-      return;
-    }
-
-    toast.success("Profil créé avec succès !");
-    navigate("/dashboard");
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -94,55 +62,16 @@ export default function Auth() {
           </Link>
         </div>
         <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
-          Connexion / Inscription
+          {showProfileForm ? "Complétez votre profil" : "Connexion / Inscription"}
         </h2>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card className="py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <SupabaseAuth 
-            supabaseClient={supabase} 
-            appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#000000',
-                    brandAccent: '#666666',
-                  },
-                },
-              },
-            }}
-            providers={[]}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'Email',
-                  password_label: 'Mot de passe',
-                  button_label: 'Se connecter',
-                  email_input_placeholder: 'Votre email',
-                  password_input_placeholder: 'Votre mot de passe',
-                  link_text: 'Déjà inscrit ? Connectez-vous',
-                },
-                sign_up: {
-                  email_label: 'Email',
-                  password_label: 'Mot de passe',
-                  button_label: "S'inscrire",
-                  email_input_placeholder: 'Votre email',
-                  password_input_placeholder: 'Choisissez un mot de passe',
-                  link_text: 'Pas encore de compte ? Inscrivez-vous',
-                },
-                forgotten_password: {
-                  button_label: 'Envoyer les instructions',
-                  link_text: 'Mot de passe oublié ?',
-                },
-              },
-            }}
-            theme="light"
-            view="sign_in"
-            showLinks={true}
-          />
-        </Card>
+        {showProfileForm ? (
+          <ProfileForm profileData={profileData} setProfileData={setProfileData} />
+        ) : (
+          <AuthForm />
+        )}
       </div>
     </div>
   );
