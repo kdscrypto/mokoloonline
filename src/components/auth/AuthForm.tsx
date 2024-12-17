@@ -8,15 +8,17 @@ import { toast } from "sonner";
 export const AuthForm = () => {
   useEffect(() => {
     // Écouter les erreurs d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "USER_DELETED") {
-        toast.error("Le compte a été supprimé");
-      }
-      if (event === "PASSWORD_RECOVERY") {
-        toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
-      }
-      if (event === "SIGNED_OUT") {
-        toast.success("Déconnexion réussie");
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      switch (event) {
+        case 'USER_DELETED':
+          toast.error("Le compte a été supprimé");
+          break;
+        case 'PASSWORD_RECOVERY':
+          toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
+          break;
+        case 'SIGNED_OUT':
+          toast.success("Déconnexion réussie");
+          break;
       }
     });
 
@@ -41,6 +43,7 @@ export const AuthForm = () => {
           },
         }}
         providers={[]}
+        redirectTo="https://www.mokoloonline.xyz/auth"
         localization={{
           variables: {
             sign_in: {
