@@ -4,11 +4,12 @@ import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 export const AuthForm = () => {
   useEffect(() => {
     // Écouter les erreurs d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       switch (event) {
         case 'USER_DELETED':
           toast.error("Le compte a été supprimé");
