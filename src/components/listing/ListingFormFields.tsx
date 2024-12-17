@@ -5,10 +5,20 @@ import { BasicInfoFields } from "./BasicInfoFields";
 import { ContactFields } from "./ContactFields";
 import { ImageUploadField } from "./ImageUploadField";
 import { ListingTypeSelector } from "./ListingTypeSelector";
+import { z } from "zod";
 
-// Add validation rules
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const listingSchema = z.object({
+  title: z.string().min(3, "Le titre doit contenir au moins 3 caractères").max(100, "Le titre ne doit pas dépasser 100 caractères"),
+  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Le prix doit être un nombre positif"),
+  location: z.string().min(2, "La localisation doit contenir au moins 2 caractères"),
+  description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
+  category: z.string().min(1, "Veuillez sélectionner une catégorie"),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
+});
 
 interface ListingFormFieldsProps {
   formData: {
@@ -36,36 +46,46 @@ export function ListingFormFields({
   handleImageChange,
   handleVipChange,
 }: ListingFormFieldsProps) {
-  // Validate file upload
-  const validateFileUpload = (file: File): string | null => {
-    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      return "Type de fichier non autorisé. Utilisez JPG, PNG ou WEBP.";
+  const validateFormData = () => {
+    try {
+      listingSchema.parse(formData);
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      }
+      return false;
     }
-    if (file.size > FILE_SIZE_LIMIT) {
-      return "Fichier trop volumineux. Maximum 5MB.";
-    }
-    return null;
   };
 
-  // Enhanced input validation
+  const validateFileUpload = (file: File): boolean => {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      toast.error("Type de fichier non autorisé. Utilisez JPG, PNG ou WEBP.");
+      return false;
+    }
+    if (file.size > FILE_SIZE_LIMIT) {
+      toast.error("Fichier trop volumineux. Maximum 5MB.");
+      return false;
+    }
+    return true;
+  };
+
   const handleEnhancedInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Sanitize and validate input
-    let sanitizedValue = value.trim();
-    
-    // Specific validations
-    if (name === 'price') {
-      const numValue = Number(sanitizedValue);
+    if (name === 'price' && value !== '') {
+      const numValue = Number(value);
       if (isNaN(numValue) || numValue < 0) {
         toast.error("Le prix doit être un nombre positif");
         return;
       }
     }
     
-    if (name === 'phone' || name === 'whatsapp') {
+    if ((name === 'phone' || name === 'whatsapp') && value !== '') {
       const phoneRegex = /^\+?[0-9\s-]{8,}$/;
-      if (sanitizedValue && !phoneRegex.test(sanitizedValue)) {
+      if (!phoneRegex.test(value)) {
         toast.error("Format de numéro de téléphone invalide");
         return;
       }
@@ -74,18 +94,13 @@ export function ListingFormFields({
     handleInputChange(e);
   };
 
-  // Enhanced file handling
   const handleEnhancedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const error = validateFileUpload(file);
-      if (error) {
-        toast.error(error);
-        e.target.value = '';
-        return;
-      }
+    if (file && validateFileUpload(file)) {
+      handleImageChange(e);
+    } else {
+      e.target.value = '';
     }
-    handleImageChange(e);
   };
 
   return (

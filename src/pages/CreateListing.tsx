@@ -24,12 +24,15 @@ export default function CreateListing() {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/auth");
         toast.error("Vous devez être connecté pour créer une annonce");
       }
-    });
+    };
+
+    checkAuth();
   }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -61,7 +64,11 @@ export default function CreateListing() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
+      if (!user) {
+        toast.error("Non authentifié");
+        navigate("/auth");
+        return;
+      }
 
       let image_url = null;
       if (formData.image) {
@@ -71,7 +78,12 @@ export default function CreateListing() {
           .from('listings')
           .upload(fileName, formData.image);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          toast.error("Erreur lors du téléchargement de l'image");
+          return;
+        }
+
         if (data) {
           const { data: { publicUrl } } = supabase.storage
             .from('listings')
@@ -80,7 +92,6 @@ export default function CreateListing() {
         }
       }
 
-      // Calculate vip_until date based on the selected duration
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
       const { error } = await supabase.from('listings').insert({
@@ -98,13 +109,17 @@ export default function CreateListing() {
         vip_until
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error creating listing:", error);
+        toast.error("Erreur lors de la création de l'annonce");
+        return;
+      }
 
       toast.success("Annonce créée avec succès ! Elle sera visible après validation.");
       navigate("/dashboard");
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue");
       console.error("Error creating listing:", error);
+      toast.error(error.message || "Une erreur est survenue");
     } finally {
       setIsLoading(false);
     }
