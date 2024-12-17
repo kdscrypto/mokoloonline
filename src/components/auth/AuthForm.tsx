@@ -8,7 +8,6 @@ import { AuthChangeEvent } from "@supabase/supabase-js";
 
 export const AuthForm = () => {
   useEffect(() => {
-    // Écouter les erreurs d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       switch (event) {
         case "USER_DELETED":
@@ -19,6 +18,9 @@ export const AuthForm = () => {
           break;
         case "SIGNED_OUT":
           toast.success("Déconnexion réussie");
+          break;
+        case "SIGNED_IN":
+          toast.success("Connexion réussie");
           break;
       }
     });
