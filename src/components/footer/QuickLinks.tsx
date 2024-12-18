@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { ContactDialog } from "../contact/ContactDialog";
+import { useState } from "react";
 
 export function QuickLinks() {
+  const [contactOpen, setContactOpen] = useState(false);
+  
   const links = [
     { label: "À propos", to: "/about" },
     { label: "Comment ça marche", to: "/how-it-works" },
@@ -24,7 +27,10 @@ export function QuickLinks() {
           </li>
         ))}
         <li>
-          <ContactDialog />
+          <ContactDialog 
+            open={contactOpen}
+            onOpenChange={setContactOpen}
+          />
         </li>
       </ul>
     </div>
