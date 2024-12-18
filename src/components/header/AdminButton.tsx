@@ -15,7 +15,7 @@ export const AdminButton = () => {
           .from("admin_users")
           .select("*")
           .eq("user_id", session.user.id)
-          .single();
+          .maybeSingle();
         
         setIsAdmin(!!adminData);
       }
@@ -29,7 +29,7 @@ export const AdminButton = () => {
           .from("admin_users")
           .select("*")
           .eq("user_id", session.user.id)
-          .single();
+          .maybeSingle();
         
         setIsAdmin(!!adminData);
       } else {
