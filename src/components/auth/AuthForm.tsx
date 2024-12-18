@@ -108,6 +108,7 @@ export function AuthForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="votre@email.com"
+              disabled={isLoading}
             />
           </div>
 
@@ -120,6 +121,8 @@ export function AuthForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
+              disabled={isLoading}
+              minLength={6}
             />
           </div>
 

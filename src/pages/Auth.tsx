@@ -18,9 +18,26 @@ export default function Auth() {
   });
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile && profile.username) {
+          navigate("/dashboard");
+        } else {
+          setShowProfileForm(true);
+        }
+      }
+    };
+
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -42,8 +59,6 @@ export default function Auth() {
         }
       } else if (event === 'SIGNED_OUT') {
         navigate("/auth");
-      } else if (event === 'PASSWORD_RECOVERY') {
-        toast.info("Vérifiez vos emails pour réinitialiser votre mot de passe");
       }
     });
 
@@ -53,8 +68,8 @@ export default function Auth() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center mb-6">
           <Link to="/" className="flex items-center text-gray-500 hover:text-gray-700">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -64,9 +79,7 @@ export default function Auth() {
         <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
           {showProfileForm ? "Complétez votre profil" : "Connexion / Inscription"}
         </h2>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         {showProfileForm ? (
           <ProfileForm profileData={profileData} setProfileData={setProfileData} />
         ) : (
