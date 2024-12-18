@@ -42,6 +42,7 @@ export const AdminButton = () => {
     };
   }, []);
 
+  // Si l'utilisateur n'est pas admin, on ne rend rien
   if (!isAdmin) return null;
 
   return (
