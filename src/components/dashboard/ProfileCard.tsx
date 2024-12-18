@@ -17,7 +17,7 @@ interface ProfileCardProps {
 
 export function ProfileCard({ profile, onPhotoUpdate }: ProfileCardProps) {
   return (
-    <Card className="p-6 mb-8 bg-white rounded-lg shadow">
+    <Card className="p-6 mb-8 bg-[#D3E4FD] rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
       <div className="flex items-center gap-4">
         <ProfilePhotoUpload
           currentPhotoUrl={profile.avatar_url}
