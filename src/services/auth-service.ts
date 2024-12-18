@@ -4,19 +4,25 @@ import { toast } from "sonner";
 
 export async function checkSession() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      throw sessionError;
+    }
+
     if (!session) {
       return null;
     }
 
-    const { data: profile, error } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', session.user.id)
       .single();
 
-    if (error) {
-      throw error;
+    if (profileError) {
+      console.error("Erreur lors de la récupération du profil:", profileError);
+      return { session, profile: null };
     }
 
     return { session, profile };
@@ -28,8 +34,13 @@ export async function checkSession() {
 
 export async function signOut() {
   try {
-    await supabase.auth.signOut();
-    toast.success("Déconnexion réussie");
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    
+    toast.success("Déconnexion réussie", {
+      description: "À bientôt !"
+    });
+    
     window.location.href = '/';
   } catch (error) {
     await handleError(error, 'signOut');
