@@ -28,7 +28,8 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError) {
-        throw new Error("Erreur d'authentification");
+        toast.error("Erreur d'authentification");
+        return;
       }
 
       if (!user) {
@@ -43,6 +44,19 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
         return;
       }
 
+      // Vérifier d'abord si le nom d'utilisateur est déjà pris
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', profileData.username)
+        .neq('id', user.id)
+        .maybeSingle();
+
+      if (existingUser) {
+        toast.error("Ce nom d'utilisateur est déjà pris");
+        return;
+      }
+
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -54,10 +68,11 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
         .eq('id', user.id);
 
       if (updateError) {
+        console.error("Erreur lors de la mise à jour:", updateError);
         if (updateError.code === '23505') {
           toast.error("Ce nom d'utilisateur est déjà pris");
         } else {
-          throw updateError;
+          toast.error("Une erreur est survenue lors de la mise à jour du profil");
         }
         return;
       }
@@ -66,7 +81,7 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Erreur lors de la mise à jour du profil:", error);
-      toast.error(error.message || "Une erreur est survenue lors de la mise à jour du profil");
+      toast.error("Une erreur est survenue lors de la mise à jour du profil");
     }
   };
 
