@@ -28,16 +28,14 @@ export function ProfileCard({ profile, onPhotoUpdate }: ProfileCardProps) {
           <h2 className="text-xl font-semibold">{profile.full_name || 'Nom non défini'}</h2>
           <div className="flex items-center gap-1 text-gray-600">
             <User className="h-4 w-4" />
-            <span>@{profile.username || 'username non défini'}</span>
+            <span>{profile.username ? `@${profile.username}` : 'Nom d\'utilisateur non défini'}</span>
           </div>
           <div className="mt-2 flex items-center gap-1 text-gray-600">
             {profile.city && <span className="mr-4">{profile.city}</span>}
-            {profile.phone && (
-              <div className="flex items-center gap-1">
-                <Phone className="h-4 w-4" />
-                <span>{profile.phone}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <Phone className="h-4 w-4" />
+              <span>{profile.phone || 'Numéro de téléphone non défini'}</span>
+            </div>
           </div>
         </div>
       </div>
