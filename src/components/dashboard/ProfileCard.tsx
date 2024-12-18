@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { User } from "lucide-react";
 import { ProfilePhotoUpload } from "../profile/ProfilePhotoUpload";
+import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
 
 interface ProfileCardProps {
   profile: {
@@ -11,7 +12,7 @@ interface ProfileCardProps {
     phone: string | null;
     avatar_url: string | null;
   };
-  onPhotoUpdate: (url: string) => void;
+  onPhotoUpdate: () => Promise<QueryObserverResult>;
 }
 
 export function ProfileCard({ profile, onPhotoUpdate }: ProfileCardProps) {

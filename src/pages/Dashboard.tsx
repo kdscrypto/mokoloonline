@@ -93,7 +93,10 @@ export default function Dashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <DashboardHeader />
-      <ProfileCard profile={profile} onPhotoUpdate={refetchProfile} />
+      <ProfileCard 
+        profile={profile} 
+        onPhotoUpdate={refetchProfile}
+      />
       <DashboardStats listings={listings} />
       <DashboardContent
         listings={listings}
