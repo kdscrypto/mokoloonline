@@ -10,7 +10,7 @@ import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 import { ProfileCard } from "@/components/dashboard/ProfileCard";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { ListingsFilters } from "@/components/dashboard/ListingsFilters";
-import type { Listing, ListingStatus } from "@/integrations/supabase/types/listing";
+import type { Listing } from "@/integrations/supabase/types/listing";
 
 export default function Dashboard() {
   usePerformanceMonitoring("dashboard");
@@ -19,6 +19,19 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Vous devez être connecté pour accéder au tableau de bord");
+        navigate("/auth");
+        return;
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const { data: profile, refetch: refetchProfile } = useQuery({
     queryKey: ['user-profile'],
@@ -49,7 +62,7 @@ export default function Dashboard() {
         .eq('user_id', user.id);
 
       if (statusFilter !== "all") {
-        query = query.eq('status', statusFilter as ListingStatus);
+        query = query.eq('status', statusFilter);
       }
 
       query = query.order('created_at', { ascending: sortOrder === "asc" });
@@ -57,22 +70,9 @@ export default function Dashboard() {
       const { data, error } = await query;
       if (error) throw error;
       
-      // Assurons-nous que le statut est du bon type
-      return (data as any[]).map(listing => ({
-        ...listing,
-        status: listing.status as ListingStatus
-      })) as Listing[];
+      return data as Listing[];
     },
   });
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        toast.error("Vous devez être connecté pour accéder au tableau de bord");
-      }
-    });
-  }, [navigate]);
 
   const handleDelete = async (id: string) => {
     try {
