@@ -13,12 +13,19 @@ interface SignUpFormProps {
 export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -78,6 +85,20 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="••••••••"
+          disabled={isLoading}
+          minLength={6}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+        <Input
+          id="confirm-password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
           placeholder="••••••••"
           disabled={isLoading}
