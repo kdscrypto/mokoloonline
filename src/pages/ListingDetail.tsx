@@ -1,13 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, MapPin, MessageCircle, Lock, Shield, AlertTriangle } from "lucide-react";
+import { Phone, MapPin, MessageCircle, Lock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { SellerProfile } from "@/components/seller/SellerProfile";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { SecurityGuidelines } from "@/components/listing/SecurityGuidelines";
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -157,54 +157,10 @@ export default function ListingDetail() {
         </Card>
 
         <Card className="p-6">
-          <Collapsible
-            open={isSecurityOpen}
+          <SecurityGuidelines 
+            isOpen={isSecurityOpen}
             onOpenChange={setIsSecurityOpen}
-            className="space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-semibold">Consignes de sécurité</h3>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {isSecurityOpen ? "Masquer" : "Afficher"}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="space-y-4">
-              <div className="grid gap-4 text-sm">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p>Ne payez jamais à l'avance sans avoir vu l'article</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p>Privilégiez les rencontres dans des lieux publics</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p>Méfiez-vous des prix anormalement bas</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p>Ne communiquez jamais vos informations bancaires</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p>En cas de doute, contactez notre équipe de support</p>
-                </div>
-              </div>
-              <div className="pt-4 border-t">
-                <Link to="/security">
-                  <Button variant="link" className="p-0">
-                    En savoir plus sur nos mesures de sécurité
-                  </Button>
-                </Link>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          />
         </Card>
 
         {isAuthenticated && listing.user_id && (
