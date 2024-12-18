@@ -24,11 +24,14 @@ export function ProfilePhotoUpload({ currentPhotoUrl, userId, onPhotoUpdate }: P
       setIsUploading(true);
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}-${Math.random()}.${fileExt}`;
+      const fileName = `${userId}/${userId}-${Math.random()}.${fileExt}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, file, { 
+          upsert: true,
+          cacheControl: '3600'
+        });
 
       if (uploadError) throw uploadError;
 
@@ -46,7 +49,7 @@ export function ProfilePhotoUpload({ currentPhotoUrl, userId, onPhotoUpdate }: P
       await onPhotoUpdate();
       toast.success("Photo de profil mise à jour");
     } catch (error: any) {
-      console.error('Error uploading photo:', error);
+      console.error('Erreur lors du téléchargement de la photo:', error);
       toast.error("Erreur lors de la mise à jour de la photo");
     } finally {
       setIsUploading(false);
