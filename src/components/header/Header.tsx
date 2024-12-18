@@ -9,7 +9,7 @@ export const Header = () => {
     <header 
       className="relative flex justify-between items-center rounded-2xl p-6 shadow-lg overflow-hidden"
       style={{
-        backgroundImage: "url('/lovable-uploads/5a53b4b8-8233-483e-bce7-673a6e2820a4.png')",
+        backgroundImage: "url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80')",
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
