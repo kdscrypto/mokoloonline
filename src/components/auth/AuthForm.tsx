@@ -6,15 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-export const AuthForm = () => {
+export function AuthForm() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
@@ -44,26 +43,41 @@ export const AuthForm = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        });
-        if (error) throw error;
-        toast.success("Vérifiez votre email pour confirmer votre inscription");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        navigate("/dashboard");
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      navigate("/dashboard");
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Erreur d'authentification:", error);
+      toast.error(error.message || "Erreur lors de la connexion");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Vérifiez votre email pour confirmer votre inscription");
+    } catch (error: any) {
+      console.error("Erreur d'inscription:", error);
+      toast.error(error.message || "Erreur lors de l'inscription");
     } finally {
       setIsLoading(false);
     }
@@ -71,12 +85,8 @@ export const AuthForm = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-md mx-auto">
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <h1 className="text-2xl font-bold text-center">
-            {isSignUp ? "Créer un compte" : "Se connecter"}
-          </h1>
-          
+      <Card className="max-w-md mx-auto p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -85,6 +95,7 @@ export const AuthForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              placeholder="votre@email.com"
             />
           </div>
 
@@ -96,27 +107,20 @@ export const AuthForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              placeholder="••••••••"
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Chargement..." : isSignUp ? "S'inscrire" : "Se connecter"}
-          </Button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-primary hover:underline"
-            >
-              {isSignUp
-                ? "Déjà inscrit ? Se connecter"
-                : "Pas encore de compte ? S'inscrire"}
-            </button>
+          <div className="flex flex-col gap-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Chargement..." : "Se connecter"}
+            </Button>
+            <Button type="button" variant="outline" onClick={handleSignUp} disabled={isLoading}>
+              Créer un compte
+            </Button>
           </div>
         </form>
       </Card>
     </div>
   );
-};
+}
