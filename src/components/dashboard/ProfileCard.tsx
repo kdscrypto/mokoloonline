@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { User } from "lucide-react";
+import { User, Phone } from "lucide-react";
 import { ProfilePhotoUpload } from "../profile/ProfilePhotoUpload";
 import { QueryObserverResult } from "@tanstack/react-query";
 
@@ -25,11 +25,19 @@ export function ProfileCard({ profile, onPhotoUpdate }: ProfileCardProps) {
           onPhotoUpdate={onPhotoUpdate}
         />
         <div>
-          <h2 className="text-xl font-semibold">{profile.full_name}</h2>
-          <p className="text-gray-600">@{profile.username}</p>
-          <div className="mt-1 text-sm text-gray-500">
-            <span className="mr-4">{profile.city}</span>
-            {profile.phone && <span>📞 {profile.phone}</span>}
+          <h2 className="text-xl font-semibold">{profile.full_name || 'Nom non défini'}</h2>
+          <div className="flex items-center gap-1 text-gray-600">
+            <User className="h-4 w-4" />
+            <span>@{profile.username || 'username non défini'}</span>
+          </div>
+          <div className="mt-2 flex items-center gap-1 text-gray-600">
+            {profile.city && <span className="mr-4">{profile.city}</span>}
+            {profile.phone && (
+              <div className="flex items-center gap-1">
+                <Phone className="h-4 w-4" />
+                <span>{profile.phone}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
