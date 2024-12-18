@@ -7,12 +7,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Check, X, Eye, Crown } from "lucide-react";
+import { Check, X, Eye, Crown, Pencil, Trash2 } from "lucide-react";
 import { ListingStatus } from "@/components/dashboard/ListingStatus";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { useState } from "react";
 import { ListingPreviewDialog } from "./ListingPreviewDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminListingsTableProps {
   listings: Listing[];
@@ -24,6 +27,7 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [vipDuration, setVipDuration] = useState<string>("0");
+  const navigate = useNavigate();
 
   const handlePreview = (listing: Listing) => {
     setSelectedListing(listing);
@@ -34,6 +38,27 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
     const duration = parseInt(vipDuration);
     onApprove(id, duration > 0 ? duration : undefined);
     setVipDuration("0"); // Reset after approval
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/edit-listing/${id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success("Annonce supprimée avec succès");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      toast.error("Erreur lors de la suppression de l'annonce");
+    }
   };
 
   return (
@@ -77,6 +102,24 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
                     onClick={() => handlePreview(listing)}
                   >
                     <Eye className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-blue-50"
+                    onClick={() => handleEdit(listing.id)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-red-50"
+                    onClick={() => handleDelete(listing.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-600" />
                   </Button>
                   
                   {listing.status === 'pending' && (
