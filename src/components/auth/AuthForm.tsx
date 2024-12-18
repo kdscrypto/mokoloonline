@@ -16,14 +16,23 @@ export function AuthForm() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (profile) {
-          navigate("/dashboard");
+          if (error) {
+            throw error;
+          }
+
+          if (profile && profile.username) {
+            navigate("/dashboard");
+          }
+        } catch (error: any) {
+          console.error("Erreur lors de la vérification du profil:", error);
+          toast.error("Erreur lors de la vérification du profil");
         }
       }
     };
@@ -32,15 +41,24 @@ export function AuthForm() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       if (event === "SIGNED_IN" && session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-        if (profile) {
-          toast.success("Connexion réussie");
-          navigate("/dashboard");
+          if (error) {
+            throw error;
+          }
+
+          if (profile && profile.username) {
+            toast.success("Connexion réussie");
+            navigate("/dashboard");
+          }
+        } catch (error: any) {
+          console.error("Erreur lors de la vérification du profil:", error);
+          toast.error("Erreur lors de la vérification du profil");
         }
       }
     });

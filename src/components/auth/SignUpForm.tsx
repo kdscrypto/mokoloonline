@@ -13,13 +13,17 @@ interface SignUpFormProps {
 export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Créer l'utilisateur
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -27,7 +31,21 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
         },
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Mettre à jour le profil
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            username,
+            full_name: fullName,
+            phone,
+          })
+          .eq('id', authData.user.id);
+
+        if (profileError) throw profileError;
+      }
 
       toast.success("Vérifiez votre email pour confirmer votre inscription");
     } catch (error: any) {
@@ -64,6 +82,45 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
           placeholder="••••••••"
           disabled={isLoading}
           minLength={6}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="username">Nom d'utilisateur</Label>
+        <Input
+          id="username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          placeholder="Votre nom d'utilisateur"
+          disabled={isLoading}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="fullName">Nom complet</Label>
+        <Input
+          id="fullName"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          placeholder="Votre nom complet"
+          disabled={isLoading}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phone">Numéro de téléphone</Label>
+        <Input
+          id="phone"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+          placeholder="Votre numéro de téléphone"
+          disabled={isLoading}
         />
       </div>
 
