@@ -7,7 +7,8 @@ export async function checkSession() {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     if (sessionError) {
-      throw sessionError;
+      console.error("Erreur de session:", sessionError);
+      throw new Error("Impossible de vérifier votre session");
     }
 
     if (!session) {
@@ -35,7 +36,10 @@ export async function checkSession() {
 export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+      throw new Error("Impossible de vous déconnecter");
+    }
     
     toast.success("Déconnexion réussie", {
       description: "À bientôt !"

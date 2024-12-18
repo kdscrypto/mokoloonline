@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { checkSession } from '@/services/auth-service';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const validateAccess = async () => {
@@ -22,7 +24,8 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         const result = await checkSession();
         
         if (requireAuth && !result) {
-          toast.error("Vous devez être connecté pour accéder à cette page", {
+          setError("Vous devez être connecté pour accéder à cette page");
+          toast.error("Accès restreint", {
             description: "Redirection vers la page de connexion..."
           });
           navigate('/auth');
@@ -37,8 +40,9 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
             .single();
 
           if (adminError || !adminData) {
+            setError("Vous n'avez pas les droits administrateur nécessaires");
             toast.error("Accès non autorisé", {
-              description: "Vous n'avez pas les droits administrateur nécessaires"
+              description: "Cette page est réservée aux administrateurs"
             });
             navigate('/');
             return;
@@ -46,9 +50,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         }
 
         setIsAuthorized(true);
+        setError(null);
       } catch (error) {
         console.error("Erreur lors de la vérification des droits:", error);
-        toast.error("Une erreur est survenue", {
+        setError("Une erreur est survenue lors de la vérification de vos droits");
+        toast.error("Erreur de vérification", {
           description: "Impossible de vérifier vos droits d'accès"
         });
         navigate('/auth');
@@ -62,7 +68,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'SIGNED_OUT') {
         setIsAuthorized(false);
+        setError("Votre session a expiré");
         if (requireAuth) {
+          toast.error("Session expirée", {
+            description: "Veuillez vous reconnecter"
+          });
           navigate('/auth');
         }
       }
@@ -76,7 +86,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
         <p className="text-sm text-gray-500">Vérification des droits d'accès...</p>
       </div>
     );
@@ -87,7 +97,14 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
         <Shield className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Accès non autorisé</h2>
-        <p className="text-sm text-gray-500">Redirection en cours...</p>
+        <p className="text-sm text-gray-500">{error || "Redirection en cours..."}</p>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="mt-4"
+        >
+          Retour à l'accueil
+        </Button>
       </div>
     );
   }
