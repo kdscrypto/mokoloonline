@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Check, X, Eye, Crown, Pencil, Trash2 } from "lucide-react";
+import { Check, X, Eye, Crown, Pencil, Trash2, Mail } from "lucide-react";
 import { ListingStatus } from "@/components/dashboard/ListingStatus";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { useState } from "react";
@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ContactDialog } from "@/components/contact/ContactDialog";
 
 interface AdminListingsTableProps {
   listings: Listing[];
@@ -27,11 +28,17 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [vipDuration, setVipDuration] = useState<string>("0");
+  const [contactOpen, setContactOpen] = useState(false);
   const navigate = useNavigate();
 
   const handlePreview = (listing: Listing) => {
     setSelectedListing(listing);
     setPreviewOpen(true);
+  };
+
+  const handleContact = (listing: Listing) => {
+    setSelectedListing(listing);
+    setContactOpen(true);
   };
 
   const handleApprove = (id: string) => {
@@ -121,6 +128,15 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
                   >
                     <Trash2 className="h-4 w-4 text-red-600" />
                   </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-green-50"
+                    onClick={() => handleContact(listing)}
+                  >
+                    <Mail className="h-4 w-4 text-green-600" />
+                  </Button>
                   
                   {listing.status === 'pending' && (
                     <>
@@ -168,6 +184,14 @@ export function ListingsTable({ listings, onApprove, onReject }: AdminListingsTa
         open={previewOpen}
         onOpenChange={setPreviewOpen}
       />
+
+      {selectedListing && (
+        <ContactDialog
+          open={contactOpen}
+          onOpenChange={setContactOpen}
+          listing={selectedListing}
+        />
+      )}
     </>
   );
 }
