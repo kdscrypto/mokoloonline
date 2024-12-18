@@ -29,6 +29,16 @@ export default function Dashboard() {
     };
 
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const { data: profile, refetch: refetchProfile } = useQuery({

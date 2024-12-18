@@ -4,11 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { User } from "lucide-react";
+import { QueryObserverResult } from "@tanstack/react-query";
 
 interface ProfilePhotoUploadProps {
   currentPhotoUrl: string | null;
   userId: string;
-  onPhotoUpdate: (url: string) => void;
+  onPhotoUpdate: () => Promise<QueryObserverResult>;
 }
 
 export function ProfilePhotoUpload({ currentPhotoUrl, userId, onPhotoUpdate }: ProfilePhotoUploadProps) {
@@ -42,7 +43,7 @@ export function ProfilePhotoUpload({ currentPhotoUrl, userId, onPhotoUpdate }: P
 
       if (updateError) throw updateError;
 
-      onPhotoUpdate(publicUrl);
+      await onPhotoUpdate();
       toast.success("Photo de profil mise à jour");
     } catch (error: any) {
       console.error('Error uploading photo:', error);

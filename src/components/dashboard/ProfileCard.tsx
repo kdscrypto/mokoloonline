@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { User } from "lucide-react";
 import { ProfilePhotoUpload } from "../profile/ProfilePhotoUpload";
-import { RefetchOptions, QueryObserverResult } from "@tanstack/react-query";
+import { QueryObserverResult } from "@tanstack/react-query";
 
 interface ProfileCardProps {
   profile: {
