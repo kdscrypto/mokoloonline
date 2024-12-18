@@ -24,29 +24,50 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Erreur d'authentification");
-      return;
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        throw new Error("Erreur d'authentification");
+      }
+
+      if (!user) {
+        toast.error("Vous devez être connecté pour mettre à jour votre profil");
+        navigate("/auth");
+        return;
+      }
+
+      // Vérification des champs requis
+      if (!profileData.username || !profileData.full_name || !profileData.city || !profileData.phone) {
+        toast.error("Veuillez remplir tous les champs");
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          username: profileData.username,
+          full_name: profileData.full_name,
+          city: profileData.city,
+          phone: profileData.phone,
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        if (updateError.code === '23505') {
+          toast.error("Ce nom d'utilisateur est déjà pris");
+        } else {
+          throw updateError;
+        }
+        return;
+      }
+
+      toast.success("Profil créé avec succès !");
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      toast.error(error.message || "Une erreur est survenue lors de la mise à jour du profil");
     }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        username: profileData.username,
-        full_name: profileData.full_name,
-        city: profileData.city,
-        phone: profileData.phone,
-      })
-      .eq('id', user.id);
-
-    if (error) {
-      toast.error("Erreur lors de la mise à jour du profil");
-      return;
-    }
-
-    toast.success("Profil créé avec succès !");
-    navigate("/dashboard");
   };
 
   return (
@@ -68,6 +89,7 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
                 required
                 value={profileData.username}
                 onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
@@ -79,6 +101,7 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
                 required
                 value={profileData.full_name}
                 onChange={(e) => setProfileData(prev => ({ ...prev, full_name: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
@@ -90,6 +113,7 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
                 required
                 value={profileData.city}
                 onChange={(e) => setProfileData(prev => ({ ...prev, city: e.target.value }))}
+                className="mt-1"
               />
             </div>
 
@@ -101,6 +125,8 @@ export const ProfileForm = ({ profileData, setProfileData }: ProfileFormProps) =
                 required
                 value={profileData.phone}
                 onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                className="mt-1"
+                placeholder="+237 6XX XX XX XX"
               />
             </div>
 
