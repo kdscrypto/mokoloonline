@@ -1,12 +1,12 @@
 import {
   TableHead,
-  TableHeader,
+  TableHeader as UITableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 export function TableHeader() {
   return (
-    <TableHeader>
+    <UITableHeader>
       <TableRow>
         <TableHead>Titre</TableHead>
         <TableHead>Prix</TableHead>
@@ -16,6 +16,6 @@ export function TableHeader() {
         <TableHead>Date de création</TableHead>
         <TableHead>Actions</TableHead>
       </TableRow>
-    </TableHeader>
+    </UITableHeader>
   );
 }
