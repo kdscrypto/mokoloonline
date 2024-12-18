@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkSession } from '@/services/auth-service';
-import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Shield, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,9 +20,14 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   useEffect(() => {
     const validateAccess = async () => {
       try {
-        const result = await checkSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (requireAuth && !result) {
+        if (sessionError) {
+          console.error("Erreur de session:", sessionError);
+          throw new Error("Erreur lors de la vérification de la session");
+        }
+        
+        if (requireAuth && !session) {
           setError("Vous devez être connecté pour accéder à cette page");
           toast.error("Accès restreint", {
             description: "Redirection vers la page de connexion..."
@@ -32,14 +36,19 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           return;
         }
 
-        if (requireAdmin && result) {
+        if (requireAdmin && session) {
           const { data: adminData, error: adminError } = await supabase
             .from('admin_users')
             .select('*')
-            .eq('user_id', result.session.user.id)
-            .single();
+            .eq('user_id', session.user.id)
+            .maybeSingle();
 
-          if (adminError || !adminData) {
+          if (adminError) {
+            console.error("Erreur lors de la vérification des droits admin:", adminError);
+            throw new Error("Erreur lors de la vérification des droits administrateur");
+          }
+
+          if (!adminData) {
             setError("Vous n'avez pas les droits administrateur nécessaires");
             toast.error("Accès non autorisé", {
               description: "Cette page est réservée aux administrateurs"
@@ -51,13 +60,13 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
         setIsAuthorized(true);
         setError(null);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erreur lors de la vérification des droits:", error);
-        setError("Une erreur est survenue lors de la vérification de vos droits");
+        setError(error.message || "Une erreur est survenue lors de la vérification de vos droits");
         toast.error("Erreur de vérification", {
           description: "Impossible de vérifier vos droits d'accès"
         });
-        navigate('/auth');
+        navigate('/');
       } finally {
         setIsLoading(false);
       }
