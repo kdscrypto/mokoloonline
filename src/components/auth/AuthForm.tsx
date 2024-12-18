@@ -16,27 +16,34 @@ export function AuthForm() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
-      switch (event) {
-        case "SIGNED_IN":
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/dashboard");
+      }
+    };
+    
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+      if (event === "SIGNED_IN" && session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
           toast.success("Connexion réussie");
-          break;
-        case "SIGNED_OUT":
-          toast.success("Déconnexion réussie");
-          break;
-        case "USER_UPDATED":
-          toast.success("Profil mis à jour");
-          break;
-        case "PASSWORD_RECOVERY":
-          toast.info("Récupération du mot de passe en cours");
-          break;
+          navigate("/dashboard");
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,12 +56,9 @@ export function AuthForm() {
       });
 
       if (error) throw error;
-
-      navigate("/dashboard");
     } catch (error: any) {
       console.error("Erreur d'authentification:", error);
       toast.error(error.message || "Erreur lors de la connexion");
-    } finally {
       setIsLoading(false);
     }
   };
