@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { AuthChangeEvent } from "@supabase/supabase-js";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,17 +19,17 @@ export const AuthForm = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       switch (event) {
-        case "USER_DELETED":
-          toast.error("Compte supprimé");
-          break;
-        case "PASSWORD_RECOVERY":
-          toast.info("Récupération du mot de passe en cours");
+        case "SIGNED_IN":
+          toast.success("Connexion réussie");
           break;
         case "SIGNED_OUT":
           toast.success("Déconnexion réussie");
           break;
-        case "SIGNED_IN":
-          toast.success("Connexion réussie");
+        case "USER_UPDATED":
+          toast.success("Profil mis à jour");
+          break;
+        case "PASSWORD_RECOVERY":
+          toast.info("Récupération du mot de passe en cours");
           break;
       }
     });
