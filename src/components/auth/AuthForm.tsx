@@ -14,26 +14,36 @@ export function AuthForm() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        try {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (error) {
-            throw error;
-          }
-
-          if (profile && profile.username) {
-            navigate("/dashboard");
-          }
-        } catch (error: any) {
-          console.error("Erreur lors de la vérification du profil:", error);
-          toast.error("Erreur lors de la vérification du profil");
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          return;
         }
+
+        if (session) {
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+
+            if (profileError) {
+              throw profileError;
+            }
+
+            if (profile?.username) {
+              navigate("/dashboard");
+            }
+          } catch (error: any) {
+            console.error("Error checking profile:", error);
+            toast.error("Erreur lors de la vérification du profil");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
       }
     };
     
@@ -42,24 +52,30 @@ export function AuthForm() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       if (event === "SIGNED_IN" && session) {
         try {
-          const { data: profile, error } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (error) {
-            throw error;
+          if (profileError) {
+            throw profileError;
           }
 
-          if (profile && profile.username) {
+          if (profile?.username) {
             toast.success("Connexion réussie");
             navigate("/dashboard");
           }
         } catch (error: any) {
-          console.error("Erreur lors de la vérification du profil:", error);
+          console.error("Error checking profile:", error);
           toast.error("Erreur lors de la vérification du profil");
         }
+      } else if (event === "SIGNED_OUT") {
+        // Clear any local auth state
+        await supabase.auth.signOut();
+        navigate("/auth");
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log("Token refreshed successfully");
       }
     });
 
