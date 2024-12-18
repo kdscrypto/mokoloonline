@@ -25,9 +25,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 30, // 30 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes (remplacé cacheTime par gcTime)
       retry: 1,
       suspense: true,
+      refetchOnWindowFocus: false, // Désactive le refetch automatique
+      refetchOnMount: false, // Désactive le refetch au montage
     },
   },
 });
@@ -39,7 +41,28 @@ const RouteWrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Préchargement des routes populaires
+const preloadPopularRoutes = () => {
+  const popularRoutes = [
+    () => import("./pages/Index"),
+    () => import("./pages/ListingDetail"),
+    () => import("./pages/Auth"),
+  ];
+
+  // Précharge en arrière-plan après le chargement initial
+  setTimeout(() => {
+    popularRoutes.forEach((route) => {
+      route().then(() => {
+        console.log("Route préchargée avec succès");
+      });
+    });
+  }, 1000);
+};
+
 const App = () => {
+  // Déclenche le préchargement des routes populaires
+  preloadPopularRoutes();
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
