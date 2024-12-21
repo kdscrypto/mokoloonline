@@ -40,10 +40,15 @@ export function AuthForm() {
           } catch (error: any) {
             console.error("Error checking profile:", error);
             toast.error("Erreur lors de la vérification du profil");
+            // If there's an error with the token, sign out the user
+            if (error.message?.includes('JWT')) {
+              await supabase.auth.signOut();
+            }
           }
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        await supabase.auth.signOut();
       }
     };
     
@@ -69,9 +74,11 @@ export function AuthForm() {
         } catch (error: any) {
           console.error("Error checking profile:", error);
           toast.error("Erreur lors de la vérification du profil");
+          if (error.message?.includes('JWT')) {
+            await supabase.auth.signOut();
+          }
         }
       } else if (event === "SIGNED_OUT") {
-        // Clear any local auth state
         await supabase.auth.signOut();
         navigate("/auth");
       } else if (event === "TOKEN_REFRESHED") {
