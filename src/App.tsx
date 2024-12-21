@@ -1,62 +1,14 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import { usePerformanceMonitoring } from "@/utils/performance-monitor";
-import { Suspense, lazy } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
-
-// Lazy load components
-const Index = lazy(() => import("./pages/Index"));
-const ListingDetail = lazy(() => import("./pages/ListingDetail"));
-const CreateListing = lazy(() => import("./pages/CreateListing"));
-const EditListing = lazy(() => import("./pages/EditListing"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Admin = lazy(() => import("./pages/Admin"));
-const About = lazy(() => import("./pages/About"));
-const HowItWorks = lazy(() => import("./pages/HowItWorks"));
-const Security = lazy(() => import("./pages/Security"));
-
-// Configure React Query with performance optimizations
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 30, // 30 minutes
-      retry: 1,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  },
-});
-
-// Route wrapper component for performance monitoring
-const RouteWrapper = ({ children }: { children: React.ReactNode }) => {
-  const location = useLocation();
-  usePerformanceMonitoring(location.pathname);
-  return <>{children}</>;
-};
-
-// Préchargement des routes populaires
-const preloadPopularRoutes = () => {
-  const popularRoutes = [
-    () => import("./pages/Index"),
-    () => import("./pages/ListingDetail"),
-    () => import("./pages/Auth"),
-  ];
-
-  setTimeout(() => {
-    popularRoutes.forEach((route) => {
-      route().then(() => {
-        console.log("Route préchargée avec succès");
-      });
-    });
-  }, 1000);
-};
+import { RouteWrapper } from "@/components/layout/RouteWrapper";
+import { queryClient } from "@/config/query-client";
+import { routes } from "@/config/routes";
+import { preloadPopularRoutes } from "@/utils/route-preloader";
 
 const App = () => {
   preloadPopularRoutes();
@@ -75,23 +27,17 @@ const App = () => {
                 }
               >
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/listing/:id" element={<ListingDetail />} />
-                  <Route path="/create" element={<CreateListing />} />
-                  <Route path="/edit-listing/:id" element={<EditListing />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route 
-                    path="/admin" 
-                    element={
-                      <AuthGuard requireAuth requireAdmin>
-                        <Admin />
-                      </AuthGuard>
-                    } 
-                  />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/how-it-works" element={<HowItWorks />} />
-                  <Route path="/security" element={<Security />} />
+                  {Object.entries(routes).map(([key, route]) => (
+                    <Route
+                      key={key}
+                      path={route.path}
+                      element={
+                        route.element ? 
+                          route.element(route.component) : 
+                          <route.component />
+                      }
+                    />
+                  ))}
                 </Routes>
               </Suspense>
             </RouteWrapper>
