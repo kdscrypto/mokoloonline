@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
