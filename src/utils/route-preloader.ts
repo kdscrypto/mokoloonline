@@ -8,9 +8,11 @@ export const preloadPopularRoutes = () => {
   ];
 
   setTimeout(() => {
-    popularRoutes.forEach((route) => {
-      route().then(() => {
+    popularRoutes.forEach((Route) => {
+      Route().then(() => {
         console.log("Route préchargée avec succès");
+      }).catch((error) => {
+        console.error("Erreur lors du préchargement de la route:", error);
       });
     });
   }, 1000);
