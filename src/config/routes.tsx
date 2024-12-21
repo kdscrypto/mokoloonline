@@ -1,8 +1,12 @@
 import { lazy } from "react";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import type { RouteObject } from "react-router-dom";
 
-// Lazy load components
-export const routes = {
+interface CustomRouteObject extends RouteObject {
+  component: React.LazyExoticComponent<() => JSX.Element>;
+}
+
+export const routes: Record<string, CustomRouteObject> = {
   index: {
     path: "/",
     component: lazy(() => import("@/pages/Index")),

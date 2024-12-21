@@ -1,19 +1,18 @@
 import { routes } from "@/config/routes";
 
 export const preloadPopularRoutes = () => {
-  const popularRoutes = [
-    routes.index.component,
-    routes.listingDetail.component,
-    routes.auth.component,
-  ];
-
+  const popularPaths = ['index', 'listingDetail', 'auth'];
+  
   setTimeout(() => {
-    popularRoutes.forEach((Route) => {
-      Route().then(() => {
-        console.log("Route préchargée avec succès");
-      }).catch((error) => {
-        console.error("Erreur lors du préchargement de la route:", error);
-      });
+    popularPaths.forEach(path => {
+      if (path in routes) {
+        const route = routes[path as keyof typeof routes];
+        route.component().then(() => {
+          console.log(`Route ${path} préchargée avec succès`);
+        }).catch(error => {
+          console.error(`Erreur lors du préchargement de la route ${path}:`, error);
+        });
+      }
     });
   }, 1000);
 };
