@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -48,7 +49,6 @@ const preloadPopularRoutes = () => {
     () => import("./pages/Auth"),
   ];
 
-  // Précharge en arrière-plan après le chargement initial
   setTimeout(() => {
     popularRoutes.forEach((route) => {
       route().then(() => {
@@ -59,47 +59,48 @@ const preloadPopularRoutes = () => {
 };
 
 const App = () => {
-  // Déclenche le préchargement des routes populaires
   preloadPopularRoutes();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TooltipProvider>
-          <RouteWrapper>
-            <Suspense 
-              fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <LoadingIndicator size="lg" />
-                </div>
-              }
-            >
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/listing/:id" element={<ListingDetail />} />
-                <Route path="/create" element={<CreateListing />} />
-                <Route path="/edit-listing/:id" element={<EditListing />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <AuthGuard requireAuth requireAdmin>
-                      <Admin />
-                    </AuthGuard>
-                  } 
-                />
-                <Route path="/about" element={<About />} />
-                <Route path="/how-it-works" element={<HowItWorks />} />
-                <Route path="/security" element={<Security />} />
-              </Routes>
-            </Suspense>
-          </RouteWrapper>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <TooltipProvider>
+            <RouteWrapper>
+              <Suspense 
+                fallback={
+                  <div className="flex items-center justify-center min-h-screen">
+                    <LoadingIndicator size="lg" />
+                  </div>
+                }
+              >
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/listing/:id" element={<ListingDetail />} />
+                  <Route path="/create" element={<CreateListing />} />
+                  <Route path="/edit-listing/:id" element={<EditListing />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <AuthGuard requireAuth requireAdmin>
+                        <Admin />
+                      </AuthGuard>
+                    } 
+                  />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/how-it-works" element={<HowItWorks />} />
+                  <Route path="/security" element={<Security />} />
+                </Routes>
+              </Suspense>
+            </RouteWrapper>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 
