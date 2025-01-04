@@ -12,35 +12,33 @@ import { routes } from "@/config/routes";
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <RouteWrapper>
-              <Suspense 
-                fallback={
-                  <div className="flex items-center justify-center min-h-screen">
-                    <LoadingIndicator size="lg" />
-                  </div>
-                }
-              >
-                <Routes>
-                  {Object.entries(routes).map(([key, route]) => (
-                    <Route
-                      key={key}
-                      path={route.path}
-                      element={<route.component />}
-                    />
-                  ))}
-                </Routes>
-              </Suspense>
-            </RouteWrapper>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <RouteWrapper>
+            <Suspense 
+              fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <LoadingIndicator size="lg" />
+                </div>
+              }
+            >
+              <Routes>
+                {Object.entries(routes).map(([key, route]) => (
+                  <Route
+                    key={key}
+                    path={route.path}
+                    element={route.element ? route.element(route.component) : <route.component />}
+                  />
+                ))}
+              </Routes>
+            </Suspense>
+          </RouteWrapper>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
