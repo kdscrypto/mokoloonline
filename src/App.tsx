@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,48 +12,50 @@ import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
 
 const App = () => {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <RouteWrapper>
-              <Suspense 
-                fallback={
-                  <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-                    <div className="text-center">
-                      <LoadingIndicator size="lg" />
-                      <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+    <React.StrictMode>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <TooltipProvider>
+              <RouteWrapper>
+                <React.Suspense 
+                  fallback={
+                    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+                      <div className="text-center">
+                        <LoadingIndicator size="lg" />
+                        <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+                      </div>
                     </div>
-                  </div>
-                }
-              >
-                <Routes>
-                  {Object.entries(routes).map(([key, route]) => (
-                    <Route
-                      key={key}
-                      path={route.path}
-                      element={
-                        <Suspense 
-                          fallback={
-                            <div className="flex items-center justify-center min-h-[200px]">
-                              <LoadingIndicator size="sm" />
-                            </div>
-                          }
-                        >
-                          {route.element ? route.element(route.component) : <route.component />}
-                        </Suspense>
-                      }
-                    />
-                  ))}
-                </Routes>
-              </Suspense>
-            </RouteWrapper>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                  }
+                >
+                  <Routes>
+                    {Object.entries(routes).map(([key, route]) => (
+                      <Route
+                        key={key}
+                        path={route.path}
+                        element={
+                          <React.Suspense 
+                            fallback={
+                              <div className="flex items-center justify-center min-h-[200px]">
+                                <LoadingIndicator size="sm" />
+                              </div>
+                            }
+                          >
+                            {route.element ? route.element(route.component) : <route.component />}
+                          </React.Suspense>
+                        }
+                      />
+                    ))}
+                  </Routes>
+                </React.Suspense>
+              </RouteWrapper>
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </React.StrictMode>
   );
 };
 
