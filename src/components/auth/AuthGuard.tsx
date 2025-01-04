@@ -18,13 +18,20 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+
     const validateAccess = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
+        if (!mounted) return;
+
         if (sessionError) {
-          console.error("Erreur de session:", sessionError);
-          throw new Error("Erreur lors de la vérification de la session");
+          if (sessionError.message?.includes('JWT')) {
+            await supabase.auth.signOut();
+            throw new Error("Session expirée");
+          }
+          throw sessionError;
         }
         
         if (requireAuth && !session) {
@@ -45,6 +52,10 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
           if (adminError) {
             console.error("Erreur lors de la vérification des droits admin:", adminError);
+            if (adminError.message?.includes('JWT')) {
+              await supabase.auth.signOut();
+              throw new Error("Session expirée");
+            }
             throw new Error("Erreur lors de la vérification des droits administrateur");
           }
 
@@ -58,23 +69,31 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           }
         }
 
-        setIsAuthorized(true);
-        setError(null);
+        if (mounted) {
+          setIsAuthorized(true);
+          setError(null);
+        }
       } catch (error: any) {
         console.error("Erreur lors de la vérification des droits:", error);
-        setError(error.message || "Une erreur est survenue lors de la vérification de vos droits");
-        toast.error("Erreur de vérification", {
-          description: "Impossible de vérifier vos droits d'accès"
-        });
-        navigate('/');
+        if (mounted) {
+          setError(error.message || "Une erreur est survenue lors de la vérification de vos droits");
+          toast.error("Erreur de vérification", {
+            description: "Impossible de vérifier vos droits d'accès"
+          });
+        }
+        navigate('/auth');
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     validateAccess();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+      if (!mounted) return;
+
       if (event === 'SIGNED_OUT') {
         setIsAuthorized(false);
         setError("Votre session a expiré");
@@ -84,10 +103,13 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           });
           navigate('/auth');
         }
+      } else if (event === 'SIGNED_IN') {
+        validateAccess();
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, requireAuth, requireAdmin]);
