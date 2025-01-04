@@ -9,6 +9,7 @@ import { RegularListings } from "@/components/RegularListings";
 import { usePerformanceMonitoring } from "@/utils/performance-monitor";
 import { Header } from "@/components/header/Header";
 import { GoogleAd } from "@/components/ads/GoogleAd";
+import { Helmet } from "react-helmet";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -23,65 +24,72 @@ export default function Index() {
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
-      <div className="flex-grow">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col gap-10">
-            <Header />
-            
-            <div className="space-y-8">
-              <div className="max-w-2xl mx-auto">
-                <SearchBar onSearch={setSearchQuery} />
-              </div>
-              <CategoryFilter onCategoryChange={setSelectedCategory} />
-            </div>
+    <>
+      <Helmet>
+        <title>Mokolo Online - Petites Annonces au Cameroun</title>
+        <meta name="description" content="Découvrez la première plateforme de petites annonces au Cameroun. Achetez et vendez facilement dans toutes les catégories." />
+        <link rel="canonical" href="https://mokolo.online" />
+      </Helmet>
 
-            {/* Publicité horizontale en haut */}
-            <div className="w-full flex justify-center my-4">
-              <GoogleAd 
-                slot="1234567890" 
-                className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
-              />
-            </div>
-
-            <VipListings />
-            
-            {/* Publicité carrée sur le côté */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              <div className="lg:col-span-3">
-                <RegularListings 
-                  selectedCategory={selectedCategory}
-                  searchQuery={searchQuery}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  itemsPerPage={ITEMS_PER_PAGE}
-                />
-              </div>
-              <div className="hidden lg:block">
-                <div className="sticky top-4">
-                  <GoogleAd 
-                    slot="0987654321" 
-                    className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
-                  />
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
+        <main className="flex-grow">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex flex-col gap-10">
+              <Header />
+              
+              <section aria-label="Recherche et filtres" className="space-y-8">
+                <div className="max-w-2xl mx-auto">
+                  <SearchBar onSearch={setSearchQuery} />
                 </div>
+                <CategoryFilter onCategoryChange={setSelectedCategory} />
+              </section>
+
+              <section aria-label="Publicité" className="w-full flex justify-center my-4">
+                <GoogleAd 
+                  slot="1234567890" 
+                  className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                />
+              </section>
+
+              <section aria-label="Annonces VIP">
+                <VipListings />
+              </section>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <section aria-label="Toutes les annonces" className="lg:col-span-3">
+                  <RegularListings 
+                    selectedCategory={selectedCategory}
+                    searchQuery={searchQuery}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                  />
+                </section>
+                <aside className="hidden lg:block">
+                  <div className="sticky top-4">
+                    <GoogleAd 
+                      slot="0987654321" 
+                      className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                    />
+                  </div>
+                </aside>
               </div>
             </div>
           </div>
-        </div>
 
-        <StatsBar />
-        <Testimonials />
+          <StatsBar />
+          <Testimonials />
+        </main>
+        
+        <section aria-label="Publicité bas de page" className="w-full flex justify-center my-8">
+          <GoogleAd 
+            slot="5432109876" 
+            className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+          />
+        </section>
+        
+        <Footer />
       </div>
-      
-      {/* Publicité horizontale en bas */}
-      <div className="w-full flex justify-center my-8">
-        <GoogleAd 
-          slot="5432109876" 
-          className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
-        />
-      </div>
-      
-      <Footer />
-    </div>
+    </>
   );
 }
