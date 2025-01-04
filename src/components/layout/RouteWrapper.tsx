@@ -1,8 +1,18 @@
-import { useLocation } from "react-router-dom";
-import { usePerformanceMonitoring } from "@/utils/performance-monitor";
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { usePerformanceMonitoring } from '@/utils/performance/performance-monitor';
 
-export const RouteWrapper = ({ children }: { children: React.ReactNode }) => {
+interface RouteWrapperProps {
+  children: React.ReactNode;
+}
+
+export function RouteWrapper({ children }: RouteWrapperProps) {
   const location = useLocation();
   usePerformanceMonitoring(location.pathname);
-  return <>{children}</>;
-};
+
+  return (
+    <div className="min-h-screen">
+      {children}
+    </div>
+  );
+}
