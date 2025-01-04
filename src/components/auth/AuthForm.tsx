@@ -19,9 +19,17 @@ export function AuthForm() {
 
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (!mounted) return;
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          if (sessionError.message?.includes('JWT')) {
+            await supabase.auth.signOut();
+          }
+          throw sessionError;
+        }
 
         if (session?.user) {
           const { data: profile, error: profileError } = await supabase
