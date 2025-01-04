@@ -19,15 +19,15 @@ export function AuthForm() {
 
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { user } } = await supabase.auth.getUser();
         
         if (!mounted) return;
 
-        if (session) {
+        if (user) {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', session.user.id)
+            .eq('id', user.id)
             .maybeSingle();
 
           if (profileError) {
@@ -87,7 +87,6 @@ export function AuthForm() {
         }
       } else if (event === "SIGNED_OUT") {
         if (mounted) {
-          await supabase.auth.signOut();
           navigate("/auth");
         }
       }
