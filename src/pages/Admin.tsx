@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useAdminCheck } from "@/hooks/use-admin-check";
 import { useAdminListings } from "@/hooks/useAdminListings";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { ListingsTable } from "@/components/admin/ListingsTable";
