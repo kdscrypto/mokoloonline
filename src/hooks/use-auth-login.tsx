@@ -28,24 +28,30 @@ export function useAuthLogin() {
     const formattedPhone = formatPhoneNumber(phone);
     
     // Look up the user's email from the profiles table
-    const { data: profile, error: profileError } = await supabase
+    const { data: profiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('phone', formattedPhone)
-      .single();
+      .select('id, email')
+      .eq('phone', formattedPhone);
 
-    if (profileError || !profile) {
+    if (profileError || !profiles || profiles.length === 0) {
       throw new Error("Numéro de téléphone non trouvé");
     }
 
-    // Get the user's email from auth.users using their profile ID
-    const { data: { user }, error: userError } = await supabase.auth.getUser(profile.id);
+    // Get the first matching profile
+    const profile = profiles[0];
 
-    if (userError || !user?.email) {
+    // Get the user's auth details using their profile ID
+    const { data: authData, error: authError } = await supabase
+      .from('auth_users_view')
+      .select('email')
+      .eq('id', profile.id)
+      .single();
+
+    if (authError || !authData?.email) {
       throw new Error("Utilisateur non trouvé");
     }
 
-    return user.email;
+    return authData.email;
   };
 
   const handleLogin = async (identifier: string, password: string) => {
