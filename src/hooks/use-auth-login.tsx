@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { formatPhoneNumber } from "@/utils/phone-utils";
 
 export function useAuthLogin() {
-  const [isLoading, setIsLoading] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const handlePasswordReset = async (identifier: string) => {
@@ -28,6 +27,7 @@ export function useAuthLogin() {
   const handlePhoneLogin = async (phone: string) => {
     const formattedPhone = formatPhoneNumber(phone);
     
+    // Look up the user's email from the profiles table
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
@@ -38,11 +38,10 @@ export function useAuthLogin() {
       throw new Error("Numéro de téléphone non trouvé");
     }
 
-    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
-      profile.id
-    );
+    // Get the user's email from auth.users using their profile ID
+    const { data: { user }, error: userError } = await supabase.auth.getUser(profile.id);
 
-    if (userError || !user) {
+    if (userError || !user?.email) {
       throw new Error("Utilisateur non trouvé");
     }
 
@@ -59,8 +58,6 @@ export function useAuthLogin() {
       toast.error("Veuillez saisir votre mot de passe");
       return;
     }
-
-    setIsLoading(true);
 
     try {
       if (isResettingPassword) {
@@ -82,16 +79,16 @@ export function useAuthLogin() {
       });
 
       if (error) throw error;
+      
+      toast.success("Connexion réussie");
     } catch (error: any) {
       console.error("Erreur d'authentification:", error);
       toast.error(error.message || "Erreur lors de la connexion");
-    } finally {
-      setIsLoading(false);
+      throw error; // Re-throw to let the component handle the loading state
     }
   };
 
   return {
-    isLoading,
     isResettingPassword,
     setIsResettingPassword,
     handleLogin
