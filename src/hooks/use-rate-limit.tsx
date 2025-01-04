@@ -1,36 +1,45 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useRateLimit() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ['rate-limit'],
-    queryFn: async () => {
-      try {
-        const response = await supabase.functions.invoke('rate-limit', {
-          body: { ip: await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(data => data.ip) }
-        });
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [queueDelay, setQueueDelay] = useState(0);
+  const [isFallback, setIsFallback] = useState(false);
 
-        if (response.error) {
-          throw new Error(response.error.message);
+  useEffect(() => {
+    const checkRateLimit = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blocked_ips')
+          .select('request_count, blocked_until')
+          .single();
+
+        if (error) {
+          console.error("Erreur lors de la vérification du rate limit:", error);
+          return;
         }
 
-        return response.data;
+        if (data) {
+          const isBlocked = data.blocked_until && new Date(data.blocked_until) > new Date();
+          setIsRateLimited(isBlocked);
+          
+          // Calculer le délai en fonction du nombre de requêtes
+          const baseDelay = Math.max(0, data.request_count - 500) * 10; // 10ms par requête au-delà de 500
+          setQueueDelay(baseDelay);
+          
+          // Mode dégradé si plus de 1000 requêtes
+          setIsFallback(data.request_count > 1000);
+        }
       } catch (error) {
-        console.error('Rate limit check failed:', error);
-        // En cas d'erreur, on utilise le fallback
-        return { success: true, fallback: true };
+        console.error("Erreur lors de la vérification du rate limit:", error);
       }
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
+    };
 
-  return {
-    isRateLimited: data?.error === 'Rate limit exceeded',
-    queueDelay: data?.queueDelay || 0,
-    remaining: data?.remaining,
-    isLoading,
-    error,
-    isFallback: data?.fallback
-  };
+    checkRateLimit();
+    const interval = setInterval(checkRateLimit, 5000); // Vérifier toutes les 5 secondes
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return { isRateLimited, queueDelay, isFallback };
 }
