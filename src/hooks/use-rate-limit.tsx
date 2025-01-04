@@ -9,15 +9,12 @@ export function useRateLimit() {
   useEffect(() => {
     const checkRateLimit = async () => {
       try {
-        // First, get the client's IP address from the request headers
-        const { data: ipData } = await supabase.functions.invoke('get-client-ip');
-        const clientIp = ipData?.ip || 'unknown';
-
-        // Then query the blocked_ips table for this specific IP
+        // Call the rate-limit function directly
         const { data, error } = await supabase
           .from('blocked_ips')
-          .select('request_count, blocked_until')
-          .eq('ip_address', clientIp)
+          .select('*')
+          .order('last_request', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
         if (error) {
@@ -35,26 +32,24 @@ export function useRateLimit() {
           
           // Mode dégradé si plus de 1000 requêtes
           setIsFallback(data.request_count > 1000);
+
+          // Update the request count
+          const { error: updateError } = await supabase
+            .from('blocked_ips')
+            .update({ 
+              request_count: data.request_count + 1,
+              last_request: new Date().toISOString()
+            })
+            .eq('id', data.id);
+
+          if (updateError) {
+            console.error("Erreur lors de la mise à jour du rate limit:", updateError);
+          }
         } else {
-          // Aucune entrée trouvée pour cette IP, réinitialiser les états
+          // Réinitialiser les états si aucune donnée
           setIsRateLimited(false);
           setQueueDelay(0);
           setIsFallback(false);
-
-          // Create an initial entry for this IP
-          const { error: insertError } = await supabase
-            .from('blocked_ips')
-            .insert([
-              { 
-                ip_address: clientIp,
-                request_count: 1,
-                last_request: new Date().toISOString()
-              }
-            ]);
-
-          if (insertError) {
-            console.error("Erreur lors de l'initialisation du rate limit:", insertError);
-          }
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du rate limit:", error);
