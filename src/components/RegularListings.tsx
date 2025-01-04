@@ -15,6 +15,12 @@ interface RegularListingsProps {
   itemsPerPage: number;
 }
 
+interface ListingsResponse {
+  listings: Listing[];
+  total: number;
+  nextPage: number | undefined;
+}
+
 export function RegularListings({
   selectedCategory,
   searchQuery,
@@ -29,9 +35,10 @@ export function RegularListings({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useInfiniteQuery({
+  } = useInfiniteQuery<ListingsResponse>({
     queryKey: ['listings', selectedCategory, searchQuery],
-    queryFn: async ({ pageParam = 0 }) => {
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
       console.log('Début de la requête Regular listings avec params:', { selectedCategory, searchQuery, pageParam, itemsPerPage });
       
       let query = supabase
@@ -49,7 +56,7 @@ export function RegularListings({
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
-      const start = pageParam * itemsPerPage;
+      const start = Number(pageParam) * itemsPerPage;
       const end = start + itemsPerPage - 1;
       query = query.range(start, end);
 
@@ -64,7 +71,7 @@ export function RegularListings({
       return {
         listings: data as Listing[],
         total: count || 0,
-        nextPage: data.length === itemsPerPage ? pageParam + 1 : undefined
+        nextPage: data.length === itemsPerPage ? Number(pageParam) + 1 : undefined
       };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
