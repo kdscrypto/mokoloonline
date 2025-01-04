@@ -1,4 +1,5 @@
-import React, { Suspense } from "react";
+import React from "react";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,7 +12,7 @@ import { routes } from "@/config/routes";
 
 const App = () => {
   return (
-    <StrictMode>
+    <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <TooltipProvider>
@@ -39,7 +40,7 @@ const App = () => {
           </TooltipProvider>
         </BrowserRouter>
       </QueryClientProvider>
-    </StrictMode>
+    </React.StrictMode>
   );
 };
 

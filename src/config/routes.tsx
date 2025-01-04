@@ -1,9 +1,10 @@
 import { lazy } from "react";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import type { RouteObject } from "react-router-dom";
 
-interface CustomRouteObject extends RouteObject {
+interface CustomRouteObject {
+  path: string;
   component: React.LazyExoticComponent<() => JSX.Element>;
+  element?: (Component: React.ComponentType) => JSX.Element;
 }
 
 export const routes: Record<string, CustomRouteObject> = {
