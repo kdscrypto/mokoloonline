@@ -1,14 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 100; // Maximum requests per window
-const QUEUE_THRESHOLD = 80; // Seuil pour la mise en file d'attente
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -17,16 +17,8 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     const { ip } = await req.json();
-
-    // Get current timestamp
-    const now = Date.now();
-    const windowStart = now - RATE_LIMIT_WINDOW;
+    console.log('Checking rate limit for IP:', ip);
 
     // Vérifier si l'IP est bloquée
     const { data: blockedIp } = await supabase
@@ -35,100 +27,71 @@ serve(async (req) => {
       .eq('ip_address', ip)
       .single();
 
-    if (blockedIp?.blocked_until && new Date(blockedIp.blocked_until) > new Date()) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'IP blocked',
-          blockedUntil: blockedIp.blocked_until
-        }),
-        { 
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+    if (blockedIp) {
+      if (blockedIp.blocked_until && new Date(blockedIp.blocked_until) > new Date()) {
+        console.log('IP is blocked:', ip);
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded', remaining: 0 }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 429 }
+        );
+      }
+
+      // Si le blocage est expiré, on le supprime
+      await supabase
+        .from('blocked_ips')
+        .delete()
+        .eq('ip_address', ip);
     }
 
-    // Compter les requêtes récentes
-    const { data: requests, error: countError } = await supabase
-      .from('security_logs')
-      .select('created_at')
-      .eq('ip_address', ip)
-      .gte('created_at', new Date(windowStart).toISOString());
-
-    if (countError) {
-      throw countError;
-    }
-
-    const requestCount = requests?.length || 0;
-
-    // Système de file d'attente si proche du seuil
-    if (requestCount >= QUEUE_THRESHOLD && requestCount < MAX_REQUESTS) {
-      const delay = Math.floor((requestCount - QUEUE_THRESHOLD) * 100); // Délai progressif
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
-    // Bloquer si limite dépassée
-    if (requestCount >= MAX_REQUESTS) {
-      const blockDuration = 5 * 60 * 1000; // 5 minutes
-      await supabase.from('blocked_ips').upsert({
+    // Mettre à jour ou créer l'entrée de l'IP
+    const { data: ipData, error: upsertError } = await supabase
+      .from('blocked_ips')
+      .upsert({
         ip_address: ip,
-        reason: 'Rate limit exceeded',
-        blocked_until: new Date(now + blockDuration).toISOString(),
-        request_count: requestCount
-      });
+        request_count: blockedIp ? (blockedIp.request_count || 0) + 1 : 1,
+        last_request: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (upsertError) throw upsertError;
+
+    // Calculer le délai de file d'attente en fonction du nombre de requêtes
+    const queueDelay = Math.max(0, Math.floor((ipData.request_count - 500) * 100));
+
+    // Si trop de requêtes, bloquer l'IP temporairement
+    if (ipData.request_count > 1000) {
+      await supabase
+        .from('blocked_ips')
+        .update({
+          blocked_until: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes
+          reason: 'Too many requests'
+        })
+        .eq('ip_address', ip);
 
       return new Response(
-        JSON.stringify({ 
-          error: 'Rate limit exceeded',
-          retryAfter: blockDuration / 1000
-        }),
-        { 
-          status: 429,
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json',
-            'Retry-After': String(blockDuration / 1000)
-          }
-        }
+        JSON.stringify({ error: 'Rate limit exceeded', remaining: 0 }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 429 }
       );
     }
 
-    // Enregistrer la requête
-    await supabase.from('security_logs').insert({
-      event_type: 'api_request',
-      description: 'API request processed',
-      ip_address: ip,
-      metadata: { 
-        request_count: requestCount,
-        window_start: new Date(windowStart).toISOString()
-      }
-    });
-
+    // Réponse normale avec informations sur la limite
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
-        remaining: MAX_REQUESTS - requestCount - 1,
-        queueDelay: requestCount >= QUEUE_THRESHOLD ? Math.floor((requestCount - QUEUE_THRESHOLD) * 100) : 0
+        remaining: 1000 - ipData.request_count,
+        queueDelay
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error in rate-limit function:', error);
+    console.error('Rate limit error:', error);
     
-    // Fallback response en cas d'erreur
+    // En cas d'erreur, utiliser le mode fallback
     return new Response(
-      JSON.stringify({ 
-        success: true, // On autorise quand même la requête en cas d'erreur du rate limiting
-        fallback: true,
-        error: error.message
-      }),
-      { 
-        status: 200, // Fallback : on accepte la requête
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ success: true, fallback: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

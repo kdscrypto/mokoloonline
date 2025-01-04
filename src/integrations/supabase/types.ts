@@ -30,21 +30,27 @@ export type Database = {
           created_at: string
           id: string
           ip_address: string
+          last_request: string | null
           reason: string
+          request_count: number | null
         }
         Insert: {
           blocked_until?: string | null
           created_at?: string
           id?: string
           ip_address: string
+          last_request?: string | null
           reason: string
+          request_count?: number | null
         }
         Update: {
           blocked_until?: string | null
           created_at?: string
           id?: string
           ip_address?: string
+          last_request?: string | null
           reason?: string
+          request_count?: number | null
         }
         Relationships: []
       }

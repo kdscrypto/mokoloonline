@@ -17,11 +17,6 @@ export default function Index() {
   usePerformanceMonitoring("home");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
 
   return (
     <>
@@ -60,8 +55,6 @@ export default function Index() {
                   <RegularListings 
                     selectedCategory={selectedCategory}
                     searchQuery={searchQuery}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
                     itemsPerPage={ITEMS_PER_PAGE}
                   />
                 </section>
