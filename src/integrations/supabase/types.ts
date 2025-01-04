@@ -22,7 +22,15 @@ export type Database = {
           created_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blocked_ips: {
         Row: {
@@ -76,7 +84,15 @@ export type Database = {
           last_attempt?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "failed_login_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listings: {
         Row: {
@@ -183,7 +199,15 @@ export type Database = {
           phone?: string | null
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -268,7 +292,15 @@ export type Database = {
           metadata?: Json | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "security_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seller_badges: {
         Row: {
@@ -301,7 +333,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      auth_users_view: {
+        Row: {
+          email: string | null
+          id: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: string | null
+        }
+        Update: {
+          email?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_security_logs: {

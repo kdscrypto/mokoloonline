@@ -27,10 +27,10 @@ export function useAuthLogin() {
   const handlePhoneLogin = async (phone: string) => {
     const formattedPhone = formatPhoneNumber(phone);
     
-    // Look up the user's email from the profiles table
+    // Look up the user's profile using the phone number
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email')
+      .select('id')
       .eq('phone', formattedPhone);
 
     if (profileError || !profiles || profiles.length === 0) {
@@ -43,7 +43,7 @@ export function useAuthLogin() {
     // Get the user's auth details using their profile ID
     const { data: authData, error: authError } = await supabase
       .from('auth_users_view')
-      .select('email')
+      .select('*')
       .eq('id', profile.id)
       .single();
 
