@@ -22,20 +22,20 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
     const validateAccess = async () => {
       try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (!mounted) return;
 
-        if (userError) {
-          console.error("User validation error:", userError);
-          if (userError.message?.includes('JWT')) {
+        if (sessionError) {
+          console.error("Session validation error:", sessionError);
+          if (sessionError.message?.includes('JWT')) {
             await supabase.auth.signOut();
             throw new Error("Session expirée");
           }
-          throw userError;
+          throw sessionError;
         }
         
-        if (requireAuth && !user) {
+        if (requireAuth && !session?.user) {
           setError("Vous devez être connecté pour accéder à cette page");
           toast.error("Accès restreint", {
             description: "Redirection vers la page de connexion..."
@@ -44,11 +44,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           return;
         }
 
-        if (requireAdmin && user) {
+        if (requireAdmin && session?.user) {
           const { data: adminData, error: adminError } = await supabase
             .from('admin_users')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('user_id', session.user.id)
             .maybeSingle();
 
           if (adminError) {

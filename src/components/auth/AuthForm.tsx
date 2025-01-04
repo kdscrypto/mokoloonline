@@ -19,15 +19,15 @@ export function AuthForm() {
 
     const checkSession = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (!mounted) return;
 
-        if (user) {
+        if (session?.user) {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', user.id)
+            .eq('id', session.user.id)
             .maybeSingle();
 
           if (profileError) {
@@ -44,7 +44,6 @@ export function AuthForm() {
         }
       } catch (error) {
         console.error("Error checking session:", error);
-        await supabase.auth.signOut();
       } finally {
         if (mounted) {
           setIsLoading(false);
