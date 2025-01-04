@@ -9,6 +9,7 @@ import { RouteWrapper } from "@/components/layout/RouteWrapper";
 import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
+import Dashboard from "@/pages/Dashboard";
 
 const App = () => {
   return (
@@ -29,7 +30,8 @@ const App = () => {
                   }
                 >
                   <Routes>
-                    {Object.entries(routes).map(([key, route]) => (
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
                       <Route
                         key={key}
                         path={route.path}
