@@ -9,9 +9,15 @@ export function useRateLimit() {
   useEffect(() => {
     const checkRateLimit = async () => {
       try {
+        // First, get the client's IP address from the request headers
+        const { data: ipData } = await supabase.functions.invoke('get-client-ip');
+        const clientIp = ipData?.ip || 'unknown';
+
+        // Then query the blocked_ips table for this specific IP
         const { data, error } = await supabase
           .from('blocked_ips')
           .select('request_count, blocked_until')
+          .eq('ip_address', clientIp)
           .maybeSingle();
 
         if (error) {
@@ -30,10 +36,25 @@ export function useRateLimit() {
           // Mode dégradé si plus de 1000 requêtes
           setIsFallback(data.request_count > 1000);
         } else {
-          // Aucune entrée trouvée, réinitialiser les états
+          // Aucune entrée trouvée pour cette IP, réinitialiser les états
           setIsRateLimited(false);
           setQueueDelay(0);
           setIsFallback(false);
+
+          // Create an initial entry for this IP
+          const { error: insertError } = await supabase
+            .from('blocked_ips')
+            .insert([
+              { 
+                ip_address: clientIp,
+                request_count: 1,
+                last_request: new Date().toISOString()
+              }
+            ]);
+
+          if (insertError) {
+            console.error("Erreur lors de l'initialisation du rate limit:", insertError);
+          }
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du rate limit:", error);
