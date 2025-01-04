@@ -10,14 +10,16 @@ import { z } from "zod";
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+const phoneRegex = /^\+237[2368]\d{8}$/;
+
 const listingSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères").max(100, "Le titre ne doit pas dépasser 100 caractères"),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Le prix doit être un nombre positif"),
   location: z.string().min(2, "La localisation doit contenir au moins 2 caractères"),
   description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   category: z.string().min(1, "Veuillez sélectionner une catégorie"),
-  phone: z.string().optional(),
-  whatsapp: z.string().optional(),
+  phone: z.string().regex(phoneRegex, "Format invalide. Utilisez le format +237 suivi de 9 chiffres").optional(),
+  whatsapp: z.string().regex(phoneRegex, "Format invalide. Utilisez le format +237 suivi de 9 chiffres").optional(),
 });
 
 interface ListingFormFieldsProps {

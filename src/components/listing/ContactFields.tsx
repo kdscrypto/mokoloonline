@@ -13,11 +13,23 @@ export function ContactFields({
   handleInputChange,
 }: ContactFieldsProps) {
   const formatPhoneNumber = (value: string) => {
-    // Permet les chiffres, les espaces, les tirets et le + au début
+    // Supprime tous les caractères sauf les chiffres, les espaces, les tirets et le +
     const cleaned = value.replace(/[^\d\s+-]/g, '');
     
     // S'assure qu'il n'y a qu'un seul + au début
-    return cleaned.replace(/^\++/, '+').replace(/\+(?=.+\+)/g, '');
+    const formatted = cleaned.replace(/^\++/, '+').replace(/\+(?=.+\+)/g, '');
+    
+    // Si le numéro commence par +237, on le garde tel quel
+    if (formatted.startsWith('+237')) {
+      return formatted;
+    }
+    
+    // Si le numéro commence par 2, 3, 6 ou 8, on ajoute +237
+    if (/^[2368]/.test(formatted)) {
+      return '+237' + formatted;
+    }
+    
+    return formatted;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,9 +49,10 @@ export function ContactFields({
           placeholder="Ex: +237 6XX XX XX XX"
           value={phone}
           onChange={handlePhoneChange}
-          pattern="^(\+237[\s-]?|)([2368]\d{1}[\s-]?\d{2}[\s-]?\d{2}[\s-]?\d{2})$"
-          title="Entrez un numéro de téléphone camerounais valide (ex: +237 6XX XX XX XX)"
         />
+        <p className="text-sm text-gray-500">
+          Format: +237 suivi de 9 chiffres (ex: +237 655 55 55 55)
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -51,9 +64,10 @@ export function ContactFields({
           placeholder="Ex: +237 6XX XX XX XX"
           value={whatsapp}
           onChange={handlePhoneChange}
-          pattern="^(\+237[\s-]?|)([2368]\d{1}[\s-]?\d{2}[\s-]?\d{2}[\s-]?\d{2})$"
-          title="Entrez un numéro de téléphone camerounais valide (ex: +237 6XX XX XX XX)"
         />
+        <p className="text-sm text-gray-500">
+          Format: +237 suivi de 9 chiffres (ex: +237 655 55 55 55)
+        </p>
       </div>
     </>
   );
