@@ -2,44 +2,19 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { usePerformanceMonitoring } from "@/utils/performance/performance-monitor";
+import { useState } from "react";
 import { ProfileCard } from "@/components/dashboard/ProfileCard";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import type { Listing } from "@/integrations/supabase/types/listing";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export default function Dashboard() {
-  usePerformanceMonitoring("dashboard");
-
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Vous devez être connecté pour accéder au tableau de bord");
-        navigate("/auth");
-        return;
-      }
-    };
-
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
 
   const { data: profile, refetch: refetchProfile } = useQuery({
     queryKey: ['user-profile'],
@@ -98,26 +73,30 @@ export default function Dashboard() {
     }
   };
 
-  if (!profile) return null;
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <DashboardHeader />
-      <ProfileCard 
-        profile={profile} 
-        onPhotoUpdate={refetchProfile}
-      />
-      <DashboardStats listings={listings} />
-      <DashboardContent
-        listings={listings}
-        searchQuery={searchQuery}
-        statusFilter={statusFilter}
-        sortOrder={sortOrder}
-        setSearchQuery={setSearchQuery}
-        setStatusFilter={setStatusFilter}
-        setSortOrder={setSortOrder}
-        onDelete={handleDelete}
-      />
-    </div>
+    <AuthGuard requireAuth>
+      <div className="container mx-auto px-4 py-8">
+        <DashboardHeader />
+        {profile && (
+          <>
+            <ProfileCard 
+              profile={profile} 
+              onPhotoUpdate={refetchProfile}
+            />
+            <DashboardStats listings={listings} />
+            <DashboardContent
+              listings={listings}
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              sortOrder={sortOrder}
+              setSearchQuery={setSearchQuery}
+              setStatusFilter={setStatusFilter}
+              setSortOrder={setSortOrder}
+              onDelete={handleDelete}
+            />
+          </>
+        )}
+      </div>
+    </AuthGuard>
   );
 }
