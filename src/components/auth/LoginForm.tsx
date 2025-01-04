@@ -53,19 +53,19 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
           const formattedPhone = formatPhoneNumber(identifier);
           
           // Récupère l'email associé au numéro de téléphone
-          const { data: profiles, error: profileError } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('id')
             .eq('phone', formattedPhone)
             .single();
 
-          if (profileError || !profiles) {
+          if (profileError || !profile) {
             throw new Error("Numéro de téléphone non trouvé");
           }
 
           // Récupère l'utilisateur via son id
           const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
-            profiles.id
+            profile.id
           );
 
           if (userError || !user) {
