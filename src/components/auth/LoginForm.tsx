@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
 interface LoginFormProps {
   isLoading: boolean;
@@ -17,6 +18,11 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) {
+      toast.error("Veuillez saisir votre email");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -32,6 +38,11 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
         });
         setIsResettingPassword(false);
       } else {
+        if (!password) {
+          toast.error("Veuillez saisir votre mot de passe");
+          return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -59,6 +70,7 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
           required
           placeholder="votre@email.com"
           disabled={isLoading}
+          className="transition-all duration-200"
         />
       </div>
 
@@ -74,23 +86,33 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
             placeholder="••••••••"
             disabled={isLoading}
             minLength={6}
+            className="transition-all duration-200"
           />
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading 
-          ? "Chargement..." 
-          : isResettingPassword 
+      <Button 
+        type="submit" 
+        className="w-full relative" 
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center">
+            <LoadingIndicator size="sm" className="mr-2" />
+            Chargement...
+          </span>
+        ) : (
+          isResettingPassword 
             ? "Envoyer les instructions"
             : "Se connecter"
-        }
+        )}
       </Button>
 
       <button
         type="button"
         onClick={() => setIsResettingPassword(!isResettingPassword)}
-        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 w-full text-center"
+        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 w-full text-center transition-colors duration-200"
+        disabled={isLoading}
       >
         {isResettingPassword 
           ? "Retour à la connexion" 

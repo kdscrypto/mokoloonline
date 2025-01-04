@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { EmailField } from "./form-fields/EmailField";
 import { PasswordFields } from "./form-fields/PasswordFields";
 import { PersonalInfoFields } from "./form-fields/PersonalInfoFields";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
 interface SignUpFormProps {
   isLoading: boolean;
@@ -19,13 +20,26 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const validateForm = () => {
+    if (!email || !password || !confirmPassword || !username || !fullName || !phone) {
+      toast.error("Veuillez remplir tous les champs");
+      return false;
+    }
     if (password !== confirmPassword) {
       toast.error("Les mots de passe ne correspondent pas");
-      return;
+      return false;
     }
+    if (password.length < 6) {
+      toast.error("Le mot de passe doit contenir au moins 6 caractères");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
 
     setIsLoading(true);
 
@@ -35,6 +49,11 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            username,
+            full_name: fullName,
+            phone,
+          }
         },
       });
 
@@ -51,9 +70,9 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
           .eq('id', authData.user.id);
 
         if (profileError) throw profileError;
-      }
 
-      toast.success("Vérifiez votre email pour confirmer votre inscription");
+        toast.success("Vérifiez votre email pour confirmer votre inscription");
+      }
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
       toast.error(error.message || "Erreur lors de l'inscription");
@@ -88,8 +107,19 @@ export function SignUpForm({ isLoading, setIsLoading }: SignUpFormProps) {
         isLoading={isLoading}
       />
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Chargement..." : "Créer un compte"}
+      <Button 
+        type="submit" 
+        className="w-full relative" 
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center">
+            <LoadingIndicator size="sm" className="mr-2" />
+            Chargement...
+          </span>
+        ) : (
+          "Créer un compte"
+        )}
       </Button>
     </form>
   );

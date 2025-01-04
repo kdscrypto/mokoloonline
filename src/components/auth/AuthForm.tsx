@@ -7,10 +7,12 @@ import { toast } from "sonner";
 import { LoginForm } from "./LoginForm";
 import { SignUpForm } from "./SignUpForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
 export function AuthForm() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -40,7 +42,6 @@ export function AuthForm() {
           } catch (error: any) {
             console.error("Error checking profile:", error);
             toast.error("Erreur lors de la vérification du profil");
-            // If there's an error with the token, sign out the user
             if (error.message?.includes('JWT')) {
               await supabase.auth.signOut();
             }
@@ -49,6 +50,8 @@ export function AuthForm() {
       } catch (error) {
         console.error("Error checking session:", error);
         await supabase.auth.signOut();
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -56,6 +59,7 @@ export function AuthForm() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       if (event === "SIGNED_IN" && session) {
+        setIsProcessing(true);
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -77,6 +81,8 @@ export function AuthForm() {
           if (error.message?.includes('JWT')) {
             await supabase.auth.signOut();
           }
+        } finally {
+          setIsProcessing(false);
         }
       } else if (event === "SIGNED_OUT") {
         await supabase.auth.signOut();
@@ -91,9 +97,25 @@ export function AuthForm() {
     };
   }, [navigate]);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <LoadingIndicator size="lg" />
+          <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-md mx-auto p-6">
+        {isProcessing && (
+          <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
+            <LoadingIndicator size="sm" />
+          </div>
+        )}
         <Tabs defaultValue="login" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Connexion</TabsTrigger>
@@ -101,11 +123,11 @@ export function AuthForm() {
           </TabsList>
           
           <TabsContent value="login">
-            <LoginForm isLoading={isLoading} setIsLoading={setIsLoading} />
+            <LoginForm isLoading={isProcessing} setIsLoading={setIsProcessing} />
           </TabsContent>
           
           <TabsContent value="signup">
-            <SignUpForm isLoading={isLoading} setIsLoading={setIsLoading} />
+            <SignUpForm isLoading={isProcessing} setIsLoading={setIsProcessing} />
           </TabsContent>
         </Tabs>
       </Card>
