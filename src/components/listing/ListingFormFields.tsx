@@ -6,12 +6,10 @@ import { ContactFields } from "./ContactFields";
 import { ImageUploadField } from "./ImageUploadField";
 import { ListingTypeSelector } from "./ListingTypeSelector";
 import { z } from "zod";
+import { phoneSchema } from "@/utils/phone-utils";
 
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
-// Mise à jour du regex pour accepter le format camerounais
-const phoneRegex = /^\+237[2368]\d{8}$/;
 
 const listingSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères").max(100, "Le titre ne doit pas dépasser 100 caractères"),
@@ -19,8 +17,8 @@ const listingSchema = z.object({
   location: z.string().min(2, "La localisation doit contenir au moins 2 caractères"),
   description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   category: z.string().min(1, "Veuillez sélectionner une catégorie"),
-  phone: z.string().regex(phoneRegex, "Format invalide. Le numéro doit commencer par +237 suivi de 9 chiffres").optional(),
-  whatsapp: z.string().regex(phoneRegex, "Format invalide. Le numéro doit commencer par +237 suivi de 9 chiffres").optional(),
+  phone: phoneSchema,
+  whatsapp: phoneSchema,
 });
 
 interface ListingFormFieldsProps {
