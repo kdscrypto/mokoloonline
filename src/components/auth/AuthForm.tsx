@@ -27,6 +27,9 @@ export function AuthForm() {
           console.error("Session error:", sessionError);
           if (sessionError.message?.includes('JWT')) {
             await supabase.auth.signOut();
+            toast.error("Session expirée", {
+              description: "Veuillez vous reconnecter"
+            });
           }
           throw sessionError;
         }
@@ -42,6 +45,9 @@ export function AuthForm() {
             console.error("Error checking profile:", profileError);
             if (profileError.message?.includes('JWT')) {
               await supabase.auth.signOut();
+              toast.error("Session expirée", {
+                description: "Veuillez vous reconnecter"
+              });
             }
             return;
           }
@@ -74,6 +80,12 @@ export function AuthForm() {
             .maybeSingle();
 
           if (profileError) {
+            if (profileError.message?.includes('JWT')) {
+              await supabase.auth.signOut();
+              toast.error("Session expirée", {
+                description: "Veuillez vous reconnecter"
+              });
+            }
             throw profileError;
           }
 
@@ -84,9 +96,6 @@ export function AuthForm() {
         } catch (error: any) {
           console.error("Error checking profile:", error);
           toast.error("Erreur lors de la vérification du profil");
-          if (error.message?.includes('JWT')) {
-            await supabase.auth.signOut();
-          }
         } finally {
           if (mounted) {
             setIsProcessing(false);

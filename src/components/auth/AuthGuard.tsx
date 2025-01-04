@@ -30,7 +30,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           console.error("Session validation error:", sessionError);
           if (sessionError.message?.includes('JWT')) {
             await supabase.auth.signOut();
-            throw new Error("Session expirée");
+            toast.error("Session expirée", {
+              description: "Veuillez vous reconnecter"
+            });
+            navigate('/auth');
+            return;
           }
           throw sessionError;
         }
@@ -55,7 +59,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
             console.error("Erreur lors de la vérification des droits admin:", adminError);
             if (adminError.message?.includes('JWT')) {
               await supabase.auth.signOut();
-              throw new Error("Session expirée");
+              toast.error("Session expirée", {
+                description: "Veuillez vous reconnecter"
+              });
+              navigate('/auth');
+              return;
             }
             throw new Error("Erreur lors de la vérification des droits administrateur");
           }
