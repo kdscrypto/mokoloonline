@@ -15,49 +15,48 @@ export function AuthForm() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     const checkSession = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          return;
-        }
+        if (!mounted) return;
 
         if (session) {
-          try {
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
 
-            if (profileError) {
-              throw profileError;
-            }
-
-            if (profile?.username) {
-              navigate("/dashboard");
-            }
-          } catch (error: any) {
-            console.error("Error checking profile:", error);
-            toast.error("Erreur lors de la vérification du profil");
-            if (error.message?.includes('JWT')) {
+          if (profileError) {
+            console.error("Error checking profile:", profileError);
+            if (profileError.message?.includes('JWT')) {
               await supabase.auth.signOut();
             }
+            return;
+          }
+
+          if (profile?.username) {
+            navigate("/dashboard");
           }
         }
       } catch (error) {
         console.error("Error checking session:", error);
         await supabase.auth.signOut();
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
     
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+      if (!mounted) return;
+
       if (event === "SIGNED_IN" && session) {
         setIsProcessing(true);
         try {
@@ -82,17 +81,20 @@ export function AuthForm() {
             await supabase.auth.signOut();
           }
         } finally {
-          setIsProcessing(false);
+          if (mounted) {
+            setIsProcessing(false);
+          }
         }
       } else if (event === "SIGNED_OUT") {
-        await supabase.auth.signOut();
-        navigate("/auth");
-      } else if (event === "TOKEN_REFRESHED") {
-        console.log("Token refreshed successfully");
+        if (mounted) {
+          await supabase.auth.signOut();
+          navigate("/auth");
+        }
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);
