@@ -13,23 +13,21 @@ export function ContactFields({
   handleInputChange,
 }: ContactFieldsProps) {
   const formatPhoneNumber = (value: string) => {
-    // Supprime tous les caractères sauf les chiffres, les espaces, les tirets et le +
-    const cleaned = value.replace(/[^\d\s+-]/g, '');
+    // Supprime tous les caractères sauf les chiffres
+    const cleaned = value.replace(/[^\d]/g, '');
     
-    // S'assure qu'il n'y a qu'un seul + au début
-    const formatted = cleaned.replace(/^\++/, '+').replace(/\+(?=.+\+)/g, '');
-    
-    // Si le numéro commence par +237, on le garde tel quel
-    if (formatted.startsWith('+237')) {
-      return formatted;
+    // Si le numéro commence déjà par 237, on ajoute juste le +
+    if (cleaned.startsWith('237')) {
+      return '+' + cleaned;
     }
     
     // Si le numéro commence par 2, 3, 6 ou 8, on ajoute +237
-    if (/^[2368]/.test(formatted)) {
-      return '+237' + formatted;
+    if (/^[2368]/.test(cleaned)) {
+      return '+237' + cleaned;
     }
     
-    return formatted;
+    // Pour tout autre cas, on retourne la valeur avec +237 si elle n'est pas vide
+    return cleaned ? '+237' + cleaned : '';
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,12 +44,12 @@ export function ContactFields({
           id="phone"
           name="phone"
           type="tel"
-          placeholder="Ex: +237 6XX XX XX XX"
+          placeholder="Ex: 6XX XX XX XX"
           value={phone}
           onChange={handlePhoneChange}
         />
         <p className="text-sm text-gray-500">
-          Format: +237 suivi de 9 chiffres (ex: +237 655 55 55 55)
+          L'indicatif +237 sera ajouté automatiquement
         </p>
       </div>
 
@@ -61,12 +59,12 @@ export function ContactFields({
           id="whatsapp"
           name="whatsapp"
           type="tel"
-          placeholder="Ex: +237 6XX XX XX XX"
+          placeholder="Ex: 6XX XX XX XX"
           value={whatsapp}
           onChange={handlePhoneChange}
         />
         <p className="text-sm text-gray-500">
-          Format: +237 suivi de 9 chiffres (ex: +237 655 55 55 55)
+          L'indicatif +237 sera ajouté automatiquement
         </p>
       </div>
     </>
