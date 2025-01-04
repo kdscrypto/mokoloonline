@@ -63,18 +63,16 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
             throw new Error("Numéro de téléphone non trouvé");
           }
 
-          // Récupère l'email de l'utilisateur
-          const { data: { users }, error: userError } = await supabase.auth.admin.listUsers({
-            filters: {
-              id: profiles.id
-            }
-          });
+          // Récupère l'utilisateur via son id
+          const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
+            profiles.id
+          );
 
-          if (userError || !users || users.length === 0) {
+          if (userError || !user) {
             throw new Error("Utilisateur non trouvé");
           }
 
-          email = users[0].email;
+          email = user.email;
         }
 
         const { error } = await supabase.auth.signInWithPassword({
