@@ -7,6 +7,8 @@ import { LatestListings } from "./listings/LatestListings";
 import { AllListings } from "./listings/AllListings";
 import { useListingsQuery } from "@/hooks/use-listings-query";
 import { InfiniteLoadingTrigger } from "./listings/InfiniteLoadingTrigger";
+import { useRateLimit } from "@/hooks/use-rate-limit";
+import { toast } from "sonner";
 
 interface RegularListingsProps {
   selectedCategory: string;
@@ -20,6 +22,7 @@ export function RegularListings({
   itemsPerPage
 }: RegularListingsProps) {
   const { ref, inView } = useInView();
+  const { isRateLimited, queueDelay, isFallback } = useRateLimit();
 
   const {
     data,
@@ -35,10 +38,33 @@ export function RegularListings({
   });
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+    if (isRateLimited) {
+      toast.error("Trop de requêtes", {
+        description: "Veuillez patienter quelques minutes avant de réessayer."
+      });
+      return;
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    if (queueDelay > 0) {
+      toast.info("Trafic élevé", {
+        description: `Votre requête est en file d'attente (${queueDelay}ms)`
+      });
+    }
+
+    if (isFallback) {
+      toast.warning("Mode dégradé", {
+        description: "Le service fonctionne en mode limité"
+      });
+    }
+
+    if (inView && hasNextPage && !isFetchingNextPage && !isRateLimited) {
+      const timeout = setTimeout(() => {
+        fetchNextPage();
+      }, queueDelay);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isRateLimited, queueDelay, isFallback]);
 
   if (error) {
     return <ListingsErrorState />;
