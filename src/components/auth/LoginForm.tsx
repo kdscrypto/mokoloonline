@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { formatPhoneNumber } from "@/utils/phone-utils";
 
 interface LoginFormProps {
   isLoading: boolean;
@@ -12,14 +13,14 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
-      toast.error("Veuillez saisir votre email");
+    if (!identifier) {
+      toast.error("Veuillez saisir votre email ou numéro de téléphone");
       return;
     }
 
@@ -27,7 +28,7 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
 
     try {
       if (isResettingPassword) {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(identifier, {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         });
 
@@ -41,6 +42,39 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
         if (!password) {
           toast.error("Veuillez saisir votre mot de passe");
           return;
+        }
+
+        // Détermine si l'identifiant est un email ou un numéro de téléphone
+        const isPhone = identifier.includes("+237") || /^[2368]\d{8}$/.test(identifier);
+        let email = identifier;
+        
+        if (isPhone) {
+          // Formate le numéro de téléphone
+          const formattedPhone = formatPhoneNumber(identifier);
+          
+          // Récupère l'email associé au numéro de téléphone
+          const { data: profiles, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('phone', formattedPhone)
+            .single();
+
+          if (profileError || !profiles) {
+            throw new Error("Numéro de téléphone non trouvé");
+          }
+
+          // Récupère l'email de l'utilisateur
+          const { data: { users }, error: userError } = await supabase.auth.admin.listUsers({
+            filters: {
+              id: profiles.id
+            }
+          });
+
+          if (userError || !users || users.length === 0) {
+            throw new Error("Utilisateur non trouvé");
+          }
+
+          email = users[0].email;
         }
 
         const { error } = await supabase.auth.signInWithPassword({
@@ -61,14 +95,14 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="identifier">Email ou numéro de téléphone</Label>
         <Input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="identifier"
+          type="text"
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
           required
-          placeholder="votre@email.com"
+          placeholder="votre@email.com ou +237 6XX XX XX XX"
           disabled={isLoading}
           className="transition-all duration-200"
         />
