@@ -6,26 +6,46 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   alt: string;
   className?: string;
   loadingClassName?: string;
+  width?: number;
+  height?: number;
 }
 
 export function OptimizedImage({ 
   src, 
   alt, 
-  className, 
+  className,
   loadingClassName,
+  width,
+  height,
   ...props 
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imageSrc, setImageSrc] = useState(src);
 
+  // Fonction pour construire l'URL optimisée avec Supabase Storage CDN
+  const getOptimizedImageUrl = (url: string) => {
+    if (!url || !url.includes('storage.googleapis.com')) return url;
+    
+    // Construire l'URL avec les paramètres de transformation
+    const baseUrl = url.split('?')[0];
+    const transformParams = new URLSearchParams({
+      width: width?.toString() || '800',
+      height: height?.toString() || '600',
+      quality: '80',
+      format: 'webp',
+    });
+
+    return `${baseUrl}?${transformParams.toString()}`;
+  };
+
   useEffect(() => {
     const img = new Image();
-    img.src = src;
+    img.src = getOptimizedImageUrl(src);
     
     img.onload = () => {
       setIsLoading(false);
-      setImageSrc(src);
+      setImageSrc(img.src);
     };
     
     img.onerror = () => {
@@ -34,7 +54,7 @@ export function OptimizedImage({
       setImageSrc("/placeholder.svg");
       console.error(`Erreur de chargement de l'image: ${src}`);
     };
-  }, [src]);
+  }, [src, width, height]);
 
   return (
     <div className={cn(
@@ -53,6 +73,7 @@ export function OptimizedImage({
       <img
         src={imageSrc}
         alt={error ? "Image non disponible" : alt}
+        loading="lazy"
         className={cn(
           "transition-opacity duration-300",
           isLoading ? "opacity-0" : "opacity-100",

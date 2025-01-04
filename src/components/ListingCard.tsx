@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
 import { useRef, useCallback, useEffect } from "react";
 import { MapPin } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 interface ListingCardProps {
   id: string;
@@ -38,9 +39,11 @@ export function ListingCard({ id, title, price, image_url, location }: ListingCa
       <Card className="listing-card overflow-hidden group w-[280px]" ref={cardRef}>
         <CardContent className="p-0 relative">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <img
+          <OptimizedImage
             src={image_url || '/placeholder.svg'}
             alt={title}
+            width={280}
+            height={144}
             className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </CardContent>
