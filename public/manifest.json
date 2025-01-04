@@ -10,12 +10,29 @@
     {
       "src": "/lovable-uploads/c51c18ce-be89-4faf-abb3-580a9758fea4.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/lovable-uploads/c51c18ce-be89-4faf-abb3-580a9758fea4.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "categories": ["shopping", "marketplace"],
+  "orientation": "any",
+  "shortcuts": [
+    {
+      "name": "Dernières annonces",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/lovable-uploads/c51c18ce-be89-4faf-abb3-580a9758fea4.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

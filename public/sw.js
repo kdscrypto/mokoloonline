@@ -19,40 +19,76 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Stratégie de mise en cache : Network First avec fallback sur le cache
+// Stratégie de mise en cache : Cache First avec Network Fallback pour les assets statiques
+// Network First avec Cache Fallback pour les requêtes API
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Mise en cache de la nouvelle réponse
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            // Ne mettre en cache que les requêtes GET
-            if (event.request.method === 'GET') {
-              cache.put(event.request, responseClone);
-            }
-          });
-        return response;
-      })
-      .catch(() => {
-        // Si la requête échoue, on essaie de récupérer depuis le cache
-        return caches.match(event.request)
-          .then((response) => {
-            if (response) {
-              return response;
-            }
-            // Si pas dans le cache non plus, on retourne une erreur
-            return new Response('Offline - Contenu non disponible', {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: new Headers({
-                'Content-Type': 'text/plain',
-              }),
+  const url = new URL(event.request.url);
+  
+  // Stratégie pour les assets statiques (images, CSS, JS)
+  if (
+    event.request.destination === 'image' ||
+    event.request.destination === 'style' ||
+    event.request.destination === 'script' ||
+    STATIC_ASSETS.includes(url.pathname)
+  ) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          if (response) {
+            // Retourner depuis le cache et mettre à jour en arrière-plan
+            fetch(event.request)
+              .then((networkResponse) => {
+                caches.open(CACHE_NAME)
+                  .then((cache) => {
+                    cache.put(event.request, networkResponse);
+                  });
+              });
+            return response;
+          }
+          
+          // Si pas dans le cache, faire la requête réseau
+          return fetch(event.request)
+            .then((networkResponse) => {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseClone);
+                });
+              return networkResponse;
             });
-          });
-      })
-  );
+        })
+    );
+  } else {
+    // Stratégie Network First pour les requêtes API
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              if (event.request.method === 'GET') {
+                cache.put(event.request, responseClone);
+              }
+            });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request)
+            .then((response) => {
+              if (response) {
+                return response;
+              }
+              return new Response('Offline - Contenu non disponible', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: new Headers({
+                  'Content-Type': 'text/plain',
+                }),
+              });
+            });
+        })
+    );
+  }
 });
 
 // Nettoyage des anciens caches
