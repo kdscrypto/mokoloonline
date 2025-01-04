@@ -1,5 +1,4 @@
 import { ListingCard } from "../ListingCard";
-import { ListingsPagination } from "../ListingsPagination";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -7,12 +6,9 @@ import { useState } from "react";
 
 interface AllListingsProps {
   listings: Listing[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
 }
 
-export function AllListings({ listings, currentPage, totalPages, onPageChange }: AllListingsProps) {
+export function AllListings({ listings }: AllListingsProps) {
   // Group listings by category
   const listingsByCategory = listings.reduce((acc, listing) => {
     if (!acc[listing.category]) {
@@ -80,12 +76,6 @@ export function AllListings({ listings, currentPage, totalPages, onPageChange }:
           </CollapsibleContent>
         </Collapsible>
       ))}
-
-      <ListingsPagination 
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
     </section>
   );
 }

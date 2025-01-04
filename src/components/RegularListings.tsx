@@ -1,4 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { ListingsLoadingState } from "./listings/ListingsLoadingState";
@@ -10,22 +12,27 @@ import { AllListings } from "./listings/AllListings";
 interface RegularListingsProps {
   selectedCategory: string;
   searchQuery: string;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
   itemsPerPage: number;
 }
 
 export function RegularListings({
   selectedCategory,
   searchQuery,
-  currentPage,
-  setCurrentPage,
   itemsPerPage
 }: RegularListingsProps) {
-  const { data: paginatedData, isLoading, error } = useQuery({
-    queryKey: ['listings', selectedCategory, searchQuery, currentPage],
-    queryFn: async () => {
-      console.log('Début de la requête Regular listings avec params:', { selectedCategory, searchQuery, currentPage, itemsPerPage });
+  const { ref, inView } = useInView();
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ['listings', selectedCategory, searchQuery],
+    queryFn: async ({ pageParam = 0 }) => {
+      console.log('Début de la requête Regular listings avec params:', { selectedCategory, searchQuery, pageParam, itemsPerPage });
       
       let query = supabase
         .from('listings')
@@ -42,7 +49,7 @@ export function RegularListings({
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
-      const start = (currentPage - 1) * itemsPerPage;
+      const start = pageParam * itemsPerPage;
       const end = start + itemsPerPage - 1;
       query = query.range(start, end);
 
@@ -54,9 +61,20 @@ export function RegularListings({
       }
 
       console.log('Regular listings récupérés:', { data, count });
-      return { listings: data as Listing[], total: count || 0 };
+      return {
+        listings: data as Listing[],
+        total: count || 0,
+        nextPage: data.length === itemsPerPage ? pageParam + 1 : undefined
+      };
     },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
   });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (error) {
     return <ListingsErrorState />;
@@ -66,21 +84,26 @@ export function RegularListings({
     return <ListingsLoadingState />;
   }
 
-  if (!paginatedData?.listings.length) {
+  const listings = data?.pages.flatMap(page => page.listings) || [];
+
+  if (!listings.length) {
     return <ListingsEmptyState />;
   }
 
-  const totalPages = Math.ceil((paginatedData.total || 0) / itemsPerPage);
-
   return (
     <div className="space-y-12">
-      <LatestListings listings={paginatedData.listings} />
-      <AllListings 
-        listings={paginatedData.listings}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      <LatestListings listings={listings.slice(0, itemsPerPage)} />
+      <AllListings listings={listings} />
+      
+      {hasNextPage && (
+        <div ref={ref} className="flex justify-center py-4">
+          {isFetchingNextPage ? (
+            <ListingsLoadingState />
+          ) : (
+            <div className="h-20" /> // Espace pour déclencher le chargement
+          )}
+        </div>
+      )}
     </div>
   );
 }
