@@ -5,23 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ListingFormFields } from "@/components/listing/ListingFormFields";
+import { useListingForm } from "@/hooks/useListingForm";
 import { addDays } from "date-fns";
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    price: "",
-    location: "",
-    description: "",
-    category: "",
-    phone: "",
-    whatsapp: "",
-    image: null as File | null,
-    isVip: false,
-    vipDuration: 30,
-  });
+  const {
+    formData,
+    handleInputChange,
+    handleCategoryChange,
+    handleImageChange,
+    handleVipChange,
+    validateFormData
+  } = useListingForm();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,31 +32,10 @@ export default function CreateListing() {
     checkAuth();
   }, [navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setFormData(prev => ({ ...prev, category: value }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, image: e.target.files![0] }));
-    }
-  };
-
-  const handleVipChange = (value: { isVip: boolean, duration?: number }) => {
-    setFormData(prev => ({
-      ...prev,
-      isVip: value.isVip,
-      vipDuration: value.duration || prev.vipDuration
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateFormData()) return;
+    
     setIsLoading(true);
 
     try {
