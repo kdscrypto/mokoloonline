@@ -11,27 +11,33 @@ export function useAdminCheck() {
   useEffect(() => {
     const checkAdminRights = async () => {
       if (!session?.user?.id) {
+        setIsAdmin(false);
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log("Checking admin rights for user:", session.user.id);
+        
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
           .select('user_id')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (adminError) {
           console.error("Error checking admin rights:", adminError);
           toast.error("Erreur lors de la vérification des droits administrateur");
+          setIsAdmin(false);
           return;
         }
 
+        console.log("Admin check result:", adminData);
         setIsAdmin(!!adminData);
       } catch (error) {
         console.error("Error in admin check:", error);
         toast.error("Erreur lors de la vérification des droits administrateur");
+        setIsAdmin(false);
       } finally {
         setIsLoading(false);
       }
