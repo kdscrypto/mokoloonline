@@ -10,6 +10,7 @@ import { z } from "zod";
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+// Mise à jour du regex pour accepter le format camerounais
 const phoneRegex = /^\+237[2368]\d{8}$/;
 
 const listingSchema = z.object({
@@ -18,8 +19,8 @@ const listingSchema = z.object({
   location: z.string().min(2, "La localisation doit contenir au moins 2 caractères"),
   description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   category: z.string().min(1, "Veuillez sélectionner une catégorie"),
-  phone: z.string().regex(phoneRegex, "Format invalide. Utilisez le format +237 suivi de 9 chiffres").optional(),
-  whatsapp: z.string().regex(phoneRegex, "Format invalide. Utilisez le format +237 suivi de 9 chiffres").optional(),
+  phone: z.string().regex(phoneRegex, "Format invalide. Le numéro doit commencer par +237 suivi de 9 chiffres").optional(),
+  whatsapp: z.string().regex(phoneRegex, "Format invalide. Le numéro doit commencer par +237 suivi de 9 chiffres").optional(),
 });
 
 interface ListingFormFieldsProps {
@@ -81,14 +82,6 @@ export function ListingFormFields({
       const numValue = Number(value);
       if (isNaN(numValue) || numValue < 0) {
         toast.error("Le prix doit être un nombre positif");
-        return;
-      }
-    }
-    
-    if ((name === 'phone' || name === 'whatsapp') && value !== '') {
-      const phoneRegex = /^\+?[0-9\s-]{8,}$/;
-      if (!phoneRegex.test(value)) {
-        toast.error("Format de numéro de téléphone invalide");
         return;
       }
     }
