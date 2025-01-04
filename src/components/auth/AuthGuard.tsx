@@ -98,6 +98,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       if (event === 'SIGNED_OUT') {
         setIsAuthorized(false);
         setError("Votre session a expiré");
+        setIsLoading(false);
         if (requireAuth) {
           toast.error("Session expirée", {
             description: "Veuillez vous reconnecter"

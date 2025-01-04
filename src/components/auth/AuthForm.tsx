@@ -86,6 +86,8 @@ export function AuthForm() {
         }
       } else if (event === "SIGNED_OUT") {
         if (mounted) {
+          setIsLoading(false);
+          setIsProcessing(false);
           navigate("/auth");
         }
       }
@@ -110,7 +112,7 @@ export function AuthForm() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-md mx-auto p-6">
+      <Card className="max-w-md mx-auto p-6 relative">
         {isProcessing && (
           <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
             <LoadingIndicator size="sm" />
