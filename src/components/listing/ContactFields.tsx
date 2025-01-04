@@ -13,10 +13,11 @@ export function ContactFields({
   handleInputChange,
 }: ContactFieldsProps) {
   const formatPhoneNumber = (value: string) => {
-    // Remove all non-digit characters except + sign
-    const cleaned = value.replace(/[^\d+]/g, '');
-    // Ensure only one + at the start
-    return cleaned.replace(/^\++/, '+');
+    // Permet les chiffres, les espaces, les tirets et le + au début
+    const cleaned = value.replace(/[^\d\s+-]/g, '');
+    
+    // S'assure qu'il n'y a qu'un seul + au début
+    return cleaned.replace(/^\++/, '+').replace(/\+(?=.+\+)/g, '');
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,8 +37,8 @@ export function ContactFields({
           placeholder="Ex: +237 6XX XX XX XX"
           value={phone}
           onChange={handlePhoneChange}
-          pattern="^\+?[0-9]{8,}$"
-          title="Entrez un numéro de téléphone valide (minimum 8 chiffres)"
+          pattern="^(\+237[\s-]?|)([2368]\d{1}[\s-]?\d{2}[\s-]?\d{2}[\s-]?\d{2})$"
+          title="Entrez un numéro de téléphone camerounais valide (ex: +237 6XX XX XX XX)"
         />
       </div>
 
@@ -50,8 +51,8 @@ export function ContactFields({
           placeholder="Ex: +237 6XX XX XX XX"
           value={whatsapp}
           onChange={handlePhoneChange}
-          pattern="^\+?[0-9]{8,}$"
-          title="Entrez un numéro de téléphone valide (minimum 8 chiffres)"
+          pattern="^(\+237[\s-]?|)([2368]\d{1}[\s-]?\d{2}[\s-]?\d{2}[\s-]?\d{2})$"
+          title="Entrez un numéro de téléphone camerounais valide (ex: +237 6XX XX XX XX)"
         />
       </div>
     </>
