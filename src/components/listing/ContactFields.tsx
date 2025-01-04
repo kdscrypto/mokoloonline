@@ -32,8 +32,15 @@ export function ContactFields({
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatPhoneNumber(e.target.value);
-    e.target.value = formattedValue;
-    handleInputChange(e);
+    const syntheticEvent = {
+      ...e,
+      target: {
+        ...e.target,
+        value: formattedValue,
+        name: e.target.name
+      }
+    };
+    handleInputChange(syntheticEvent);
   };
 
   return (
