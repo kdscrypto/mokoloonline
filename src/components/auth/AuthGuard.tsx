@@ -4,6 +4,7 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useSession } from "@/hooks/use-session";
 import { useAdminCheck } from "@/hooks/use-admin-check";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -17,21 +18,28 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   const { isAdmin, isLoading: adminLoading } = useAdminCheck();
 
   useEffect(() => {
-    if (!sessionLoading && requireAuth && !session) {
-      toast.error("Accès restreint", {
-        description: "Veuillez vous connecter pour accéder à cette page"
-      });
-      navigate('/auth');
-      return;
-    }
+    const validateAuth = async () => {
+      if (!sessionLoading && requireAuth && !session) {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!currentSession) {
+          toast.error("Accès restreint", {
+            description: "Veuillez vous connecter pour accéder à cette page"
+          });
+          navigate('/auth');
+          return;
+        }
+      }
 
-    if (!adminLoading && requireAdmin && !isAdmin) {
-      toast.error("Accès restreint", {
-        description: "Vous n'avez pas les droits administrateur nécessaires"
-      });
-      navigate('/');
-      return;
-    }
+      if (!adminLoading && requireAdmin && !isAdmin) {
+        toast.error("Accès restreint", {
+          description: "Vous n'avez pas les droits administrateur nécessaires"
+        });
+        navigate('/');
+        return;
+      }
+    };
+
+    validateAuth();
   }, [session, isAdmin, sessionLoading, adminLoading, requireAuth, requireAdmin, navigate]);
 
   if (sessionLoading || (requireAdmin && adminLoading)) {

@@ -8,8 +8,15 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { session, isLoading: sessionLoading } = useSession();
   const { profile, isLoading: profileLoading } = useProfile();
+  const [profileData, setProfileData] = useState({
+    username: "",
+    full_name: "",
+    city: "",
+    phone: "",
+  });
 
   if (sessionLoading || profileLoading) {
     return (
@@ -20,21 +27,22 @@ export function AuthForm() {
   }
 
   if (session && !profile?.username) {
-    return <ProfileForm />;
+    return <ProfileForm profileData={profileData} setProfileData={setProfileData} />;
   }
 
   return (
     <div className="space-y-6">
       {isLogin ? (
-        <LoginForm />
+        <LoginForm isLoading={isLoading} setIsLoading={setIsLoading} />
       ) : (
-        <SignUpForm isLoading={false} setIsLoading={() => {}} />
+        <SignUpForm isLoading={isLoading} setIsLoading={setIsLoading} />
       )}
       
       <button
         type="button"
         onClick={() => setIsLogin(!isLogin)}
         className="text-sm text-muted-foreground hover:text-primary transition-colors"
+        disabled={isLoading}
       >
         {isLogin ? "Créer un compte" : "Déjà inscrit ?"}
       </button>

@@ -10,11 +10,15 @@ export function useSession() {
 
   useEffect(() => {
     const handleSessionError = async () => {
-      await supabase.auth.signOut();
-      toast.error("Session expirée", {
-        description: "Veuillez vous reconnecter"
-      });
-      navigate('/auth');
+      try {
+        await supabase.auth.signOut();
+        toast.error("Session expirée", {
+          description: "Veuillez vous reconnecter"
+        });
+        navigate('/auth');
+      } catch (error) {
+        console.error("Error during signout:", error);
+      }
     };
 
     const validateSession = async () => {
@@ -24,11 +28,19 @@ export function useSession() {
 
         if (sessionError) {
           console.error("Session error:", sessionError);
-          if (sessionError.message?.includes('JWT')) {
+          if (sessionError.message?.includes('JWT') || 
+              sessionError.message?.includes('token') || 
+              sessionError.message?.includes('session')) {
             await handleSessionError();
             return;
           }
           throw sessionError;
+        }
+
+        // If we have a session but no refresh token, sign out
+        if (currentSession && !currentSession.refresh_token) {
+          await handleSessionError();
+          return;
         }
 
         setSession(currentSession);
@@ -42,8 +54,14 @@ export function useSession() {
 
     validateSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'TOKEN_REFRESHED') {
+        setSession(session);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+      } else {
+        setSession(session);
+      }
     });
 
     return () => {
