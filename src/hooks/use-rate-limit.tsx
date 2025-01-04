@@ -12,7 +12,7 @@ export function useRateLimit() {
         const { data, error } = await supabase
           .from('blocked_ips')
           .select('request_count, blocked_until')
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Erreur lors de la vérification du rate limit:", error);
@@ -29,6 +29,11 @@ export function useRateLimit() {
           
           // Mode dégradé si plus de 1000 requêtes
           setIsFallback(data.request_count > 1000);
+        } else {
+          // Aucune entrée trouvée, réinitialiser les états
+          setIsRateLimited(false);
+          setQueueDelay(0);
+          setIsFallback(false);
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du rate limit:", error);
