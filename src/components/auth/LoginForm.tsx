@@ -5,11 +5,15 @@ import { Label } from "@/components/ui/label";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useAuthLogin } from "@/hooks/use-auth-login";
 
-export function LoginForm() {
+interface LoginFormProps {
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+}
+
+export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const { 
-    isLoading, 
     isResettingPassword, 
     setIsResettingPassword, 
     handleLogin 
@@ -17,7 +21,12 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleLogin(identifier, password);
+    setIsLoading(true);
+    try {
+      await handleLogin(identifier, password);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
