@@ -15,6 +15,7 @@ export function useAdminCheck() {
         if (!session?.user?.id) {
           console.log("No session found, user is not admin");
           setIsAdmin(false);
+          setIsLoading(false);
           return;
         }
 
@@ -22,17 +23,13 @@ export function useAdminCheck() {
         
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
-          .select('user_id')
+          .select('*')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
         if (adminError) {
           console.error("Admin check error:", adminError);
-          if (adminError.code === 'PGRST116') {
-            console.log("No admin record found for user");
-          } else {
-            toast.error("Erreur lors de la vérification des droits administrateur");
-          }
+          toast.error("Erreur lors de la vérification des droits administrateur");
           setIsAdmin(false);
           return;
         }

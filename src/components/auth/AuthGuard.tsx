@@ -4,7 +4,6 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useSession } from "@/hooks/use-session";
 import { useAdminCheck } from "@/hooks/use-admin-check";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -19,9 +18,18 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
   useEffect(() => {
     const validateAuth = async () => {
-      // Si l'authentification est requise et qu'il n'y a pas de session
+      console.log("AuthGuard - État actuel:", {
+        sessionLoading,
+        requireAuth,
+        session: !!session,
+        adminLoading,
+        requireAdmin,
+        isAdmin
+      });
+
+      // Vérification de l'authentification
       if (!sessionLoading && requireAuth && !session) {
-        console.log("AuthGuard - Pas de session, redirection vers auth");
+        console.log("AuthGuard - Redirection vers la page de connexion");
         toast.error("Accès restreint", {
           description: "Veuillez vous connecter pour accéder à cette page"
         });
@@ -29,10 +37,9 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         return;
       }
 
-      // Si les droits admin sont requis et que l'utilisateur n'est pas admin
+      // Vérification des droits admin
       if (!adminLoading && requireAdmin && !isAdmin) {
-        console.log("AuthGuard - Vérification admin échouée, redirection vers accueil");
-        console.log("État actuel - Session:", !!session, "IsAdmin:", isAdmin);
+        console.log("AuthGuard - Accès admin refusé");
         toast.error("Accès restreint", {
           description: "Vous n'avez pas les droits administrateur nécessaires"
         });
@@ -44,7 +51,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
     validateAuth();
   }, [session, isAdmin, sessionLoading, adminLoading, requireAuth, requireAdmin, navigate]);
 
-  // Afficher le loader pendant la vérification
+  // Affichage du loader pendant la vérification
   if (sessionLoading || (requireAdmin && adminLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -53,12 +60,12 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
     );
   }
 
-  // Si l'authentification est requise et qu'il n'y a pas de session, ne rien rendre
+  // Ne rien rendre si l'authentification est requise mais absente
   if (requireAuth && !session) {
     return null;
   }
 
-  // Si les droits admin sont requis et que l'utilisateur n'est pas admin, ne rien rendre
+  // Ne rien rendre si les droits admin sont requis mais absents
   if (requireAdmin && !isAdmin) {
     return null;
   }
