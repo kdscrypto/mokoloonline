@@ -10,37 +10,33 @@ export function useAdminCheck() {
 
   useEffect(() => {
     const checkAdminRights = async () => {
-      if (!session?.user?.id) {
-        setIsAdmin(false);
-        setIsLoading(false);
-        return;
-      }
-
+      setIsLoading(true);
       try {
+        if (!session?.user?.id) {
+          console.log("No session found, user is not admin");
+          setIsAdmin(false);
+          return;
+        }
+
         console.log("Checking admin rights for user:", session.user.id);
         
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (adminError) {
           console.error("Admin check error:", adminError);
-          if (adminError.code === 'PGRST116') {
-            console.log("User is not admin");
-            setIsAdmin(false);
-          } else {
+          if (adminError.code !== 'PGRST116') { // PGRST116 means no rows found
             toast.error("Erreur lors de la vérification des droits administrateur");
-            setIsAdmin(false);
           }
-        } else if (adminData) {
-          console.log("Admin check result:", adminData);
-          setIsAdmin(true);
-        } else {
-          console.log("No admin data found");
           setIsAdmin(false);
+          return;
         }
+
+        console.log("Admin check result:", adminData);
+        setIsAdmin(!!adminData);
       } catch (error) {
         console.error("Error in admin check:", error);
         toast.error("Erreur lors de la vérification des droits administrateur");
