@@ -22,9 +22,9 @@ export function useAdminCheck() {
         
         const { data: adminData, error } = await supabase
           .from('admin_users')
-          .select('*')
+          .select('user_id')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (error) {
           console.error("Error checking admin rights:", error);

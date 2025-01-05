@@ -46,7 +46,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
       // Vérification des droits admin
       if (requireAdmin && !isAdmin) {
-        console.log("AuthGuard - Accès admin refusé");
+        console.log("AuthGuard - Accès admin refusé, isAdmin:", isAdmin);
         toast.error("Accès restreint", {
           description: "Vous n'avez pas les droits administrateur nécessaires"
         });

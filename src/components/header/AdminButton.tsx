@@ -41,7 +41,7 @@ export const AdminButton = () => {
   if (!isAdmin) return null;
 
   return (
-    <Link to="/admin" onClick={handleAdminClick}>
+    <Link to="/admin">
       <Button 
         variant="outline" 
         className="rounded-full hover:shadow-md transition-all duration-300"
