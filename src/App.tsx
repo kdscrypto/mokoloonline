@@ -13,10 +13,10 @@ import Dashboard from "@/pages/Dashboard";
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <React.StrictMode>
+          <ErrorBoundary>
             <TooltipProvider>
               <RouteWrapper>
                 <React.Suspense 
@@ -54,10 +54,10 @@ const App = () => {
               <Toaster />
               <Sonner />
             </TooltipProvider>
-          </BrowserRouter>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </React.StrictMode>
+          </ErrorBoundary>
+        </React.StrictMode>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
