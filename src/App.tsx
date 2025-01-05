@@ -3,13 +3,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
 import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
 import Dashboard from "@/pages/Dashboard";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const App = () => {
   return (
@@ -30,7 +31,11 @@ const App = () => {
                   }
                 >
                   <Routes>
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard" element={
+                      <AuthGuard requireAuth>
+                        <Dashboard />
+                      </AuthGuard>
+                    } />
                     {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
                       <Route
                         key={key}
@@ -48,6 +53,7 @@ const App = () => {
                         }
                       />
                     ))}
+                    <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </React.Suspense>
               </RouteWrapper>

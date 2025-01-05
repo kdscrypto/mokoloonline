@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useSession } from "@/hooks/use-session";
@@ -15,18 +15,19 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
   const navigate = useNavigate();
   const { session, isLoading: sessionLoading } = useSession();
   const { isAdmin, isLoading: adminLoading } = useAdminCheck();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const validateAuth = async () => {
+    const validateAccess = async () => {
       // Attendre que toutes les vérifications soient terminées
       if (sessionLoading || (requireAdmin && adminLoading)) {
         return;
       }
 
-      console.log("AuthGuard - État actuel:", {
+      console.log("AuthGuard - Validation d'accès:", {
         sessionLoading,
         requireAuth,
-        session: !!session,
+        hasSession: !!session,
         adminLoading,
         requireAdmin,
         isAdmin
@@ -51,27 +52,24 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         navigate('/');
         return;
       }
+
+      setIsAuthorized(true);
     };
 
-    validateAuth();
+    validateAccess();
   }, [session, isAdmin, sessionLoading, adminLoading, requireAuth, requireAdmin, navigate]);
 
   // Affichage du loader pendant la vérification
   if (sessionLoading || (requireAdmin && adminLoading)) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <LoadingIndicator size="lg" />
       </div>
     );
   }
 
-  // Ne rien rendre si l'authentification est requise mais absente
-  if (requireAuth && !session) {
-    return null;
-  }
-
-  // Ne rien rendre si les droits admin sont requis mais absents
-  if (requireAdmin && !isAdmin) {
+  // Ne rien rendre tant que l'autorisation n'est pas confirmée
+  if (!isAuthorized) {
     return null;
   }
 

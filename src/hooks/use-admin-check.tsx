@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useSession } from "./use-session";
 
 export function useAdminCheck() {
@@ -32,8 +31,9 @@ export function useAdminCheck() {
           return;
         }
 
-        console.log("Admin check result:", !!adminData);
-        setIsAdmin(!!adminData);
+        const isUserAdmin = !!adminData;
+        console.log("Admin check result:", isUserAdmin);
+        setIsAdmin(isUserAdmin);
       } catch (error) {
         console.error("Error in admin check:", error);
         setIsAdmin(false);
@@ -43,7 +43,7 @@ export function useAdminCheck() {
     };
 
     checkAdminRights();
-  }, [session]);
+  }, [session?.user?.id]);
 
   return { isAdmin, isLoading };
 }
