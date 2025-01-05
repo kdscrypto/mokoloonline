@@ -35,11 +35,10 @@ export function useAdminCheck() {
             toast.error("Erreur lors de la vérification des droits administrateur");
             setIsAdmin(false);
           }
-          return;
+        } else {
+          console.log("Admin check result:", adminData);
+          setIsAdmin(true);
         }
-
-        console.log("Admin check result:", adminData);
-        setIsAdmin(true);
       } catch (error) {
         console.error("Error in admin check:", error);
         toast.error("Erreur lors de la vérification des droits administrateur");
