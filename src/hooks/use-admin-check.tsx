@@ -15,29 +15,27 @@ export function useAdminCheck() {
         if (!session?.user?.id) {
           console.log("No session found, user is not admin");
           setIsAdmin(false);
-          setIsLoading(false);
           return;
         }
 
         console.log("Checking admin rights for user:", session.user.id);
         
-        const { data: adminData, error: adminError } = await supabase
+        const { data: adminData, error } = await supabase
           .from('admin_users')
           .select('*')
           .eq('user_id', session.user.id)
           .single();
 
-        if (adminError) {
-          console.error("Admin check error:", adminError);
-          toast.error("Erreur lors de la vérification des droits administrateur");
+        if (error) {
+          console.error("Admin check error:", error);
           setIsAdmin(false);
-        } else {
-          console.log("Admin check result:", adminData);
-          setIsAdmin(!!adminData);
+          return;
         }
+
+        console.log("Admin check result:", !!adminData);
+        setIsAdmin(!!adminData);
       } catch (error) {
         console.error("Error in admin check:", error);
-        toast.error("Erreur lors de la vérification des droits administrateur");
         setIsAdmin(false);
       } finally {
         setIsLoading(false);
