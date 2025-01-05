@@ -37,6 +37,7 @@ export const AdminButton = () => {
     );
   }
 
+  // Ne pas afficher le bouton si l'utilisateur n'est pas admin
   if (!isAdmin) return null;
 
   return (
