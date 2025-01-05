@@ -26,18 +26,20 @@ export function useAdminCheck() {
           .single();
 
         if (adminError) {
+          console.error("Admin check error:", adminError);
           if (adminError.code === 'PGRST116') {
-            // Pas d'erreur, l'utilisateur n'est simplement pas admin
             console.log("User is not admin");
             setIsAdmin(false);
           } else {
-            console.error("Error checking admin rights:", adminError);
             toast.error("Erreur lors de la vérification des droits administrateur");
             setIsAdmin(false);
           }
-        } else {
+        } else if (adminData) {
           console.log("Admin check result:", adminData);
           setIsAdmin(true);
+        } else {
+          console.log("No admin data found");
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error("Error in admin check:", error);
