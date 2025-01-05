@@ -25,17 +25,21 @@ export function useAdminCheck() {
           .from('admin_users')
           .select('*')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (adminError) {
-          console.error("Admin check error:", adminError);
-          toast.error("Erreur lors de la vérification des droits administrateur");
-          setIsAdmin(false);
-          return;
+          if (adminError.code === 'PGRST116') {
+            console.log("No admin record found for user");
+            setIsAdmin(false);
+          } else {
+            console.error("Admin check error:", adminError);
+            toast.error("Erreur lors de la vérification des droits administrateur");
+            setIsAdmin(false);
+          }
+        } else {
+          console.log("Admin check result:", adminData);
+          setIsAdmin(!!adminData);
         }
-
-        console.log("Admin check result:", adminData);
-        setIsAdmin(!!adminData);
       } catch (error) {
         console.error("Error in admin check:", error);
         toast.error("Erreur lors de la vérification des droits administrateur");
