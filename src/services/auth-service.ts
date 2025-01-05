@@ -45,7 +45,7 @@ export async function signOut() {
       return;
     }
     
-    // Attempt to sign out
+    // Attempt to sign out without scope parameter
     const { error } = await supabase.auth.signOut();
     
     if (error) {
