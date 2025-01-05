@@ -4,9 +4,30 @@ import { Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/use-admin-check";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { useSession } from "@/hooks/use-session";
+import { toast } from "sonner";
 
 export const AdminButton = () => {
+  const { session } = useSession();
   const { isAdmin, isLoading } = useAdminCheck();
+
+  const handleAdminClick = (e: React.MouseEvent) => {
+    if (!session) {
+      e.preventDefault();
+      toast.error("Accès restreint", {
+        description: "Veuillez vous connecter pour accéder à l'administration"
+      });
+      return;
+    }
+
+    if (!isAdmin) {
+      e.preventDefault();
+      toast.error("Accès restreint", {
+        description: "Vous n'avez pas les droits administrateur nécessaires"
+      });
+      return;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -19,8 +40,11 @@ export const AdminButton = () => {
   if (!isAdmin) return null;
 
   return (
-    <Link to="/admin">
-      <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
+    <Link to="/admin" onClick={handleAdminClick}>
+      <Button 
+        variant="outline" 
+        className="rounded-full hover:shadow-md transition-all duration-300"
+      >
         <Settings className="mr-2 h-4 w-4" /> Administration
       </Button>
     </Link>
