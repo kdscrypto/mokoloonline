@@ -16,13 +16,13 @@ export async function logSecurityEvent(event: LogEvent) {
     // Insert directly into the security_logs table instead of using edge function
     const { error } = await supabase
       .from('security_logs')
-      .insert([{
+      .insert({
         event_type: event.event_type,
         description: event.description,
         user_id: event.user_id,
         ip_address: event.ip_address,
-        metadata: event.metadata
-      }]);
+        metadata: event.metadata as any // Type assertion needed due to Json type limitations
+      });
 
     if (error) throw error;
     
