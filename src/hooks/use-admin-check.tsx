@@ -24,18 +24,16 @@ export function useAdminCheck() {
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
-          .eq('user_id', session.user.id)
-          .single();
+          .eq('user_id', session.user.id);
 
         if (adminError) {
           console.error("Admin check error:", adminError);
-          if (adminError.code !== 'PGRST116') { // PGRST116 means no rows returned
-            toast.error("Erreur lors de la vérification des droits administrateur");
-          }
+          toast.error("Erreur lors de la vérification des droits administrateur");
           setIsAdmin(false);
         } else {
           console.log("Admin check result:", adminData);
-          setIsAdmin(true);
+          // Vérifie si adminData est un tableau non vide
+          setIsAdmin(Array.isArray(adminData) && adminData.length > 0);
         }
       } catch (error) {
         console.error("Error in admin check:", error);
