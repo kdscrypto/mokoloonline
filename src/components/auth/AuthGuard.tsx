@@ -19,22 +19,20 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
   useEffect(() => {
     const validateAuth = async () => {
-      console.log("AuthGuard validation - Session:", !!session, "IsAdmin:", isAdmin, "RequireAdmin:", requireAdmin);
-      
+      // Si l'authentification est requise et qu'il n'y a pas de session
       if (!sessionLoading && requireAuth && !session) {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        if (!currentSession) {
-          console.log("AuthGuard - No session found, redirecting to auth");
-          toast.error("Accès restreint", {
-            description: "Veuillez vous connecter pour accéder à cette page"
-          });
-          navigate('/auth');
-          return;
-        }
+        console.log("AuthGuard - Pas de session, redirection vers auth");
+        toast.error("Accès restreint", {
+          description: "Veuillez vous connecter pour accéder à cette page"
+        });
+        navigate('/auth');
+        return;
       }
 
+      // Si les droits admin sont requis et que l'utilisateur n'est pas admin
       if (!adminLoading && requireAdmin && !isAdmin) {
-        console.log("AuthGuard - Admin check failed, redirecting to home");
+        console.log("AuthGuard - Vérification admin échouée, redirection vers accueil");
+        console.log("État actuel - Session:", !!session, "IsAdmin:", isAdmin);
         toast.error("Accès restreint", {
           description: "Vous n'avez pas les droits administrateur nécessaires"
         });
@@ -46,12 +44,23 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
     validateAuth();
   }, [session, isAdmin, sessionLoading, adminLoading, requireAuth, requireAdmin, navigate]);
 
+  // Afficher le loader pendant la vérification
   if (sessionLoading || (requireAdmin && adminLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingIndicator size="lg" />
       </div>
     );
+  }
+
+  // Si l'authentification est requise et qu'il n'y a pas de session, ne rien rendre
+  if (requireAuth && !session) {
+    return null;
+  }
+
+  // Si les droits admin sont requis et que l'utilisateur n'est pas admin, ne rien rendre
+  if (requireAdmin && !isAdmin) {
+    return null;
   }
 
   return <>{children}</>;
