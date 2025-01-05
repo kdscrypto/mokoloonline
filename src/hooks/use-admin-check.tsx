@@ -21,20 +21,25 @@ export function useAdminCheck() {
         
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
-          .select('user_id')
+          .select('*')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (adminError) {
-          console.error("Error checking admin rights:", adminError);
-          toast.error("Erreur lors de la vérification des droits administrateur");
-          setIsAdmin(false);
+          if (adminError.code === 'PGRST116') {
+            // Pas d'erreur, l'utilisateur n'est simplement pas admin
+            console.log("User is not admin");
+            setIsAdmin(false);
+          } else {
+            console.error("Error checking admin rights:", adminError);
+            toast.error("Erreur lors de la vérification des droits administrateur");
+            setIsAdmin(false);
+          }
           return;
         }
 
         console.log("Admin check result:", adminData);
-        // adminData will be null if no matching row is found
-        setIsAdmin(!!adminData);
+        setIsAdmin(true);
       } catch (error) {
         console.error("Error in admin check:", error);
         toast.error("Erreur lors de la vérification des droits administrateur");
