@@ -30,7 +30,8 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         hasSession: !!session,
         adminLoading,
         requireAdmin,
-        isAdmin
+        isAdmin,
+        userId: session?.user?.id
       });
 
       // Vérification de l'authentification

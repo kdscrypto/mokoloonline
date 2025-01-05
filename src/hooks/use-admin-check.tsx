@@ -26,7 +26,7 @@ export function useAdminCheck() {
           .single();
 
         if (error) {
-          console.error("Admin check error:", error);
+          console.error("Error checking admin rights:", error);
           setIsAdmin(false);
           return;
         }
