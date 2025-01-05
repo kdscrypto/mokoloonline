@@ -13,23 +13,20 @@ interface LogEvent {
 
 export async function logSecurityEvent(event: LogEvent) {
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/security-logs`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ event }),
-      }
-    );
+    // Insert directly into the security_logs table instead of using edge function
+    const { error } = await supabase
+      .from('security_logs')
+      .insert([{
+        event_type: event.event_type,
+        description: event.description,
+        user_id: event.user_id,
+        ip_address: event.ip_address,
+        metadata: event.metadata
+      }]);
 
-    if (!response.ok) {
-      throw new Error('Failed to log security event');
-    }
-
-    return await response.json();
+    if (error) throw error;
+    
+    return { success: true };
   } catch (error) {
     console.error('Error logging security event:', error);
     return null;

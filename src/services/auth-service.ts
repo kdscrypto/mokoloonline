@@ -43,8 +43,13 @@ export async function signOut() {
       window.location.href = '/';
       return;
     }
+
+    // Clear any stored auth data
+    await supabase.auth.clearSession();
     
+    // Attempt to sign out
     const { error } = await supabase.auth.signOut();
+    
     if (error) {
       if (error.message?.includes('session_not_found')) {
         toast.success("Déconnexion réussie");
