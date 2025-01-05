@@ -18,6 +18,11 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
   useEffect(() => {
     const validateAuth = async () => {
+      // Attendre que toutes les vérifications soient terminées
+      if (sessionLoading || (requireAdmin && adminLoading)) {
+        return;
+      }
+
       console.log("AuthGuard - État actuel:", {
         sessionLoading,
         requireAuth,
@@ -28,7 +33,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       });
 
       // Vérification de l'authentification
-      if (!sessionLoading && requireAuth && !session) {
+      if (requireAuth && !session) {
         console.log("AuthGuard - Redirection vers la page de connexion");
         toast.error("Accès restreint", {
           description: "Veuillez vous connecter pour accéder à cette page"
@@ -38,7 +43,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       }
 
       // Vérification des droits admin
-      if (!adminLoading && requireAdmin && !isAdmin) {
+      if (requireAdmin && !isAdmin) {
         console.log("AuthGuard - Accès admin refusé");
         toast.error("Accès restreint", {
           description: "Vous n'avez pas les droits administrateur nécessaires"
