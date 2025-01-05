@@ -23,7 +23,7 @@ export function useAdminCheck() {
           .from('admin_users')
           .select('user_id')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (adminError) {
           console.error("Error checking admin rights:", adminError);
