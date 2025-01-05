@@ -35,8 +35,22 @@ export async function checkSession() {
 
 export async function signOut() {
   try {
+    // First check if we still have a valid session
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast.success("Déconnexion réussie");
+      window.location.href = '/';
+      return;
+    }
+    
     const { error } = await supabase.auth.signOut();
     if (error) {
+      if (error.message?.includes('session_not_found')) {
+        toast.success("Déconnexion réussie");
+        window.location.href = '/';
+        return;
+      }
       console.error("Erreur lors de la déconnexion:", error);
       throw new Error("Impossible de vous déconnecter");
     }
