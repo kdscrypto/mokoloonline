@@ -18,6 +18,7 @@ export const AuthButtons = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
     });
 
@@ -28,14 +29,40 @@ export const AuthButtons = () => {
 
   const handleLogout = async () => {
     try {
+      // First check if we still have a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session exists, just clean up the UI state
+        setIsAuthenticated(false);
+        toast.success("Déconnexion réussie");
+        navigate("/");
+        return;
+      }
+
+      // Proceed with logout if we have a session
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Erreur de déconnexion:", error);
+        if (error.message?.includes('session_not_found')) {
+          // If session not found, clean up the UI state
+          setIsAuthenticated(false);
+          toast.success("Déconnexion réussie");
+          navigate("/");
+          return;
+        }
+        throw error;
+      }
       
       toast.success("Déconnexion réussie");
       navigate("/");
     } catch (error: any) {
-      toast.error("Erreur lors de la déconnexion");
       console.error("Erreur de déconnexion:", error);
+      // Even if there's an error, we should clean up the UI state
+      setIsAuthenticated(false);
+      toast.success("Déconnexion réussie");
+      navigate("/");
     }
   };
 
