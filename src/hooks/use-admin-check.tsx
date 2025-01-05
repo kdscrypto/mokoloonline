@@ -32,7 +32,6 @@ export function useAdminCheck() {
           setIsAdmin(false);
         } else {
           console.log("Admin check result:", adminData);
-          // Vérifie si adminData est un tableau non vide
           setIsAdmin(Array.isArray(adminData) && adminData.length > 0);
         }
       } catch (error) {
