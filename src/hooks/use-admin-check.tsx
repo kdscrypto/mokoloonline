@@ -24,7 +24,8 @@ export function useAdminCheck() {
         const { data: adminData, error: adminError } = await supabase
           .from('admin_users')
           .select('*')
-          .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id)
+          .single();
 
         if (adminError) {
           console.error("Admin check error:", adminError);
@@ -32,7 +33,7 @@ export function useAdminCheck() {
           setIsAdmin(false);
         } else {
           console.log("Admin check result:", adminData);
-          setIsAdmin(Array.isArray(adminData) && adminData.length > 0);
+          setIsAdmin(!!adminData);
         }
       } catch (error) {
         console.error("Error in admin check:", error);
