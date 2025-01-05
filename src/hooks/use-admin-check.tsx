@@ -33,6 +33,7 @@ export function useAdminCheck() {
         }
 
         console.log("Admin check result:", adminData);
+        // adminData will be null if no matching row is found
         setIsAdmin(!!adminData);
       } catch (error) {
         console.error("Error in admin check:", error);
