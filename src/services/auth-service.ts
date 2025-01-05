@@ -39,17 +39,18 @@ export async function signOut() {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
+      // If no session exists, just redirect to home
       toast.success("Déconnexion réussie");
       window.location.href = '/';
       return;
     }
     
     // Attempt to sign out
-    const { error } = await supabase.auth.signOut({
-      scope: 'global'
-    });
+    const { error } = await supabase.auth.signOut();
     
     if (error) {
+      // If we get a session_not_found error, the session is already invalid
+      // so we can just redirect to home
       if (error.message?.includes('session_not_found')) {
         toast.success("Déconnexion réussie");
         window.location.href = '/';
@@ -63,6 +64,7 @@ export async function signOut() {
       description: "À bientôt !"
     });
     
+    // Use window.location.href for a complete page reload
     window.location.href = '/';
   } catch (error) {
     await handleError(error, 'signOut');
