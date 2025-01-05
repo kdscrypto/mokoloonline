@@ -28,17 +28,14 @@ export function useAdminCheck() {
           .single();
 
         if (adminError) {
-          if (adminError.code === 'PGRST116') {
-            console.log("No admin record found for user");
-            setIsAdmin(false);
-          } else {
-            console.error("Admin check error:", adminError);
+          console.error("Admin check error:", adminError);
+          if (adminError.code !== 'PGRST116') { // PGRST116 means no rows returned
             toast.error("Erreur lors de la vérification des droits administrateur");
-            setIsAdmin(false);
           }
+          setIsAdmin(false);
         } else {
           console.log("Admin check result:", adminData);
-          setIsAdmin(!!adminData);
+          setIsAdmin(true);
         }
       } catch (error) {
         console.error("Error in admin check:", error);
