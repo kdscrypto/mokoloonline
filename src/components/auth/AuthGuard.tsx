@@ -19,9 +19,12 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
   useEffect(() => {
     const validateAuth = async () => {
+      console.log("AuthGuard validation - Session:", !!session, "IsAdmin:", isAdmin, "RequireAdmin:", requireAdmin);
+      
       if (!sessionLoading && requireAuth && !session) {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         if (!currentSession) {
+          console.log("AuthGuard - No session found, redirecting to auth");
           toast.error("Accès restreint", {
             description: "Veuillez vous connecter pour accéder à cette page"
           });
@@ -31,6 +34,7 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
       }
 
       if (!adminLoading && requireAdmin && !isAdmin) {
+        console.log("AuthGuard - Admin check failed, redirecting to home");
         toast.error("Accès restreint", {
           description: "Vous n'avez pas les droits administrateur nécessaires"
         });

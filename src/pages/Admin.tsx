@@ -13,10 +13,17 @@ export default function Admin() {
   const { listings, isLoading: listingsLoading, handleStatusUpdate } = useAdminListings(true);
 
   useEffect(() => {
-    if (!adminCheckLoading && !isAdmin) {
-      toast.error("Accès non autorisé");
-      navigate("/");
-    }
+    const checkAdminAccess = async () => {
+      if (!adminCheckLoading && !isAdmin) {
+        console.log("Admin access denied. isAdmin:", isAdmin);
+        toast.error("Accès restreint", {
+          description: "Vous n'avez pas les droits administrateur nécessaires"
+        });
+        navigate("/");
+      }
+    };
+
+    checkAdminAccess();
   }, [isAdmin, adminCheckLoading, navigate]);
 
   if (adminCheckLoading || listingsLoading) {
@@ -27,6 +34,7 @@ export default function Admin() {
     );
   }
 
+  // Si l'utilisateur n'est pas admin, on ne rend rien
   if (!isAdmin) {
     return null;
   }
