@@ -11,12 +11,38 @@ import { routes } from "@/config/routes";
 import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
 import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const App = () => {
+  // Handle Supabase auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Clear any stored tokens
+        localStorage.removeItem('supabase.auth.token');
+        queryClient.clear();
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed successfully');
+      }
+      
+      if (event === 'SIGNED_IN') {
+        console.log('User signed in successfully');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ErrorBoundary>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
           <TooltipProvider>
             <RouteWrapper>
               <React.Suspense 
@@ -59,9 +85,9 @@ const App = () => {
             <Toaster />
             <Sonner />
           </TooltipProvider>
-        </ErrorBoundary>
-      </BrowserRouter>
-    </QueryClientProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
