@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet";
 
 const ITEMS_PER_PAGE = 12;
 
-export default function Index() {
+function Index() {
   usePerformanceMonitoring("home");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,3 +86,6 @@ export default function Index() {
     </>
   );
 }
+
+// Make sure to export the component as default
+export default Index;
