@@ -48,22 +48,28 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
 
       // Si l'utilisateur est connecté et que c'est un email autorisé, l'ajouter aux admin_users
       if (session?.user) {
-        const { data: allowedEmail } = await supabase
-          .from('admin_allowed_emails')
-          .select('email')
-          .eq('email', session.user.email)
-          .single();
-
-        if (allowedEmail) {
-          const { error: insertError } = await supabase
-            .from('admin_users')
-            .insert({ user_id: session.user.id })
-            .select()
+        try {
+          const { data: allowedEmail } = await supabase
+            .from('admin_allowed_emails')
+            .select('email')
+            .eq('email', session.user.email)
             .single();
 
-          if (!insertError || insertError.code === '23505') { // 23505 est le code d'erreur pour une violation de contrainte unique
-            console.log("Utilisateur ajouté ou déjà présent dans admin_users");
+          if (allowedEmail) {
+            const { error: upsertError } = await supabase
+              .from('admin_users')
+              .upsert({ user_id: session.user.id })
+              .select()
+              .single();
+
+            if (upsertError && upsertError.code !== '23505') {
+              console.error("Erreur lors de l'ajout aux admin_users:", upsertError);
+            } else {
+              console.log("Utilisateur ajouté ou déjà présent dans admin_users");
+            }
           }
+        } catch (error) {
+          console.error("Erreur lors de la vérification des droits admin:", error);
         }
       }
 
