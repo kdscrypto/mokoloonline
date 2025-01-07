@@ -58,11 +58,12 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
           if (allowedEmail) {
             const { error: upsertError } = await supabase
               .from('admin_users')
-              .upsert({ user_id: session.user.id })
-              .select()
-              .single();
+              .upsert({ 
+                user_id: session.user.id,
+                created_at: new Date().toISOString()
+              });
 
-            if (upsertError && upsertError.code !== '23505') {
+            if (upsertError) {
               console.error("Erreur lors de l'ajout aux admin_users:", upsertError);
             } else {
               console.log("Utilisateur ajouté ou déjà présent dans admin_users");
