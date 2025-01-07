@@ -15,12 +15,11 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const App = () => {
+const AppContent = () => {
   // Handle Supabase auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
-        // Clear any stored tokens
         localStorage.removeItem('supabase.auth.token');
         queryClient.clear();
       }
@@ -40,54 +39,60 @@ const App = () => {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <RouteWrapper>
-              <React.Suspense 
-                fallback={
-                  <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-                    <div className="text-center">
-                      <LoadingIndicator size="lg" />
-                      <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+    <RouteWrapper>
+      <React.Suspense 
+        fallback={
+          <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+            <div className="text-center">
+              <LoadingIndicator size="lg" />
+              <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+            </div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/dashboard" element={
+            <AuthGuard requireAuth>
+              <Dashboard />
+            </AuthGuard>
+          } />
+          {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
+            <Route
+              key={key}
+              path={route.path}
+              element={
+                <React.Suspense 
+                  fallback={
+                    <div className="flex items-center justify-center min-h-[200px]">
+                      <LoadingIndicator size="sm" />
                     </div>
-                  </div>
-                }
-              >
-                <Routes>
-                  <Route path="/dashboard" element={
-                    <AuthGuard requireAuth>
-                      <Dashboard />
-                    </AuthGuard>
-                  } />
-                  {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
-                    <Route
-                      key={key}
-                      path={route.path}
-                      element={
-                        <React.Suspense 
-                          fallback={
-                            <div className="flex items-center justify-center min-h-[200px]">
-                              <LoadingIndicator size="sm" />
-                            </div>
-                          }
-                        >
-                          {route.element ? route.element(route.component) : <route.component />}
-                        </React.Suspense>
-                      }
-                    />
-                  ))}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </React.Suspense>
-            </RouteWrapper>
-            <Toaster />
-            <Sonner />
+                  }
+                >
+                  {route.element ? route.element(route.component) : <route.component />}
+                </React.Suspense>
+              }
+            />
+          ))}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </React.Suspense>
+      <Toaster />
+      <Sonner />
+    </RouteWrapper>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary>
+          <TooltipProvider>
+            <AppContent />
           </TooltipProvider>
-        </BrowserRouter>
+        </ErrorBoundary>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </BrowserRouter>
   );
 };
 
