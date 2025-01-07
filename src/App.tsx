@@ -16,52 +16,50 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <React.StrictMode>
-          <ErrorBoundary>
-            <TooltipProvider>
-              <RouteWrapper>
-                <React.Suspense 
-                  fallback={
-                    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-                      <div className="text-center">
-                        <LoadingIndicator size="lg" />
-                        <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
-                      </div>
+        <ErrorBoundary>
+          <TooltipProvider>
+            <RouteWrapper>
+              <React.Suspense 
+                fallback={
+                  <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+                    <div className="text-center">
+                      <LoadingIndicator size="lg" />
+                      <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
                     </div>
-                  }
-                >
-                  <Routes>
-                    <Route path="/dashboard" element={
-                      <AuthGuard requireAuth>
-                        <Dashboard />
-                      </AuthGuard>
-                    } />
-                    {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
-                      <Route
-                        key={key}
-                        path={route.path}
-                        element={
-                          <React.Suspense 
-                            fallback={
-                              <div className="flex items-center justify-center min-h-[200px]">
-                                <LoadingIndicator size="sm" />
-                              </div>
-                            }
-                          >
-                            {route.element ? route.element(route.component) : <route.component />}
-                          </React.Suspense>
-                        }
-                      />
-                    ))}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </React.Suspense>
-              </RouteWrapper>
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </ErrorBoundary>
-        </React.StrictMode>
+                  </div>
+                }
+              >
+                <Routes>
+                  <Route path="/dashboard" element={
+                    <AuthGuard requireAuth>
+                      <Dashboard />
+                    </AuthGuard>
+                  } />
+                  {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
+                    <Route
+                      key={key}
+                      path={route.path}
+                      element={
+                        <React.Suspense 
+                          fallback={
+                            <div className="flex items-center justify-center min-h-[200px]">
+                              <LoadingIndicator size="sm" />
+                            </div>
+                          }
+                        >
+                          {route.element ? route.element(route.component) : <route.component />}
+                        </React.Suspense>
+                      }
+                    />
+                  ))}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </React.Suspense>
+            </RouteWrapper>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </ErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>
   );
