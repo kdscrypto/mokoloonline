@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -11,7 +11,9 @@ export const AdminButton = () => {
   const { session } = useSession();
   const { isAdmin, isLoading } = useAdminCheck();
 
-  console.log("AdminButton - Session:", !!session, "IsAdmin:", isAdmin, "IsLoading:", isLoading);
+  useEffect(() => {
+    console.log("AdminButton - Session:", !!session, "IsAdmin:", isAdmin, "IsLoading:", isLoading);
+  }, [session, isAdmin, isLoading]);
 
   const handleAdminClick = (e: React.MouseEvent) => {
     if (!session) {

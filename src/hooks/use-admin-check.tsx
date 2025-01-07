@@ -14,7 +14,6 @@ export function useAdminCheck() {
         if (!session?.user?.id) {
           console.log("useAdminCheck - No session found, user is not admin");
           setIsAdmin(false);
-          setIsLoading(false);
           return;
         }
 
@@ -24,7 +23,7 @@ export function useAdminCheck() {
           .from('admin_users')
           .select('user_id')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("useAdminCheck - Error checking admin rights:", error);
