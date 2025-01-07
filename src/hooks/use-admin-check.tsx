@@ -12,13 +12,13 @@ export function useAdminCheck() {
       setIsLoading(true);
       try {
         if (!session?.user?.id) {
-          console.log("No session found, user is not admin");
+          console.log("useAdminCheck - No session found, user is not admin");
           setIsAdmin(false);
           setIsLoading(false);
           return;
         }
 
-        console.log("Checking admin rights for user:", session.user.id);
+        console.log("useAdminCheck - Checking admin rights for user:", session.user.id);
         
         const { data: adminData, error } = await supabase
           .from('admin_users')
@@ -27,16 +27,16 @@ export function useAdminCheck() {
           .single();
 
         if (error) {
-          console.error("Error checking admin rights:", error);
+          console.error("useAdminCheck - Error checking admin rights:", error);
           setIsAdmin(false);
           return;
         }
 
         const isUserAdmin = !!adminData;
-        console.log("Admin check result:", isUserAdmin, "Admin data:", adminData);
+        console.log("useAdminCheck - Admin check result:", isUserAdmin, "Admin data:", adminData);
         setIsAdmin(isUserAdmin);
       } catch (error) {
-        console.error("Error in admin check:", error);
+        console.error("useAdminCheck - Error in admin check:", error);
         setIsAdmin(false);
       } finally {
         setIsLoading(false);

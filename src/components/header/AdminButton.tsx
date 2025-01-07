@@ -11,6 +11,8 @@ export const AdminButton = () => {
   const { session } = useSession();
   const { isAdmin, isLoading } = useAdminCheck();
 
+  console.log("AdminButton - Session:", !!session, "IsAdmin:", isAdmin, "IsLoading:", isLoading);
+
   const handleAdminClick = (e: React.MouseEvent) => {
     if (!session) {
       e.preventDefault();
@@ -37,17 +39,20 @@ export const AdminButton = () => {
     );
   }
 
-  // Ne pas afficher le bouton si l'utilisateur n'est pas admin
-  if (!isAdmin) return null;
+  // Afficher le bouton si l'utilisateur est connecté et admin
+  if (session && isAdmin) {
+    return (
+      <Link to="/admin">
+        <Button 
+          variant="outline" 
+          className="rounded-full hover:shadow-md transition-all duration-300"
+          onClick={handleAdminClick}
+        >
+          <Settings className="mr-2 h-4 w-4" /> Administration
+        </Button>
+      </Link>
+    );
+  }
 
-  return (
-    <Link to="/admin">
-      <Button 
-        variant="outline" 
-        className="rounded-full hover:shadow-md transition-all duration-300"
-      >
-        <Settings className="mr-2 h-4 w-4" /> Administration
-      </Button>
-    </Link>
-  );
+  return null;
 };
