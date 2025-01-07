@@ -9,6 +9,21 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_allowed_emails: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           created_at: string
@@ -359,6 +374,10 @@ export type Database = {
           seller_id: string
         }
         Returns: number
+      }
+      is_allowed_admin_email: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
     }
     Enums: {

@@ -4,6 +4,7 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useSession } from "@/hooks/use-session";
 import { useAdminCheck } from "@/hooks/use-admin-check";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -31,7 +32,8 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         adminLoading,
         requireAdmin,
         isAdmin,
-        userId: session?.user?.id
+        userId: session?.user?.id,
+        userEmail: session?.user?.email
       });
 
       // Vérification de l'authentification
@@ -42,6 +44,27 @@ export function AuthGuard({ children, requireAuth = false, requireAdmin = false 
         });
         navigate('/auth');
         return;
+      }
+
+      // Si l'utilisateur est connecté et que c'est un email autorisé, l'ajouter aux admin_users
+      if (session?.user) {
+        const { data: allowedEmail } = await supabase
+          .from('admin_allowed_emails')
+          .select('email')
+          .eq('email', session.user.email)
+          .single();
+
+        if (allowedEmail) {
+          const { error: insertError } = await supabase
+            .from('admin_users')
+            .insert({ user_id: session.user.id })
+            .select()
+            .single();
+
+          if (!insertError || insertError.code === '23505') { // 23505 est le code d'erreur pour une violation de contrainte unique
+            console.log("Utilisateur ajouté ou déjà présent dans admin_users");
+          }
+        }
       }
 
       // Vérification des droits admin
