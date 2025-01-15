@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AdminButton } from "./AdminButton";
 import { AuthButtons } from "./AuthButtons";
 
 export const Header = () => {
@@ -37,7 +36,6 @@ export const Header = () => {
         </div>
       </div>
       <div className="flex items-center gap-4 relative z-10">
-        <AdminButton />
         <AuthButtons />
         <Link to="/create">
           <Button className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg">

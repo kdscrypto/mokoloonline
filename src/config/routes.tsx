@@ -32,15 +32,6 @@ export const routes: Record<string, CustomRouteObject> = {
     path: "/dashboard",
     component: lazy(() => import("@/pages/Dashboard")),
   },
-  admin: {
-    path: "/admin",
-    component: lazy(() => import("@/pages/Admin")),
-    element: (Component: React.ComponentType) => (
-      <AuthGuard requireAuth requireAdmin>
-        <Component />
-      </AuthGuard>
-    ),
-  },
   about: {
     path: "/about",
     component: lazy(() => import("@/pages/About")),
