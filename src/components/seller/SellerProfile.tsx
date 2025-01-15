@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +6,7 @@ import { ReviewForm } from "../reviews/ReviewForm";
 import { ReviewsList } from "../reviews/ReviewsList";
 import { SellerBadges } from "./SellerBadges";
 import { Star } from "lucide-react";
+import { useEffect } from "react";
 
 interface SellerProfileProps {
   sellerId: string;
@@ -13,6 +14,8 @@ interface SellerProfileProps {
 }
 
 export function SellerProfile({ sellerId, listingId }: SellerProfileProps) {
+  const queryClient = useQueryClient();
+
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", sellerId],
     queryFn: async () => {
@@ -37,6 +40,33 @@ export function SellerProfile({ sellerId, listingId }: SellerProfileProps) {
       return data;
     },
   });
+
+  // Configurer les abonnements en temps réel pour les avis
+  useEffect(() => {
+    // S'abonner aux changements de la table reviews
+    const channel = supabase
+      .channel('reviews-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Écouter tous les événements (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'reviews',
+          filter: `seller_id=eq.${sellerId}` // Filtrer pour ce vendeur spécifique
+        },
+        () => {
+          // Invalider les requêtes pour forcer un rafraîchissement
+          queryClient.invalidateQueries({ queryKey: ["seller-rating", sellerId] });
+          queryClient.invalidateQueries({ queryKey: ["reviews", sellerId] });
+        }
+      )
+      .subscribe();
+
+    // Nettoyer l'abonnement
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [sellerId, queryClient]);
 
   if (!profile) return null;
 
