@@ -1,47 +1,55 @@
 import { lazy } from "react";
-import { AuthGuard } from "@/components/auth/AuthGuard";
 
-export interface CustomRouteObject {
-  path: string;
-  component: React.LazyExoticComponent<() => JSX.Element>;
-  element?: (Component: React.ComponentType) => JSX.Element;
-}
+const Index = lazy(() => import("@/pages/Index"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const CreateListing = lazy(() => import("@/pages/CreateListing"));
+const EditListing = lazy(() => import("@/pages/EditListing"));
+const ListingDetail = lazy(() => import("@/pages/ListingDetail"));
+const About = lazy(() => import("@/pages/About"));
+const HowItWorks = lazy(() => import("@/pages/HowItWorks"));
+const Security = lazy(() => import("@/pages/Security"));
+const Moderation = lazy(() => import("@/pages/Moderation"));
 
-export const routes: Record<string, CustomRouteObject> = {
+export const routes = {
   index: {
     path: "/",
-    component: lazy(() => import("@/pages/Index")),
-  },
-  listingDetail: {
-    path: "/listing/:id",
-    component: lazy(() => import("@/pages/ListingDetail")),
-  },
-  createListing: {
-    path: "/create",
-    component: lazy(() => import("@/pages/CreateListing")),
-  },
-  editListing: {
-    path: "/edit-listing/:id",
-    component: lazy(() => import("@/pages/EditListing")),
+    component: Index,
   },
   auth: {
     path: "/auth",
-    component: lazy(() => import("@/pages/Auth")),
+    component: Auth,
   },
   dashboard: {
     path: "/dashboard",
-    component: lazy(() => import("@/pages/Dashboard")),
+    component: Dashboard,
+  },
+  createListing: {
+    path: "/create-listing",
+    component: CreateListing,
+  },
+  editListing: {
+    path: "/edit-listing/:id",
+    component: EditListing,
+  },
+  listingDetail: {
+    path: "/listing/:id",
+    component: ListingDetail,
   },
   about: {
     path: "/about",
-    component: lazy(() => import("@/pages/About")),
+    component: About,
   },
   howItWorks: {
     path: "/how-it-works",
-    component: lazy(() => import("@/pages/HowItWorks")),
+    component: HowItWorks,
   },
   security: {
     path: "/security",
-    component: lazy(() => import("@/pages/Security")),
+    component: Security,
   },
-};
+  moderation: {
+    path: "/moderation",
+    component: Moderation,
+  },
+} as const;

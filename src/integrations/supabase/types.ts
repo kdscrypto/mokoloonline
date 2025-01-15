@@ -133,6 +133,42 @@ export type Database = {
           },
         ]
       }
+      moderators: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["moderator_role"]
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["moderator_role"]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["moderator_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderators_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderators_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "auth_users_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Mokolo: {
         Row: {
           created_at: string
@@ -337,9 +373,15 @@ export type Database = {
         }
         Returns: number
       }
+      is_moderator: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      moderator_role: "moderator" | "super_moderator"
     }
     CompositeTypes: {
       [_ in never]: never
