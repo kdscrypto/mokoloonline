@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export function useRateLimit() {
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -9,7 +10,8 @@ export function useRateLimit() {
   useEffect(() => {
     const checkRateLimit = async () => {
       try {
-        // Call the rate-limit function directly
+        console.log("Checking rate limit...");
+        
         const { data, error } = await supabase
           .from('blocked_ips')
           .select('*')
@@ -19,31 +21,46 @@ export function useRateLimit() {
 
         if (error) {
           console.error("Erreur lors de la vérification du rate limit:", error);
+          // En cas d'erreur, on passe en mode dégradé plutôt que de bloquer l'utilisateur
+          setIsFallback(true);
+          setIsRateLimited(false);
+          setQueueDelay(0);
           return;
         }
+
+        console.log("Rate limit data:", data);
 
         if (data) {
           const isBlocked = data.blocked_until && new Date(data.blocked_until) > new Date();
           setIsRateLimited(isBlocked);
           
+          if (isBlocked) {
+            console.log("User is rate limited until:", data.blocked_until);
+            toast.error("Trop de requêtes, veuillez patienter");
+          }
+          
           // Calculer le délai en fonction du nombre de requêtes
-          const baseDelay = Math.max(0, data.request_count - 500) * 10; // 10ms par requête au-delà de 500
+          const baseDelay = Math.max(0, (data.request_count || 0) - 500) * 10;
           setQueueDelay(baseDelay);
           
           // Mode dégradé si plus de 1000 requêtes
           setIsFallback(data.request_count > 1000);
 
-          // Update the request count
-          const { error: updateError } = await supabase
-            .from('blocked_ips')
-            .update({ 
-              request_count: data.request_count + 1,
-              last_request: new Date().toISOString()
-            })
-            .eq('id', data.id);
+          try {
+            // Update the request count
+            const { error: updateError } = await supabase
+              .from('blocked_ips')
+              .update({ 
+                request_count: (data.request_count || 0) + 1,
+                last_request: new Date().toISOString()
+              })
+              .eq('id', data.id);
 
-          if (updateError) {
-            console.error("Erreur lors de la mise à jour du rate limit:", updateError);
+            if (updateError) {
+              console.error("Erreur lors de la mise à jour du rate limit:", updateError);
+            }
+          } catch (updateError) {
+            console.error("Erreur lors de la mise à jour du compteur:", updateError);
           }
         } else {
           // Réinitialiser les états si aucune donnée
@@ -53,6 +70,10 @@ export function useRateLimit() {
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du rate limit:", error);
+        // En cas d'erreur, on passe en mode dégradé
+        setIsFallback(true);
+        setIsRateLimited(false);
+        setQueueDelay(0);
       }
     };
 
