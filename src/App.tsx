@@ -1,8 +1,8 @@
-import React from "react";
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
@@ -14,7 +14,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const AppContent: React.FC = () => {
+const AppContent = React.memo(() => {
   React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -78,9 +78,11 @@ const AppContent: React.FC = () => {
       <Sonner />
     </RouteWrapper>
   );
-};
+});
 
-const App: React.FC = () => {
+AppContent.displayName = 'AppContent';
+
+const App = React.memo(() => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
@@ -92,6 +94,8 @@ const App: React.FC = () => {
       </QueryClientProvider>
     </BrowserRouter>
   );
-};
+});
+
+App.displayName = 'App';
 
 export default App;
