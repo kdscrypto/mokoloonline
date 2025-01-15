@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,13 +11,11 @@ import { routes } from "@/config/routes";
 import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
 import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const AppContent = () => {
-  // Handle Supabase auth state changes
-  useEffect(() => {
+const AppContent: React.FC = () => {
+  React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         localStorage.removeItem('supabase.auth.token');
@@ -82,7 +80,7 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
