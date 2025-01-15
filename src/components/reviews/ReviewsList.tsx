@@ -27,32 +27,48 @@ export function ReviewsList({ sellerId, listingId }: ReviewsListProps) {
       let query = supabase
         .from("reviews")
         .select(`
-          *,
+          id,
+          rating,
+          comment,
+          created_at,
           reviewer:profiles!reviews_reviewer_id_fkey(
             full_name,
             username
           )
         `)
-        .eq("seller_id", sellerId);
+        .eq("seller_id", sellerId)
+        .order("created_at", { ascending: false });
 
-      // Si un listingId est fourni, filtrer les avis pour cet article spécifique
+      // Filter reviews for specific listing if listingId is provided
       if (listingId) {
         query = query.eq("listing_id", listingId);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching reviews:", error);
+        throw error;
+      }
+
       return data as unknown as Review[];
     },
   });
 
   if (isLoading) {
-    return <div>Chargement des avis...</div>;
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   if (!reviews?.length) {
-    return <div>Aucun avis pour le moment.</div>;
+    return (
+      <div className="text-center p-4 text-muted-foreground">
+        Aucun avis pour le moment.
+      </div>
+    );
   }
 
   return (
