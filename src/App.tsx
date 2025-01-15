@@ -68,7 +68,7 @@ const AppContent = React.memo(() => {
                       </div>
                     }
                   >
-                    {route.element ? route.element(Component) : <Component />}
+                    <Component />
                   </React.Suspense>
                 }
               />

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { ListingsFilters } from "./ListingsFilters";
+import type { Listing } from "@/types/listing";
 
 export function ModerationPanel() {
   const [statusFilter, setStatusFilter] = useState<string>("pending");
@@ -29,7 +30,7 @@ export function ModerationPanel() {
         throw error;
       }
       
-      return data;
+      return data as Listing[];
     },
   });
 
