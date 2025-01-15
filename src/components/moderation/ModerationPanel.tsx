@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { ListingsFilters } from "./ListingsFilters";
-import type { Listing } from "@/types/listing";
+import type { Listing } from "@/integrations/supabase/types/listing";
 
 export function ModerationPanel() {
   const [statusFilter, setStatusFilter] = useState<string>("pending");
