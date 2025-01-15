@@ -54,23 +54,26 @@ const AppContent = React.memo(() => {
               <Dashboard />
             </AuthGuard>
           } />
-          {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => (
-            <Route
-              key={key}
-              path={route.path}
-              element={
-                <React.Suspense 
-                  fallback={
-                    <div className="flex items-center justify-center min-h-[200px]">
-                      <LoadingIndicator size="sm" />
-                    </div>
-                  }
-                >
-                  {route.element ? route.element(route.component) : <route.component />}
-                </React.Suspense>
-              }
-            />
-          ))}
+          {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
+            const Component = route.component;
+            return (
+              <Route
+                key={key}
+                path={route.path}
+                element={
+                  <React.Suspense 
+                    fallback={
+                      <div className="flex items-center justify-center min-h-[200px]">
+                        <LoadingIndicator size="sm" />
+                      </div>
+                    }
+                  >
+                    {route.element ? route.element(Component) : <Component />}
+                  </React.Suspense>
+                }
+              />
+            );
+          })}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </React.Suspense>
