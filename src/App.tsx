@@ -25,62 +25,60 @@ const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <RouteWrapper>
-          <React.Suspense 
-            fallback={
-              <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-                <div className="text-center">
-                  <LoadingIndicator size="lg" />
-                  <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
-                </div>
-              </div>
-            }
-          >
-            <Routes>
-              <Route path="/dashboard" element={
-                <AuthGuard requireAuth>
-                  <Dashboard />
-                </AuthGuard>
-              } />
-              {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
-                const Component = route.component;
-                return (
-                  <Route
-                    key={key}
-                    path={route.path}
-                    element={
-                      <React.Suspense 
-                        fallback={
-                          <div className="flex items-center justify-center min-h-[200px]">
-                            <LoadingIndicator size="sm" />
-                          </div>
-                        }
-                      >
-                        <Component />
-                      </React.Suspense>
-                    }
-                  />
-                );
-              })}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </React.Suspense>
-          <Toaster />
-        </RouteWrapper>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <React.Suspense 
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+          <div className="text-center">
+            <LoadingIndicator size="lg" />
+            <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+          </div>
+        </div>
+      }
+    >
+      <Routes>
+        <Route path="/dashboard" element={
+          <AuthGuard requireAuth>
+            <Dashboard />
+          </AuthGuard>
+        } />
+        {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
+          const Component = route.component;
+          return (
+            <Route
+              key={key}
+              path={route.path}
+              element={
+                <React.Suspense 
+                  fallback={
+                    <div className="flex items-center justify-center min-h-[200px]">
+                      <LoadingIndicator size="sm" />
+                    </div>
+                  }
+                >
+                  <Component />
+                </React.Suspense>
+              }
+            />
+          );
+        })}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster />
+    </React.Suspense>
   );
 }
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <RouteWrapper>
+            <AppContent />
+          </RouteWrapper>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 

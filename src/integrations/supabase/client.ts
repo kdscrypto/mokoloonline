@@ -23,35 +23,31 @@ const options = {
     params: {
       eventsPerSecond: 10
     }
-  },
-  // Add retry configuration
-  fetch: (url: string, options: RequestInit) => {
-    return fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    }).catch(error => {
-      console.error('Supabase fetch error:', error);
-      toast.error('Erreur de connexion', {
-        description: 'Veuillez vérifier votre connexion internet'
-      });
-      throw error;
-    });
   }
 };
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, options);
 
-// Add error event listener
-supabase.auth.onError((error) => {
-  console.error('Supabase auth error:', error);
-  toast.error('Erreur d\'authentification', {
-    description: error.message
-  });
+// Add error handling for network issues
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    console.log('User signed out');
+  } else if (event === 'SIGNED_IN') {
+    console.log('User signed in:', session?.user?.id);
+  }
 });
 
-// Add auto-reconnect for realtime
-supabase.realtime.setAuth(supabaseKey);
+// Add network error handling
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+  try {
+    const response = await originalFetch(...args);
+    return response;
+  } catch (error) {
+    console.error('Network error:', error);
+    toast.error('Erreur de connexion', {
+      description: 'Veuillez vérifier votre connexion internet'
+    });
+    throw error;
+  }
+};
