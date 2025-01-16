@@ -12,9 +12,8 @@ import { ErrorBoundary } from "@/components/error-boundary/ErrorBoundary";
 import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
-const AppContent = React.memo(() => {
+const AppContent = () => {
   React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -37,55 +36,55 @@ const AppContent = React.memo(() => {
   }, []);
 
   return (
-    <RouteWrapper>
-      <React.Suspense 
-        fallback={
-          <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-            <div className="text-center">
-              <LoadingIndicator size="lg" />
-              <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+    <React.Fragment>
+      <RouteWrapper>
+        <React.Suspense 
+          fallback={
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+              <div className="text-center">
+                <LoadingIndicator size="lg" />
+                <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+              </div>
             </div>
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/dashboard" element={
-            <AuthGuard requireAuth>
-              <Dashboard />
-            </AuthGuard>
-          } />
-          {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
-            const Component = route.component;
-            return (
-              <Route
-                key={key}
-                path={route.path}
-                element={
-                  <React.Suspense 
-                    fallback={
-                      <div className="flex items-center justify-center min-h-[200px]">
-                        <LoadingIndicator size="sm" />
-                      </div>
-                    }
-                  >
-                    <Component />
-                  </React.Suspense>
-                }
-              />
-            );
-          })}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </React.Suspense>
-      <Toaster />
-      <Sonner />
-    </RouteWrapper>
+          }
+        >
+          <Routes>
+            <Route path="/dashboard" element={
+              <AuthGuard requireAuth>
+                <Dashboard />
+              </AuthGuard>
+            } />
+            {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
+              const Component = route.component;
+              return (
+                <Route
+                  key={key}
+                  path={route.path}
+                  element={
+                    <React.Suspense 
+                      fallback={
+                        <div className="flex items-center justify-center min-h-[200px]">
+                          <LoadingIndicator size="sm" />
+                        </div>
+                      }
+                    >
+                      <Component />
+                    </React.Suspense>
+                  }
+                />
+              );
+            })}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </React.Suspense>
+        <Toaster />
+        <Sonner />
+      </RouteWrapper>
+    </React.Fragment>
   );
-});
+};
 
-AppContent.displayName = 'AppContent';
-
-const App = React.memo(() => {
+const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
@@ -97,8 +96,6 @@ const App = React.memo(() => {
       </QueryClientProvider>
     </BrowserRouter>
   );
-});
-
-App.displayName = 'App';
+};
 
 export default App;
