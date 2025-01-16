@@ -1,10 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { PerformanceMetrics } from './types';
-
-interface ViewportDimensions {
-  width: number;
-  height: number;
-}
+import type { PerformanceMetrics, ViewportDimensions } from './types';
 
 export async function logPerformanceMetrics(
   page: string,
@@ -28,7 +23,7 @@ export async function logPerformanceMetrics(
     await supabase.from('security_logs').insert({
       event_type: 'performance_metrics',
       description: `Performance metrics collected for ${page}`,
-      metadata
+      metadata: JSON.stringify(metadata)
     });
 
   } catch (error) {

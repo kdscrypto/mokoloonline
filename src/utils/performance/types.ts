@@ -26,6 +26,7 @@ export interface PerformanceMetrics {
 }
 
 export interface ViewportDimensions {
+  [key: string]: number;
   width: number;
   height: number;
 }
