@@ -1,15 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types/database";
-
-type JsonValue = string | number | boolean | null | { [key: string]: JsonValue } | JsonValue[];
-type Json = JsonValue;
-
-interface PerformanceMetrics {
-  [key: string]: Json;
-}
+import type { PerformanceMetrics } from './types';
 
 interface ViewportDimensions {
-  [key: string]: number;
+  width: number;
+  height: number;
 }
 
 export async function logPerformanceMetrics(
@@ -22,7 +16,7 @@ export async function logPerformanceMetrics(
       height: window.innerHeight
     };
 
-    const metadata: { [key: string]: Json } = {
+    const metadata = {
       page,
       metrics,
       userAgent: navigator.userAgent,

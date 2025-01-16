@@ -19,7 +19,11 @@ export const usePerformanceMonitoring = (pageName: string) => {
   useEffect(() => {
     // Capture initial load metrics
     const captureMetrics = () => {
-      requestIdleCallback(() => capturePerformanceMetrics(pageName));
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(() => capturePerformanceMetrics(pageName));
+      } else {
+        setTimeout(() => capturePerformanceMetrics(pageName), 0);
+      }
     };
 
     // Listen for route changes

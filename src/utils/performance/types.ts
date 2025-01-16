@@ -9,6 +9,7 @@ export interface ResourceTiming {
 }
 
 export interface PerformanceMetrics {
+  [key: string]: any; // Add index signature to allow dynamic properties
   pageLoadTime: number;
   timeToFirstByte: number;
   timeToFirstPaint: number;
