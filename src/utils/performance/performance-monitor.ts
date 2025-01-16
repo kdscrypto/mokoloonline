@@ -16,20 +16,22 @@ export const capturePerformanceMetrics = async (pageName: string): Promise<void>
 };
 
 export const usePerformanceMonitoring = (pageName: string) => {
+  const captureMetrics = () => {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(() => capturePerformanceMetrics(pageName));
+    } else {
+      setTimeout(() => capturePerformanceMetrics(pageName), 0);
+    }
+  };
+
   useEffect(() => {
     // Capture initial load metrics
-    const captureMetrics = () => {
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(() => capturePerformanceMetrics(pageName));
-      } else {
-        setTimeout(() => capturePerformanceMetrics(pageName), 0);
-      }
-    };
+    captureMetrics();
 
     // Listen for route changes
     window.addEventListener('popstate', captureMetrics);
     
-    // Capture metrics on initial load
+    // Listen for initial load
     window.addEventListener('load', captureMetrics);
 
     return () => {
