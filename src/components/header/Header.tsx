@@ -1,9 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthButtons } from "./AuthButtons";
+import { useSession } from "@/hooks/use-session";
+import { toast } from "sonner";
 
 export const Header = () => {
+  const { session } = useSession();
+  const navigate = useNavigate();
+
+  const handleCreateListing = () => {
+    if (!session) {
+      toast.error("Vous devez être connecté pour publier une annonce");
+      navigate("/auth");
+      return;
+    }
+    navigate("/create");
+  };
+
   return (
     <header 
       className="relative flex justify-between items-center rounded-2xl p-6 shadow-lg overflow-hidden"
@@ -37,11 +51,12 @@ export const Header = () => {
       </div>
       <div className="flex items-center gap-4 relative z-10">
         <AuthButtons />
-        <Link to="/create">
-          <Button className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg">
-            <Plus className="mr-2 h-4 w-4" /> Publier une annonce
-          </Button>
-        </Link>
+        <Button 
+          onClick={handleCreateListing}
+          className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Publier une annonce
+        </Button>
         <Link to="/about" className="ml-4">
           <Button variant="ghost" className="rounded-full">
             À propos
