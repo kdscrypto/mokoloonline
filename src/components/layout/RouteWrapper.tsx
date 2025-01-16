@@ -8,10 +8,7 @@ interface RouteWrapperProps {
 
 export function RouteWrapper({ children }: RouteWrapperProps) {
   const location = useLocation();
-  
-  React.useEffect(() => {
-    usePerformanceMonitoring(location.pathname);
-  }, [location.pathname]);
+  usePerformanceMonitoring(location.pathname);
 
   return (
     <div className="min-h-screen">
