@@ -1,4 +1,4 @@
-import type { Database as DatabaseGenerated } from './types';
+import type { Database as DatabaseGenerated } from '../types';
 
 export type Database = DatabaseGenerated;
 
