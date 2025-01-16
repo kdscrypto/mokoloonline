@@ -8,7 +8,6 @@ interface RouteWrapperProps {
 
 export function RouteWrapper({ children }: RouteWrapperProps) {
   const location = useLocation();
-  
   usePerformanceMonitoring(location.pathname);
 
   return (

@@ -2,34 +2,33 @@ import { useEffect } from 'react';
 import { collectPerformanceMetrics } from './metrics-collector';
 import { logPerformanceMetrics } from './metrics-logger';
 
-const capturePerformanceMetrics = async (pageName: string): Promise<void> => {
-  try {
-    const metrics = await collectPerformanceMetrics();
-    await logPerformanceMetrics(pageName, metrics);
-    performance.clearResourceTimings();
-  } catch (error) {
-    console.error('Failed to capture performance metrics:', error);
-  }
-};
-
 export const usePerformanceMonitoring = (pageName: string) => {
   useEffect(() => {
-    const captureMetrics = () => {
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(() => capturePerformanceMetrics(pageName));
-      } else {
-        setTimeout(() => capturePerformanceMetrics(pageName), 0);
+    const capturePerformanceMetrics = async () => {
+      try {
+        const metrics = await collectPerformanceMetrics();
+        await logPerformanceMetrics(pageName, metrics);
+        performance.clearResourceTimings();
+      } catch (error) {
+        console.error('Failed to capture performance metrics:', error);
       }
     };
 
-    captureMetrics();
+    // Initial capture
+    capturePerformanceMetrics();
 
-    window.addEventListener('popstate', captureMetrics);
-    window.addEventListener('load', captureMetrics);
-
-    return () => {
-      window.removeEventListener('popstate', captureMetrics);
-      window.removeEventListener('load', captureMetrics);
+    // Setup event listeners
+    const handleRouteChange = () => {
+      requestIdleCallback(() => capturePerformanceMetrics());
     };
-  }, [pageName]);
+
+    window.addEventListener('popstate', handleRouteChange);
+    window.addEventListener('load', handleRouteChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+      window.removeEventListener('load', handleRouteChange);
+    };
+  }, [pageName]); // Only re-run if pageName changes
 };
