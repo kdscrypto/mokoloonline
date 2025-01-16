@@ -26,9 +26,9 @@ function Index() {
         <link rel="canonical" href="https://mokolo.online" />
       </Helmet>
 
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-secondary/5">
-        <main className="flex-grow">
-          <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-b from-white to-secondary/5">
+        <main className="w-full">
+          <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col gap-10">
               <Header />
               
@@ -87,5 +87,4 @@ function Index() {
   );
 }
 
-// Make sure to export the component as default
 export default Index;
