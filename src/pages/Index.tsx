@@ -19,7 +19,7 @@ const Index: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   return (
-    <>
+    <React.Fragment>
       <Helmet>
         <title>Mokolo Online - Petites Annonces au Cameroun</title>
         <meta 
@@ -86,7 +86,7 @@ const Index: React.FC = () => {
         
         <Footer />
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
