@@ -1,9 +1,9 @@
+import * as React from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
-import { useState } from "react";
 import { VipListings } from "@/components/VipListings";
 import { RegularListings } from "@/components/RegularListings";
 import { usePerformanceMonitoring } from "@/utils/performance/performance-monitor";
@@ -13,16 +13,19 @@ import { Helmet } from "react-helmet";
 
 const ITEMS_PER_PAGE = 12;
 
-function Index() {
+const Index: React.FC = () => {
   usePerformanceMonitoring("home");
-  const [selectedCategory, setSelectedCategory] = useState("Tous");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = React.useState("Tous");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   return (
     <>
       <Helmet>
         <title>Mokolo Online - Petites Annonces au Cameroun</title>
-        <meta name="description" content="Découvrez la première plateforme de petites annonces au Cameroun. Achetez et vendez facilement dans toutes les catégories." />
+        <meta 
+          name="description" 
+          content="Découvrez la première plateforme de petites annonces au Cameroun. Achetez et vendez facilement dans toutes les catégories." 
+        />
         <link rel="canonical" href="https://mokolo.online" />
       </Helmet>
 
@@ -85,6 +88,6 @@ function Index() {
       </div>
     </>
   );
-}
+};
 
 export default Index;
