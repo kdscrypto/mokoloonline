@@ -48,11 +48,16 @@ export default function CreateListing() {
 
       let image_url = null;
       if (formData.image) {
+        // Generate a unique filename using UUID
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+
         const { error: uploadError, data } = await supabase.storage
           .from('listings')
-          .upload(fileName, formData.image);
+          .upload(fileName, formData.image, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
         if (uploadError) {
           console.error("Error uploading image:", uploadError);
@@ -60,12 +65,12 @@ export default function CreateListing() {
           return;
         }
 
-        if (data) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('listings')
-            .getPublicUrl(data.path);
-          image_url = publicUrl;
-        }
+        // Get the public URL after successful upload
+        const { data: { publicUrl } } = supabase.storage
+          .from('listings')
+          .getPublicUrl(fileName);
+          
+        image_url = publicUrl;
       }
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
