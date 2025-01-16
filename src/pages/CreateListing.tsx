@@ -7,10 +7,12 @@ import { toast } from "sonner";
 import { ListingFormFields } from "@/components/listing/ListingFormFields";
 import { useListingForm } from "@/hooks/useListingForm";
 import { addDays } from "date-fns";
+import { useSession } from "@/hooks/use-session";
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { session } = useSession();
   const {
     formData,
     handleInputChange,
@@ -21,39 +23,32 @@ export default function CreateListing() {
   } = useListingForm();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        toast.error("Vous devez être connecté pour créer une annonce");
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+    if (!session) {
+      navigate("/auth");
+      toast.error("Vous devez être connecté pour créer une annonce");
+    }
+  }, [session, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateFormData()) return;
+    if (!session?.user) {
+      toast.error("Vous devez être connecté pour créer une annonce");
+      navigate("/auth");
+      return;
+    }
     
     setIsLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Non authentifié");
-        navigate("/auth");
-        return;
-      }
-
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${session.user.id}/${crypto.randomUUID()}.${fileExt}`;
 
         console.log("Uploading image with path:", fileName);
 
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('listings')
           .upload(fileName, formData.image, {
             cacheControl: '3600',
@@ -82,7 +77,7 @@ export default function CreateListing() {
         location: formData.location,
         description: formData.description,
         image_url,
-        user_id: user.id,
+        user_id: session.user.id,
         status: 'pending',
         category: formData.category || 'Autres',
         phone: formData.phone || null,
@@ -106,6 +101,10 @@ export default function CreateListing() {
       setIsLoading(false);
     }
   };
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
