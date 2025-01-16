@@ -22,10 +22,8 @@ export const usePerformanceMonitoring = (pageName: string) => {
       }
     };
 
-    // Capture initial load metrics
     captureMetrics();
 
-    // Listen for route changes and initial load
     window.addEventListener('popstate', captureMetrics);
     window.addEventListener('load', captureMetrics);
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
@@ -9,7 +9,6 @@ import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const AppContent: React.FC = () => {
   React.useEffect(() => {
@@ -71,13 +70,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <RouteWrapper>
-            <AppContent />
-          </RouteWrapper>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <TooltipProvider>
+        <RouteWrapper>
+          <AppContent />
+        </RouteWrapper>
+      </TooltipProvider>
     </BrowserRouter>
   );
 }
