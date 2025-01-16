@@ -1,9 +1,13 @@
-export interface SecurityLog {
-  id: string;
-  event_type: 'auth' | 'api' | 'suspicious_activity';
+import type { Tables } from './database';
+
+export type SecurityLog = Tables<'security_logs'>;
+
+export type SecurityLogInsert = {
+  event_type: string;
   description: string;
-  user_id?: string;
-  ip_address?: string;
-  metadata?: Record<string, unknown>;
-  created_at: string;
-}
+  user_id?: string | null;
+  ip_address?: string | null;
+  metadata?: any;
+};
+
+export type SecurityLogUpdate = Partial<SecurityLogInsert>;
