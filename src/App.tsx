@@ -5,7 +5,7 @@ import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { Toaster } from "@/components/ui/toaster";
-import { Sonner } from "sonner";
+import { Toaster as Sonner } from "sonner";
 import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
