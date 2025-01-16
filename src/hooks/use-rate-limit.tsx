@@ -25,7 +25,6 @@ export function useRateLimit() {
 
         if (error) {
           console.error("Erreur lors de la vérification du rate limit:", error);
-          // En cas d'erreur réseau, on passe en mode dégradé sans bloquer l'utilisateur
           setIsFallback(true);
           setIsRateLimited(false);
           setQueueDelay(0);

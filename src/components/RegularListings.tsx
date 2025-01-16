@@ -1,3 +1,4 @@
+import React from 'react';
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import { ListingsLoadingState } from "./listings/ListingsLoadingState";
