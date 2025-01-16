@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-function AppContent() {
+const AppContent: React.FC = () => {
   React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -73,13 +73,15 @@ function AppContent() {
   );
 }
 
-function App() {
+const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AppContent />
-      </QueryClientProvider>
-    </BrowserRouter>
+    <React.StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AppContent />
+        </QueryClientProvider>
+      </BrowserRouter>
+    </React.StrictMode>
   );
 }
 
