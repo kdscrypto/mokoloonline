@@ -17,11 +17,11 @@ interface RegularListingsProps {
   itemsPerPage: number;
 }
 
-export function RegularListings({
+export const RegularListings: React.FC<RegularListingsProps> = ({
   selectedCategory,
   searchQuery,
   itemsPerPage
-}: RegularListingsProps) {
+}) => {
   const { ref, inView } = useInView();
   const { isRateLimited, queueDelay, isFallback } = useRateLimit();
 
@@ -93,4 +93,4 @@ export function RegularListings({
       />
     </div>
   );
-}
+};
