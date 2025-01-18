@@ -34,34 +34,36 @@ const AppContent: React.FC = () => {
         </div>
       }
     >
-      <Routes>
-        <Route path="/dashboard" element={
-          <AuthGuard requireAuth>
-            <Dashboard />
-          </AuthGuard>
-        } />
-        {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
-          const Component = route.component;
-          return (
-            <Route
-              key={key}
-              path={route.path}
-              element={
-                <React.Suspense 
-                  fallback={
-                    <div className="flex items-center justify-center min-h-[200px]">
-                      <LoadingIndicator size="sm" />
-                    </div>
-                  }
-                >
-                  <Component />
-                </React.Suspense>
-              }
-            />
-          );
-        })}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <RouteWrapper>
+        <Routes>
+          <Route path="/dashboard" element={
+            <AuthGuard requireAuth>
+              <Dashboard />
+            </AuthGuard>
+          } />
+          {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
+            const Component = route.component;
+            return (
+              <Route
+                key={key}
+                path={route.path}
+                element={
+                  <React.Suspense 
+                    fallback={
+                      <div className="flex items-center justify-center min-h-[200px]">
+                        <LoadingIndicator size="sm" />
+                      </div>
+                    }
+                  >
+                    <Component />
+                  </React.Suspense>
+                }
+              />
+            );
+          })}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </RouteWrapper>
       <Toaster />
     </React.Suspense>
   );
@@ -71,9 +73,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <TooltipProvider>
-        <RouteWrapper>
-          <AppContent />
-        </RouteWrapper>
+        <AppContent />
       </TooltipProvider>
     </BrowserRouter>
   );
