@@ -33,7 +33,7 @@ export const Header = () => {
           <div className="relative">
             <div className="absolute inset-0 bg-primary blur-lg opacity-20 rounded-full" />
             <img
-              src="/icon-192x192.png"
+              src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png"
               alt="Logo"
               className="w-10 h-10 relative z-10"
             />
