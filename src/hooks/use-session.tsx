@@ -46,11 +46,10 @@ export function useSession() {
         navigate('/auth');
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setSession(session);
-      } else if (event === 'USER_DELETED') {
-        setSession(null);
-        navigate('/auth');
-        toast.info("Compte supprimé", {
-          description: "Votre compte a été supprimé avec succès"
+      } else if (event === 'USER_UPDATED') {
+        setSession(session);
+        toast.success("Profil mis à jour", {
+          description: "Vos informations ont été mises à jour avec succès"
         });
       }
     });
