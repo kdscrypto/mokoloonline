@@ -7,7 +7,6 @@ import { Footer } from "@/components/Footer";
 import { VipListings } from "@/components/VipListings";
 import { RegularListings } from "@/components/RegularListings";
 import { usePerformanceMonitoring } from "@/utils/performance/performance-monitor";
-import { Header } from "@/components/header/Header";
 import { GoogleAd } from "@/components/ads/GoogleAd";
 import { Helmet } from "react-helmet";
 
@@ -32,9 +31,7 @@ const Index: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-white to-secondary/5">
         <main className="w-full">
           <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-col gap-10">
-              <Header />
-              
+            <div className="flex flex-col gap-10">              
               <section aria-label="Recherche et filtres" className="space-y-8">
                 <div className="max-w-2xl mx-auto">
                   <SearchBar onSearch={setSearchQuery} />
