@@ -29,7 +29,7 @@ export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
       });
 
       // Vérification de l'authentification
-      if (requireAuth && !session) {
+      if (requireAuth && !session?.user) {
         console.log("AuthGuard - Redirection vers la page de connexion");
         toast.error("Accès restreint", {
           description: "Veuillez vous connecter pour accéder à cette page"

@@ -43,7 +43,7 @@ const AppContent: React.FC = () => {
                   key={key}
                   path={route.path}
                   element={
-                    key === 'dashboard' ? (
+                    key === 'dashboard' || key === 'create-listing' ? (
                       <AuthGuard requireAuth>
                         <Component />
                       </AuthGuard>
