@@ -1,6 +1,6 @@
-import { Toaster as SonnerToaster } from "sonner"
+import { Toaster as SonnerToaster } from "sonner";
 
-type ToasterProps = React.ComponentProps<typeof SonnerToaster>
+type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
@@ -19,8 +19,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
-export { toast } from "sonner"
+export { Toaster };
+export { toast } from "sonner";

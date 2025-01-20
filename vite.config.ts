@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
+    }
   },
   build: {
     sourcemap: mode === 'development',
@@ -23,7 +23,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['@/components/ui'],
         }
       }
     },
@@ -31,7 +30,6 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild'
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: []
+    include: ['react', 'react-dom', 'react-router-dom', 'sonner'],
   }
 }));
