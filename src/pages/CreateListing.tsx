@@ -31,16 +31,21 @@ export default function CreateListing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateFormData()) return;
-    if (!session?.user) {
-      toast.error("Vous devez être connecté pour créer une annonce");
-      navigate("/auth");
-      return;
-    }
     
-    setIsLoading(true);
-
     try {
+      if (!validateFormData()) {
+        return;
+      }
+
+      if (!session?.user) {
+        toast.error("Vous devez être connecté pour créer une annonce");
+        navigate("/auth");
+        return;
+      }
+      
+      setIsLoading(true);
+      console.log("Starting listing creation process...");
+
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
@@ -48,7 +53,7 @@ export default function CreateListing() {
 
         console.log("Uploading image with path:", fileName);
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError, data } = await supabase.storage
           .from('listings')
           .upload(fileName, formData.image, {
             cacheControl: '3600',
@@ -57,8 +62,7 @@ export default function CreateListing() {
 
         if (uploadError) {
           console.error("Error uploading image:", uploadError);
-          toast.error("Erreur lors du téléchargement de l'image");
-          return;
+          throw new Error("Erreur lors du téléchargement de l'image");
         }
 
         const { data: { publicUrl } } = supabase.storage
@@ -71,7 +75,7 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      const { error } = await supabase.from('listings').insert({
+      const { error: insertError } = await supabase.from('listings').insert({
         title: formData.title,
         price: parseInt(formData.price),
         location: formData.location,
@@ -86,17 +90,17 @@ export default function CreateListing() {
         vip_until
       });
 
-      if (error) {
-        console.error("Error creating listing:", error);
-        toast.error("Erreur lors de la création de l'annonce");
-        return;
+      if (insertError) {
+        console.error("Error inserting listing:", insertError);
+        throw insertError;
       }
 
+      console.log("Listing created successfully");
       toast.success("Annonce créée avec succès ! Elle sera visible après validation.");
       navigate("/dashboard");
     } catch (error: any) {
-      console.error("Error creating listing:", error);
-      toast.error(error.message || "Une erreur est survenue");
+      console.error("Error in handleSubmit:", error);
+      toast.error(error.message || "Une erreur est survenue lors de la création de l'annonce");
     } finally {
       setIsLoading(false);
     }
