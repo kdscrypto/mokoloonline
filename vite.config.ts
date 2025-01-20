@@ -23,11 +23,15 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['@/components/ui'],
         }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000,
+    minify: 'esbuild'
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: []
   }
 }));

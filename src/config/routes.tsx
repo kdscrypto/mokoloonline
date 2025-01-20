@@ -1,15 +1,29 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
-const Index = lazy(() => import("@/pages/Index"));
-const Auth = lazy(() => import("@/pages/Auth"));
-const Dashboard = lazy(() => import("@/pages/Dashboard"));
-const CreateListing = lazy(() => import("@/pages/CreateListing"));
-const EditListing = lazy(() => import("@/pages/EditListing"));
-const ListingDetail = lazy(() => import("@/pages/ListingDetail"));
-const About = lazy(() => import("@/pages/About"));
-const HowItWorks = lazy(() => import("@/pages/HowItWorks"));
-const Security = lazy(() => import("@/pages/Security"));
-const Moderation = lazy(() => import("@/pages/Moderation"));
+const lazyLoad = (importFn: () => Promise<any>) => {
+  const LazyComponent = lazy(importFn);
+  return () => (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[200px]">
+        <LoadingIndicator size="sm" />
+      </div>
+    }>
+      <LazyComponent />
+    </Suspense>
+  );
+};
+
+const Index = lazyLoad(() => import("@/pages/Index"));
+const Auth = lazyLoad(() => import("@/pages/Auth"));
+const Dashboard = lazyLoad(() => import("@/pages/Dashboard"));
+const CreateListing = lazyLoad(() => import("@/pages/CreateListing"));
+const EditListing = lazyLoad(() => import("@/pages/EditListing"));
+const ListingDetail = lazyLoad(() => import("@/pages/ListingDetail"));
+const About = lazyLoad(() => import("@/pages/About"));
+const HowItWorks = lazyLoad(() => import("@/pages/HowItWorks"));
+const Security = lazyLoad(() => import("@/pages/Security"));
+const Moderation = lazyLoad(() => import("@/pages/Moderation"));
 
 export const routes = {
   index: {

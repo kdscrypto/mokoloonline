@@ -5,7 +5,6 @@ import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { Toaster } from "@/components/ui/toaster";
-import Dashboard from "@/pages/Dashboard";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
@@ -37,27 +36,20 @@ const AppContent: React.FC = () => {
       <BrowserRouter>
         <RouteWrapper>
           <Routes>
-            <Route path="/dashboard" element={
-              <AuthGuard requireAuth>
-                <Dashboard />
-              </AuthGuard>
-            } />
-            {Object.entries(routes).filter(([key]) => key !== 'dashboard').map(([key, route]) => {
+            {Object.entries(routes).map(([key, route]) => {
               const Component = route.component;
               return (
                 <Route
                   key={key}
                   path={route.path}
                   element={
-                    <React.Suspense 
-                      fallback={
-                        <div className="flex items-center justify-center min-h-[200px]">
-                          <LoadingIndicator size="sm" />
-                        </div>
-                      }
-                    >
+                    key === 'dashboard' ? (
+                      <AuthGuard requireAuth>
+                        <Component />
+                      </AuthGuard>
+                    ) : (
                       <Component />
-                    </React.Suspense>
+                    )
                   }
                 />
               );
