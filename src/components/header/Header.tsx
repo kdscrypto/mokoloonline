@@ -6,15 +6,27 @@ import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
 
 export const Header = () => {
-  const { session } = useSession();
+  const { session, isLoading } = useSession();
   const navigate = useNavigate();
 
   const handleCreateListing = () => {
-    if (!session) {
+    // Attendre que la vérification de session soit terminée
+    if (isLoading) {
+      return;
+    }
+
+    console.log("Create listing clicked - Session state:", { 
+      isLoading, 
+      hasSession: !!session,
+      userId: session?.user?.id 
+    });
+
+    if (!session?.user) {
       toast.error("Vous devez être connecté pour publier une annonce");
       navigate("/auth");
       return;
     }
+
     navigate("/create-listing");
   };
 
@@ -47,6 +59,7 @@ export const Header = () => {
         <Button 
           onClick={handleCreateListing}
           className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg"
+          disabled={isLoading}
         >
           <Plus className="mr-2 h-4 w-4" /> Publier une annonce
         </Button>
