@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { queryClient } from "@/config/query-client";
 import { routes } from "@/config/routes";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
