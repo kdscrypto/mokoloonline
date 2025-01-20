@@ -12,7 +12,7 @@ import { useSession } from "@/hooks/use-session";
 export default function CreateListing() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { session } = useSession();
+  const { session, isLoading: sessionLoading } = useSession();
   const {
     formData,
     handleInputChange,
@@ -23,11 +23,17 @@ export default function CreateListing() {
   } = useListingForm();
 
   useEffect(() => {
-    if (!session) {
-      navigate("/auth");
-      toast.error("Vous devez être connecté pour créer une annonce");
-    }
-  }, [session, navigate]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.log("No session found in CreateListing, redirecting to auth");
+        toast.error("Vous devez être connecté pour créer une annonce");
+        navigate("/auth", { state: { from: "/create-listing" } });
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +44,9 @@ export default function CreateListing() {
       }
 
       if (!session?.user) {
+        console.log("No session found during form submission");
         toast.error("Vous devez être connecté pour créer une annonce");
-        navigate("/auth");
+        navigate("/auth", { state: { from: "/create-listing" } });
         return;
       }
       
@@ -105,6 +112,17 @@ export default function CreateListing() {
       setIsLoading(false);
     }
   };
+
+  if (sessionLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-sm text-gray-500">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!session) {
     return null;

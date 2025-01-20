@@ -19,7 +19,8 @@ export const Header = () => {
       isLoading, 
       hasSession: !!session,
       userId: session?.user?.id,
-      currentPath: location.pathname
+      currentPath: location.pathname,
+      timestamp: new Date().toISOString()
     });
 
     if (!session?.user) {

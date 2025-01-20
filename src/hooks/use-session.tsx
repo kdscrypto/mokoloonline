@@ -10,6 +10,8 @@ export function useSession() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     const validateSession = async () => {
       try {
         setIsLoading(true);
@@ -19,7 +21,7 @@ export function useSession() {
           console.error("Session error:", error);
           if (error.message?.includes('refresh_token_not_found')) {
             await supabase.auth.signOut();
-            setSession(null);
+            if (mounted) setSession(null);
             return;
           }
           throw error;
@@ -27,36 +29,40 @@ export function useSession() {
 
         console.log("Current session state:", { 
           hasSession: !!currentSession,
-          userId: currentSession?.user?.id 
+          userId: currentSession?.user?.id,
+          timestamp: new Date().toISOString()
         });
 
-        setSession(currentSession);
+        if (mounted) setSession(currentSession);
       } catch (error) {
         console.error("Error validating session:", error);
         toast.error("Erreur de connexion", {
           description: "Une erreur est survenue lors de la validation de votre session"
         });
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
 
     validateSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, !!session);
+      console.log("Auth state changed:", event, !!session, new Date().toISOString());
       
       if (event === 'SIGNED_OUT') {
-        setSession(null);
-        navigate('/auth');
+        if (mounted) {
+          setSession(null);
+          navigate('/auth');
+        }
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        setSession(session);
+        if (mounted) setSession(session);
       } else if (event === 'USER_UPDATED') {
-        setSession(session);
+        if (mounted) setSession(session);
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);
