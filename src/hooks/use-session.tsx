@@ -25,6 +25,11 @@ export function useSession() {
           throw error;
         }
 
+        console.log("Current session state:", { 
+          hasSession: !!currentSession,
+          userId: currentSession?.user?.id 
+        });
+
         setSession(currentSession);
       } catch (error) {
         console.error("Error validating session:", error);
@@ -39,7 +44,7 @@ export function useSession() {
     validateSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("Auth state changed:", event, !!session);
       
       if (event === 'SIGNED_OUT') {
         setSession(null);
@@ -48,9 +53,6 @@ export function useSession() {
         setSession(session);
       } else if (event === 'USER_UPDATED') {
         setSession(session);
-        toast.success("Profil mis à jour", {
-          description: "Vos informations ont été mises à jour avec succès"
-        });
       }
     });
 

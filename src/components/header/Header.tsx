@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthButtons } from "./AuthButtons";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
@@ -8,9 +8,9 @@ import { toast } from "sonner";
 export const Header = () => {
   const { session, isLoading } = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleCreateListing = () => {
-    // Attendre que la vérification de session soit terminée
     if (isLoading) {
       return;
     }
@@ -18,12 +18,13 @@ export const Header = () => {
     console.log("Create listing clicked - Session state:", { 
       isLoading, 
       hasSession: !!session,
-      userId: session?.user?.id 
+      userId: session?.user?.id,
+      currentPath: location.pathname
     });
 
     if (!session?.user) {
       toast.error("Vous devez être connecté pour publier une annonce");
-      navigate("/auth");
+      navigate("/auth", { state: { from: "/create-listing" } });
       return;
     }
 

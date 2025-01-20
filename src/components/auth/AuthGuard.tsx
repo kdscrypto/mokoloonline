@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session, isLoading: sessionLoading } = useSession();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -25,7 +26,8 @@ export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
         requireAuth,
         hasSession: !!session,
         userId: session?.user?.id,
-        userEmail: session?.user?.email
+        userEmail: session?.user?.email,
+        currentPath: location.pathname
       });
 
       // Vérification de l'authentification
@@ -34,7 +36,7 @@ export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
         toast.error("Accès restreint", {
           description: "Veuillez vous connecter pour accéder à cette page"
         });
-        navigate('/auth');
+        navigate('/auth', { state: { from: location.pathname } });
         return;
       }
 
@@ -42,7 +44,7 @@ export function AuthGuard({ children, requireAuth = false }: AuthGuardProps) {
     };
 
     validateAccess();
-  }, [session, sessionLoading, requireAuth, navigate]);
+  }, [session, sessionLoading, requireAuth, navigate, location]);
 
   // Affichage du loader pendant la vérification
   if (sessionLoading) {
