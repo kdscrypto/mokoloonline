@@ -53,12 +53,14 @@ export default function CreateListing() {
       setIsLoading(true);
       console.log("Starting listing creation process...");
 
-      // Vérifier d'abord que le profil existe
+      // Vérifier que le profil existe et récupérer son ID
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
+
+      console.log("Profile check result:", { profile, profileError });
 
       if (profileError) {
         console.error("Error fetching profile:", profileError);
@@ -73,7 +75,7 @@ export default function CreateListing() {
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${session.user.id}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${profile.id}/${crypto.randomUUID()}.${fileExt}`;
 
         console.log("Uploading image with path:", fileName);
 
@@ -99,7 +101,19 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      console.log("Inserting listing with user_id:", profile.id);
+      console.log("Inserting listing with data:", {
+        title: formData.title,
+        price: parseInt(formData.price),
+        location: formData.location,
+        description: formData.description,
+        image_url,
+        user_id: profile.id,
+        category: formData.category,
+        phone: formData.phone,
+        whatsapp: formData.whatsapp,
+        is_vip: formData.isVip,
+        vip_until
+      });
 
       const { error: insertError, data: insertedListing } = await supabase
         .from('listings')
@@ -110,7 +124,6 @@ export default function CreateListing() {
           description: formData.description,
           image_url,
           user_id: profile.id,
-          status: 'pending',
           category: formData.category || 'Autres',
           phone: formData.phone || null,
           whatsapp: formData.whatsapp || null,
