@@ -82,27 +82,32 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      const { error: insertError } = await supabase.from('listings').insert({
-        title: formData.title,
-        price: parseInt(formData.price),
-        location: formData.location,
-        description: formData.description,
-        image_url,
-        user_id: session.user.id,
-        status: 'pending',
-        category: formData.category || 'Autres',
-        phone: formData.phone || null,
-        whatsapp: formData.whatsapp || null,
-        is_vip: formData.isVip,
-        vip_until
-      });
+      // Assurez-vous que user_id est défini lors de l'insertion
+      const { error: insertError, data: insertedListing } = await supabase
+        .from('listings')
+        .insert({
+          title: formData.title,
+          price: parseInt(formData.price),
+          location: formData.location,
+          description: formData.description,
+          image_url,
+          user_id: session.user.id, // Important: définir explicitement user_id
+          status: 'pending',
+          category: formData.category || 'Autres',
+          phone: formData.phone || null,
+          whatsapp: formData.whatsapp || null,
+          is_vip: formData.isVip,
+          vip_until
+        })
+        .select()
+        .single();
 
       if (insertError) {
         console.error("Error inserting listing:", insertError);
         throw insertError;
       }
 
-      console.log("Listing created successfully");
+      console.log("Listing created successfully:", insertedListing);
       toast.success("Annonce créée avec succès ! Elle sera visible après validation.");
       navigate("/dashboard");
     } catch (error: any) {
