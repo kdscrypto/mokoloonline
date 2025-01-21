@@ -53,6 +53,23 @@ export default function CreateListing() {
       setIsLoading(true);
       console.log("Starting listing creation process...");
 
+      // Vérifier d'abord que le profil existe
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        throw new Error("Erreur lors de la récupération du profil");
+      }
+
+      if (!profile) {
+        console.error("No profile found for user:", session.user.id);
+        throw new Error("Profil utilisateur non trouvé");
+      }
+
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
@@ -82,7 +99,8 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      // Assurez-vous que user_id est défini lors de l'insertion
+      console.log("Inserting listing with user_id:", profile.id);
+
       const { error: insertError, data: insertedListing } = await supabase
         .from('listings')
         .insert({
@@ -91,7 +109,7 @@ export default function CreateListing() {
           location: formData.location,
           description: formData.description,
           image_url,
-          user_id: session.user.id, // Important: définir explicitement user_id
+          user_id: profile.id,
           status: 'pending',
           category: formData.category || 'Autres',
           phone: formData.phone || null,
