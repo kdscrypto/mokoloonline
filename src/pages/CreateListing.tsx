@@ -53,29 +53,10 @@ export default function CreateListing() {
       setIsLoading(true);
       console.log("Starting listing creation process...");
 
-      // Vérifier que le profil existe et récupérer son ID
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', session.user.id)
-        .single();
-
-      console.log("Profile check result:", { profile, profileError });
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        throw new Error("Erreur lors de la récupération du profil");
-      }
-
-      if (!profile) {
-        console.error("No profile found for user:", session.user.id);
-        throw new Error("Profil utilisateur non trouvé");
-      }
-
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${profile.id}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${session.user.id}/${crypto.randomUUID()}.${fileExt}`;
 
         console.log("Uploading image with path:", fileName);
 
@@ -101,13 +82,14 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
+      // Assurez-vous que le user_id est défini à partir de session.user.id
       const listingData = {
         title: formData.title,
         price: parseInt(formData.price),
         location: formData.location,
         description: formData.description,
         image_url,
-        user_id: profile.id,
+        user_id: session.user.id, // Utilisez directement l'ID de l'utilisateur authentifié
         category: formData.category || 'Autres',
         phone: formData.phone || null,
         whatsapp: formData.whatsapp || null,
