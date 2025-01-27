@@ -4,11 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { signOut } from "@/services/auth-service";
-import { useModeratorCheck } from "@/hooks/use-moderator-check";
+import { useAdminCheck } from "@/hooks/use-admin-check";
 
 export const AuthButtons = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { isModerator, isLoading: moderatorCheckLoading } = useModeratorCheck();
+  const { isAdmin, isLoading: adminCheckLoading } = useAdminCheck();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export const AuthButtons = () => {
 
   return (
     <div className="flex gap-4">
-      {isModerator && !moderatorCheckLoading && (
+      {isAdmin && !adminCheckLoading && (
         <Link to="/moderation">
           <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
             <Shield className="mr-2 h-4 w-4" /> Modération

@@ -47,6 +47,10 @@ const AppContent: React.FC = () => {
                       <AuthGuard requireAuth>
                         <Component />
                       </AuthGuard>
+                    ) : key === 'moderation' ? (
+                      <AuthGuard requireAuth requireAdmin>
+                        <Component />
+                      </AuthGuard>
                     ) : (
                       <Component />
                     )
