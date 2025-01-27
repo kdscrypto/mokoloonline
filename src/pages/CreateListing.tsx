@@ -101,35 +101,25 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      console.log("Inserting listing with data:", {
+      const listingData = {
         title: formData.title,
         price: parseInt(formData.price),
         location: formData.location,
         description: formData.description,
         image_url,
         user_id: profile.id,
-        category: formData.category,
-        phone: formData.phone,
-        whatsapp: formData.whatsapp,
+        category: formData.category || 'Autres',
+        phone: formData.phone || null,
+        whatsapp: formData.whatsapp || null,
         is_vip: formData.isVip,
         vip_until
-      });
+      };
+
+      console.log("Inserting listing with data:", listingData);
 
       const { error: insertError, data: insertedListing } = await supabase
         .from('listings')
-        .insert({
-          title: formData.title,
-          price: parseInt(formData.price),
-          location: formData.location,
-          description: formData.description,
-          image_url,
-          user_id: profile.id,
-          category: formData.category || 'Autres',
-          phone: formData.phone || null,
-          whatsapp: formData.whatsapp || null,
-          is_vip: formData.isVip,
-          vip_until
-        })
+        .insert(listingData)
         .select()
         .single();
 
