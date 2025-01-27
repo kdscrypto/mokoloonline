@@ -22,18 +22,14 @@ export default function CreateListing() {
     validateFormData
   } = useListingForm();
 
+  // Vérifier la session dès le chargement
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        console.log("No session found in CreateListing, redirecting to auth");
-        toast.error("Vous devez être connecté pour créer une annonce");
-        navigate("/auth", { state: { from: "/create-listing" } });
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+    if (!sessionLoading && !session) {
+      console.log("No active session found, redirecting to auth");
+      toast.error("Veuillez vous connecter pour créer une annonce");
+      navigate("/auth", { state: { from: "/create-listing" } });
+    }
+  }, [session, sessionLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,20 +39,22 @@ export default function CreateListing() {
         return;
       }
 
-      if (!session?.user) {
-        console.log("No session found during form submission");
-        toast.error("Vous devez être connecté pour créer une annonce");
+      // Vérifier à nouveau la session avant de soumettre
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (!currentSession?.user) {
+        console.log("Session check failed during submission");
+        toast.error("Session expirée, veuillez vous reconnecter");
         navigate("/auth", { state: { from: "/create-listing" } });
         return;
       }
       
       setIsLoading(true);
-      console.log("Starting listing creation process...");
+      console.log("Starting listing creation process with user:", currentSession.user.id);
 
       let image_url = null;
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${session.user.id}/${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${currentSession.user.id}/${crypto.randomUUID()}.${fileExt}`;
 
         console.log("Uploading image with path:", fileName);
 
@@ -82,14 +80,13 @@ export default function CreateListing() {
 
       const vip_until = formData.isVip ? addDays(new Date(), formData.vipDuration).toISOString() : null;
 
-      // Assurez-vous que le user_id est défini à partir de session.user.id
       const listingData = {
         title: formData.title,
         price: parseInt(formData.price),
         location: formData.location,
         description: formData.description,
         image_url,
-        user_id: session.user.id, // Utilisez directement l'ID de l'utilisateur authentifié
+        user_id: currentSession.user.id,
         category: formData.category || 'Autres',
         phone: formData.phone || null,
         whatsapp: formData.whatsapp || null,
@@ -115,7 +112,12 @@ export default function CreateListing() {
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Error in handleSubmit:", error);
-      toast.error(error.message || "Une erreur est survenue lors de la création de l'annonce");
+      if (error.message?.includes('auth/invalid-session')) {
+        toast.error("Session expirée, veuillez vous reconnecter");
+        navigate("/auth", { state: { from: "/create-listing" } });
+      } else {
+        toast.error(error.message || "Une erreur est survenue lors de la création de l'annonce");
+      }
     } finally {
       setIsLoading(false);
     }
