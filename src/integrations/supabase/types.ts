@@ -111,7 +111,7 @@ export type Database = {
           status: string | null
           title: string
           updated_at: string
-          user_id: string | null
+          user_id: string
           vip_until: string | null
           whatsapp: string | null
         }
@@ -128,7 +128,7 @@ export type Database = {
           status?: string | null
           title: string
           updated_at?: string
-          user_id?: string | null
+          user_id: string
           vip_until?: string | null
           whatsapp?: string | null
         }
@@ -145,7 +145,7 @@ export type Database = {
           status?: string | null
           title?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
           vip_until?: string | null
           whatsapp?: string | null
         }

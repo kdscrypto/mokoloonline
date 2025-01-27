@@ -58,7 +58,7 @@ export default function CreateListing() {
         .from('profiles')
         .select('id')
         .eq('id', session.user.id)
-        .maybeSingle();
+        .single();
 
       console.log("Profile check result:", { profile, profileError });
 
