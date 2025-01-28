@@ -1,31 +1,19 @@
-import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import { queryClient } from "@/config/query-client";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { lazy } from "react";
+import { MessagingLayout } from "@/components/messaging/MessagingLayout";
 
 const lazyLoad = (importFn: () => Promise<any>) => {
-  const LazyComponent = lazy(importFn);
-  return () => (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-[200px]">
-        <LoadingIndicator size="sm" />
-      </div>
-    }>
-      <LazyComponent />
-    </Suspense>
-  );
+  const Component = lazy(importFn);
+  return <Component />;
 };
 
 const Index = lazyLoad(() => import("@/pages/Index"));
+const About = lazyLoad(() => import("@/pages/About"));
 const Auth = lazyLoad(() => import("@/pages/Auth"));
-const Dashboard = lazyLoad(() => import("@/pages/Dashboard"));
 const CreateListing = lazyLoad(() => import("@/pages/CreateListing"));
 const EditListing = lazyLoad(() => import("@/pages/EditListing"));
 const ListingDetail = lazyLoad(() => import("@/pages/ListingDetail"));
-const About = lazyLoad(() => import("@/pages/About"));
+const Dashboard = lazyLoad(() => import("@/pages/Dashboard"));
 const HowItWorks = lazyLoad(() => import("@/pages/HowItWorks"));
 const Security = lazyLoad(() => import("@/pages/Security"));
 const Moderation = lazyLoad(() => import("@/pages/Moderation"));
@@ -35,13 +23,13 @@ export const routes = {
     path: "/",
     component: Index,
   },
+  about: {
+    path: "/about",
+    component: About,
+  },
   auth: {
     path: "/auth",
     component: Auth,
-  },
-  dashboard: {
-    path: "/dashboard",
-    component: Dashboard,
   },
   createListing: {
     path: "/create-listing",
@@ -55,9 +43,9 @@ export const routes = {
     path: "/listing/:id",
     component: ListingDetail,
   },
-  about: {
-    path: "/about",
-    component: About,
+  dashboard: {
+    path: "/dashboard",
+    component: Dashboard,
   },
   howItWorks: {
     path: "/how-it-works",
@@ -71,45 +59,26 @@ export const routes = {
     path: "/moderation",
     component: Moderation,
   },
-} as const;
+  messages: {
+    path: "/messages",
+    component: MessagingLayout,
+  },
+};
 
 export function AppRoutes() {
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === 'SIGNED_OUT') {
-        queryClient.clear();
-      }
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, []);
-
   return (
     <Routes>
-      {Object.entries(routes).map(([key, route]) => {
-        const Component = route.component;
-        return (
-          <Route
-            key={key}
-            path={route.path}
-            element={
-              key === 'dashboard' || key === 'create-listing' ? (
-                <AuthGuard requireAuth>
-                  <Component />
-                </AuthGuard>
-              ) : key === 'moderation' ? (
-                <AuthGuard requireAuth requireAdmin>
-                  <Component />
-                </AuthGuard>
-              ) : (
-                <Component />
-              )
-            }
-          />
-        );
-      })}
+      <Route path={routes.index.path} element={routes.index.component} />
+      <Route path={routes.about.path} element={routes.about.component} />
+      <Route path={routes.auth.path} element={routes.auth.component} />
+      <Route path={routes.createListing.path} element={routes.createListing.component} />
+      <Route path={routes.editListing.path} element={routes.editListing.component} />
+      <Route path={routes.listingDetail.path} element={routes.listingDetail.component} />
+      <Route path={routes.dashboard.path} element={routes.dashboard.component} />
+      <Route path={routes.howItWorks.path} element={routes.howItWorks.component} />
+      <Route path={routes.security.path} element={routes.security.component} />
+      <Route path={routes.moderation.path} element={routes.moderation.component} />
+      <Route path={routes.messages.path} element={<MessagingLayout />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
