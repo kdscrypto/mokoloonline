@@ -42,7 +42,7 @@ export const Header = () => {
     >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 -z-10" />
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shrink-0">
         <Link to="/" className="flex items-center gap-2">
           <div className="relative">
             <div className="absolute inset-0 bg-primary blur-lg opacity-20 rounded-full" />
@@ -56,21 +56,23 @@ export const Header = () => {
         </Link>
       </div>
 
-      <div className="flex items-center gap-4 relative z-10">
-        <AuthButtons />
-        <Button 
-          onClick={handleCreateListing}
-          className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg"
-          size="sm"
-          disabled={isLoading}
-        >
-          <Plus className="mr-2 h-3 w-3" /> Publier une annonce
-        </Button>
-        <Link to="/about" className="ml-4">
-          <Button variant="ghost" size="sm" className="rounded-full">
-            À propos
+      <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide px-2 py-1 -mx-2 relative z-10">
+        <div className="flex items-center gap-4 min-w-max">
+          <AuthButtons />
+          <Button 
+            onClick={handleCreateListing}
+            className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg whitespace-nowrap"
+            size="sm"
+            disabled={isLoading}
+          >
+            <Plus className="mr-2 h-3 w-3" /> Publier une annonce
           </Button>
-        </Link>
+          <Link to="/about" className="ml-4">
+            <Button variant="ghost" size="sm" className="rounded-full whitespace-nowrap">
+              À propos
+            </Button>
+          </Link>
+        </div>
       </div>
     </header>
   );
