@@ -23,9 +23,23 @@ export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
     e.preventDefault();
     if (isLoading) return;
     
+    // Basic validation
+    if (!identifier.trim()) {
+      toast.error("Veuillez saisir votre email ou numéro de téléphone");
+      return;
+    }
+
+    if (!isResettingPassword && !password.trim()) {
+      toast.error("Veuillez saisir votre mot de passe");
+      return;
+    }
+    
     setIsLoading(true);
     try {
-      await handleLogin(identifier, password);
+      await handleLogin(identifier.trim(), password.trim());
+    } catch (error: any) {
+      console.error("Login error:", error);
+      // Let useAuthLogin handle the error messages
     } finally {
       setIsLoading(false);
     }

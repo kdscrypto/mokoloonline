@@ -61,16 +61,6 @@ export function useAuthLogin() {
   };
 
   const handleLogin = async (identifier: string, password: string) => {
-    if (!identifier) {
-      toast.error("Veuillez saisir votre email ou numéro de téléphone");
-      return;
-    }
-
-    if (!password && !isResettingPassword) {
-      toast.error("Veuillez saisir votre mot de passe");
-      return;
-    }
-
     try {
       if (isResettingPassword) {
         await handlePasswordReset(identifier);
@@ -97,6 +87,7 @@ export function useAuthLogin() {
       });
 
       if (error) {
+        console.error("Login error:", error);
         if (error.message === "Invalid login credentials") {
           toast.error("Identifiants invalides", {
             description: "Email/téléphone ou mot de passe incorrect"
@@ -106,7 +97,9 @@ export function useAuthLogin() {
             description: "Veuillez vérifier votre boîte mail pour confirmer votre compte"
           });
         } else {
-          throw error;
+          toast.error("Erreur lors de la connexion", {
+            description: error.message
+          });
         }
         return;
       }
