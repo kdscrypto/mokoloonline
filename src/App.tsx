@@ -5,7 +5,7 @@ import { queryClient } from "@/config/query-client";
 import { AppRoutes } from "@/config/routes";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const App = () => {

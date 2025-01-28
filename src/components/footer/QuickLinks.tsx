@@ -26,12 +26,6 @@ export function QuickLinks() {
             </Link>
           </li>
         ))}
-        <li>
-          <ContactDialog 
-            open={contactOpen}
-            onOpenChange={setContactOpen}
-          />
-        </li>
       </ul>
     </div>
   );
