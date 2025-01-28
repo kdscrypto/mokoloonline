@@ -1,5 +1,10 @@
 import { lazy, Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { queryClient } from "@/config/query-client";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 const lazyLoad = (importFn: () => Promise<any>) => {
   const LazyComponent = lazy(importFn);
@@ -67,3 +72,47 @@ export const routes = {
     component: Moderation,
   },
 } as const;
+
+export const AppRoutes = () => {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_OUT') {
+        queryClient.clear();
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <Routes>
+      {Object.entries(routes).map(([key, route]) => {
+        const Component = route.component;
+        return (
+          <Route
+            key={key}
+            path={route.path}
+            element={
+              key === 'dashboard' || key === 'create-listing' ? (
+                <AuthGuard requireAuth>
+                  <Component />
+                </AuthGuard>
+              ) : key === 'moderation' ? (
+                <AuthGuard requireAuth requireAdmin>
+                  <Component />
+                </AuthGuard>
+              ) : (
+                <Component />
+              )
+            }
+          />
+        );
+      })}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+export { routes };
