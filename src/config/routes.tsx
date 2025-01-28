@@ -73,7 +73,7 @@ const routes = {
   },
 } as const;
 
-export const AppRoutes = () => {
+const AppRoutes = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'SIGNED_OUT') {
