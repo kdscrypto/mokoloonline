@@ -1,8 +1,11 @@
 import type { Tables } from './database';
+import type { Profile } from './profile';
 
 export type ListingStatus = 'pending' | 'approved' | 'rejected' | 'sold';
 
-export type Listing = Tables<'listings'>;
+export type Listing = Tables<'listings'> & {
+  profiles?: Profile | null;
+};
 
 export type ListingInsert = {
   title: string;
