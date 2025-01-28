@@ -8,6 +8,11 @@ export function useAuthLogin() {
 
   const handlePasswordReset = async (identifier: string) => {
     try {
+      if (!identifier) {
+        toast.error("Veuillez saisir votre email");
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(identifier, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });
@@ -20,14 +25,17 @@ export function useAuthLogin() {
       setIsResettingPassword(false);
     } catch (error: any) {
       console.error("Erreur de réinitialisation:", error);
-      toast.error(error.message || "Erreur lors de la réinitialisation");
+      toast.error("Erreur lors de la réinitialisation", {
+        description: error.message === "Email rate limit exceeded" 
+          ? "Trop de tentatives. Veuillez réessayer plus tard."
+          : "Vérifiez que l'email est correct"
+      });
     }
   };
 
   const handlePhoneLogin = async (phone: string) => {
     const formattedPhone = formatPhoneNumber(phone);
     
-    // Look up the user's profile using the phone number
     const { data: profiles, error: profileError } = await supabase
       .from('profiles')
       .select('id')
@@ -37,10 +45,8 @@ export function useAuthLogin() {
       throw new Error("Numéro de téléphone non trouvé");
     }
 
-    // Get the first matching profile
     const profile = profiles[0];
 
-    // Get the user's auth details using their profile ID
     const { data: authData, error: authError } = await supabase
       .from('auth_users_view')
       .select('*')
@@ -71,12 +77,18 @@ export function useAuthLogin() {
         return;
       }
 
-      // Détermine si l'identifiant est un email ou un numéro de téléphone
       const isPhone = identifier.includes("+237") || /^[2368]\d{8}$/.test(identifier);
       let email = identifier;
       
       if (isPhone) {
-        email = await handlePhoneLogin(identifier);
+        try {
+          email = await handlePhoneLogin(identifier);
+        } catch (error: any) {
+          toast.error("Erreur d'authentification", {
+            description: "Numéro de téléphone non trouvé ou invalide"
+          });
+          return;
+        }
       }
 
       const { error } = await supabase.auth.signInWithPassword({
@@ -84,13 +96,27 @@ export function useAuthLogin() {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast.error("Identifiants invalides", {
+            description: "Email/téléphone ou mot de passe incorrect"
+          });
+        } else if (error.message.includes("Email not confirmed")) {
+          toast.error("Email non confirmé", {
+            description: "Veuillez vérifier votre boîte mail pour confirmer votre compte"
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
       
       toast.success("Connexion réussie");
     } catch (error: any) {
       console.error("Erreur d'authentification:", error);
-      toast.error(error.message || "Erreur lors de la connexion");
-      throw error; // Re-throw to let the component handle the loading state
+      toast.error("Erreur lors de la connexion", {
+        description: "Une erreur inattendue est survenue"
+      });
     }
   };
 
