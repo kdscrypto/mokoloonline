@@ -42,17 +42,19 @@ export const Header = () => {
     >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 -z-10" />
       
-      <div className="flex items-center gap-4 shrink-0">
-        <Link to="/" className="flex items-center gap-2">
+      <div className="flex items-center gap-4 shrink-0 pl-0">
+        <Link to="/" className="flex items-center gap-2 group">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary blur-lg opacity-20 rounded-full" />
+            <div className="absolute inset-0 bg-primary blur-lg opacity-20 rounded-full animate-pulse" />
             <img
               src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png"
               alt="Logo"
-              className="w-10 h-10 relative z-10"
+              className="w-10 h-10 relative z-10 animate-float transition-transform duration-300 group-hover:scale-110"
             />
           </div>
-          <span className="text-xl font-bold gradient-text">Mokolo Online</span>
+          <span className="text-xl font-bold gradient-text animate-float transition-all duration-300 group-hover:text-primary">
+            Mokolo Online
+          </span>
         </Link>
       </div>
 
