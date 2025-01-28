@@ -61,12 +61,13 @@ export const Header = () => {
         <Button 
           onClick={handleCreateListing}
           className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg"
+          size="sm"
           disabled={isLoading}
         >
-          <Plus className="mr-2 h-4 w-4" /> Publier une annonce
+          <Plus className="mr-2 h-3 w-3" /> Publier une annonce
         </Button>
         <Link to="/about" className="ml-4">
-          <Button variant="ghost" className="rounded-full">
+          <Button variant="ghost" size="sm" className="rounded-full">
             À propos
           </Button>
         </Link>

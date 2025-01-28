@@ -32,8 +32,8 @@ export const AuthButtons = () => {
   if (!isAuthenticated) {
     return (
       <Link to="/auth">
-        <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
-          <LogIn className="mr-2 h-4 w-4" /> Connexion
+        <Button variant="outline" size="sm" className="rounded-full hover:shadow-md transition-all duration-300">
+          <LogIn className="mr-2 h-3 w-3" /> Connexion
         </Button>
       </Link>
     );
@@ -43,22 +43,23 @@ export const AuthButtons = () => {
     <div className="flex gap-4">
       {isAdmin && !adminCheckLoading && (
         <Link to="/moderation">
-          <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
-            <Shield className="mr-2 h-4 w-4" /> Modération
+          <Button variant="outline" size="sm" className="rounded-full hover:shadow-md transition-all duration-300">
+            <Shield className="mr-2 h-3 w-3" /> Modération
           </Button>
         </Link>
       )}
       <Link to="/dashboard">
-        <Button variant="outline" className="rounded-full hover:shadow-md transition-all duration-300">
-          <Settings className="mr-2 h-4 w-4" /> Tableau de bord
+        <Button variant="outline" size="sm" className="rounded-full hover:shadow-md transition-all duration-300">
+          <Settings className="mr-2 h-3 w-3" /> Tableau de bord
         </Button>
       </Link>
       <Button 
         variant="outline" 
+        size="sm"
         className="rounded-full hover:shadow-md transition-all duration-300"
         onClick={signOut}
       >
-        <LogIn className="mr-2 h-4 w-4" /> Déconnexion
+        <LogIn className="mr-2 h-3 w-3" /> Déconnexion
       </Button>
     </div>
   );
