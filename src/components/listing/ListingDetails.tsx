@@ -44,15 +44,6 @@ export function ListingDetails({ listing, onContactClick }: ListingDetailsProps)
             WhatsApp
           </Button>
         )}
-
-        <Button 
-          variant="outline"
-          className="w-full"
-          onClick={() => navigate("/messages")}
-        >
-          <MessageCircle className="mr-2 h-4 w-4" />
-          Messagerie interne
-        </Button>
       </div>
     </div>
   );
