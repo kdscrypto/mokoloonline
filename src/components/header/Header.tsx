@@ -52,7 +52,7 @@ export const Header = () => {
               className="w-10 h-10 relative z-10"
             />
           </div>
-          <span className="text-xl font-bold gradient-text">Mokolo</span>
+          <span className="text-xl font-bold gradient-text">Mokolo Online</span>
         </Link>
       </div>
 
