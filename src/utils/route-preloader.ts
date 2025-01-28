@@ -2,24 +2,22 @@ import { routes } from "@/config/routes";
 
 export const preloadPopularRoutes = () => {
   // Préchargement prioritaire des routes les plus utilisées
-  const priorityRoutes = ['index', 'auth', 'dashboard'];
+  const priorityRoutes = ['index', 'auth', 'dashboard'] as const;
   
-  const preloadRoute = async (path: string) => {
-    if (path in routes) {
-      const route = routes[path as keyof typeof routes];
-      try {
-        // Type assertion sécurisée pour accéder au mécanisme de préchargement
-        const lazyComponent = route.component as unknown as { 
-          _payload?: { _result?: () => Promise<unknown> }
-        };
-        
-        if (lazyComponent._payload?._result) {
-          await lazyComponent._payload._result();
-          console.log(`✓ Route ${path} préchargée`);
-        }
-      } catch (error) {
-        console.error(`× Échec du préchargement de la route ${path}:`, error);
+  const preloadRoute = async (path: keyof typeof routes) => {
+    const route = routes[path];
+    try {
+      // Type assertion sécurisée pour accéder au mécanisme de préchargement
+      const lazyComponent = route.component as unknown as { 
+        _payload?: { _result?: () => Promise<unknown> }
+      };
+      
+      if (lazyComponent._payload?._result) {
+        await lazyComponent._payload._result();
+        console.log(`✓ Route ${path} préchargée`);
       }
+    } catch (error) {
+      console.error(`× Échec du préchargement de la route ${path}:`, error);
     }
   };
 
