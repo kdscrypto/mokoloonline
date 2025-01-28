@@ -10,6 +10,8 @@ import { usePerformanceMonitoring } from "@/utils/performance/performance-monito
 import { GoogleAd } from "@/components/ads/GoogleAd";
 import { Helmet } from "react-helmet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Suspense } from "react";
+import { ListingsLoadingState } from "@/components/listings/ListingsLoadingState";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -17,7 +19,20 @@ const Index: React.FC = () => {
   usePerformanceMonitoring("home");
   const [selectedCategory, setSelectedCategory] = React.useState("Tous");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [isPending, startTransition] = React.useTransition();
   const isMobile = useIsMobile();
+
+  const handleCategoryChange = (category: string) => {
+    startTransition(() => {
+      setSelectedCategory(category);
+    });
+  };
+
+  const handleSearch = (query: string) => {
+    startTransition(() => {
+      setSearchQuery(query);
+    });
+  };
 
   return (
     <React.Fragment>
@@ -36,9 +51,9 @@ const Index: React.FC = () => {
             <div className="flex flex-col gap-6 sm:gap-10">              
               <section aria-label="Recherche et filtres" className="space-y-6 sm:space-y-8">
                 <div className="max-w-2xl mx-auto w-full">
-                  <SearchBar onSearch={setSearchQuery} />
+                  <SearchBar onSearch={handleSearch} />
                 </div>
-                <CategoryFilter onCategoryChange={setSelectedCategory} />
+                <CategoryFilter onCategoryChange={handleCategoryChange} />
               </section>
 
               <section aria-label="Publicité" className="w-full flex justify-center my-4">
@@ -48,27 +63,29 @@ const Index: React.FC = () => {
                 />
               </section>
 
-              <section aria-label="Annonces VIP" className="px-4 sm:px-6">
-                <VipListings />
-              </section>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
-                <section aria-label="Toutes les annonces" className="lg:col-span-3">
-                  <RegularListings 
-                    selectedCategory={selectedCategory}
-                    searchQuery={searchQuery}
-                    itemsPerPage={isMobile ? 6 : ITEMS_PER_PAGE}
-                  />
+              <Suspense fallback={<ListingsLoadingState />}>
+                <section aria-label="Annonces VIP" className="px-4 sm:px-6">
+                  <VipListings />
                 </section>
-                <aside className="hidden lg:block">
-                  <div className="sticky top-4">
-                    <GoogleAd 
-                      slot="0987654321" 
-                      className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
+                  <section aria-label="Toutes les annonces" className="lg:col-span-3">
+                    <RegularListings 
+                      selectedCategory={selectedCategory}
+                      searchQuery={searchQuery}
+                      itemsPerPage={isMobile ? 6 : ITEMS_PER_PAGE}
                     />
-                  </div>
-                </aside>
-              </div>
+                  </section>
+                  <aside className="hidden lg:block">
+                    <div className="sticky top-4">
+                      <GoogleAd 
+                        slot="0987654321" 
+                        className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                      />
+                    </div>
+                  </aside>
+                </div>
+              </Suspense>
             </div>
           </div>
 
