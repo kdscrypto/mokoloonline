@@ -12,23 +12,23 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <React.Suspense
-          fallback={
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-              <div className="text-center">
-                <LoadingIndicator size="lg" />
-                <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+        <TooltipProvider>
+          <React.Suspense
+            fallback={
+              <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+                <div className="text-center">
+                  <LoadingIndicator size="lg" />
+                  <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+                </div>
               </div>
-            </div>
-          }
-        >
-          <TooltipProvider>
+            }
+          >
             <RouteWrapper>
               <AppRoutes />
             </RouteWrapper>
-          </TooltipProvider>
+          </React.Suspense>
           <Toaster />
-        </React.Suspense>
+        </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
