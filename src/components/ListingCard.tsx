@@ -37,7 +37,7 @@ export function ListingCard({ id, title, price, image_url, location }: ListingCa
   }, []);
 
   return (
-    <Link to={`/listing/${id}`}>
+    <Link to={`/listings/${id}`}>
       <Card 
         className={`listing-card overflow-hidden group ${
           isMobile ? 'w-full' : 'w-[280px]'
