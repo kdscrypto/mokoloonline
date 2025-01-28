@@ -12,7 +12,6 @@ const HowItWorks = React.lazy(() => import("@/pages/HowItWorks"));
 const ListingDetail = React.lazy(() => import("@/pages/ListingDetail"));
 const Moderation = React.lazy(() => import("@/pages/Moderation"));
 const Security = React.lazy(() => import("@/pages/Security"));
-const Messages = React.lazy(() => import("@/pages/Messages"));
 
 // Export routes object for preloading
 export const routes = {
@@ -26,7 +25,6 @@ export const routes = {
   listingDetail: { path: "/listings/:id", component: ListingDetail },
   moderation: { path: "/moderation", component: Moderation },
   security: { path: "/security", component: Security },
-  messages: { path: "/messages", component: Messages },
 };
 
 export const AppRoutes = () => {
@@ -38,11 +36,6 @@ export const AppRoutes = () => {
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/security" element={<Security />} />
       <Route path="/listings/:id" element={<ListingDetail />} />
-      <Route path="/messages" element={
-        <AuthGuard requireAuth={true}>
-          <Messages />
-        </AuthGuard>
-      } />
       
       <Route path="/dashboard" element={
         <AuthGuard requireAuth={true}>
