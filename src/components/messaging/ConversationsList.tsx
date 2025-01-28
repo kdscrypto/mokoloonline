@@ -35,7 +35,6 @@ export function ConversationsList({ selectedConversationId, onSelectConversation
     },
   });
 
-  // Écouter les mises à jour en temps réel des conversations et messages
   useEffect(() => {
     const channel = supabase
       .channel('conversations-updates')
@@ -68,13 +67,13 @@ export function ConversationsList({ selectedConversationId, onSelectConversation
     };
   }, [refetch]);
 
-  const getOtherParticipant = (conversation: any) => {
-    const { data: { user } } = supabase.auth.getUser();
+  const getOtherParticipant = async (conversation: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
     return conversation.initiator_id === user?.id ? conversation.recipient : conversation.initiator;
   };
 
-  const getUnreadCount = (conversation: any) => {
-    const { data: { user } } = supabase.auth.getUser();
+  const getUnreadCount = async (conversation: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
     return conversation.messages?.filter(
       (m: any) => !m.read && m.sender_id !== user?.id
     ).length || 0;
