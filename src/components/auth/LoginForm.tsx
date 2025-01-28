@@ -1,112 +1,60 @@
 import { useState } from "react";
+import { useAuthLogin } from "@/hooks/use-auth-login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoadingIndicator } from "@/components/ui/loading-indicator";
-import { useAuthLogin } from "@/hooks/use-auth-login";
 import { toast } from "sonner";
 
-interface LoginFormProps {
-  isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
-}
-
-export function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
-  const [identifier, setIdentifier] = useState("");
+export function LoginForm() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { 
-    isResettingPassword, 
-    setIsResettingPassword, 
-    handleLogin 
-  } = useAuthLogin();
+  const { login, isLoading } = useAuthLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLoading) return;
     
-    // Basic validation
-    if (!identifier.trim()) {
-      toast.error("Veuillez saisir votre email ou numéro de téléphone");
+    if (!email || !password) {
+      toast.error("Veuillez remplir tous les champs");
       return;
     }
 
-    if (!isResettingPassword && !password.trim()) {
-      toast.error("Veuillez saisir votre mot de passe");
-      return;
-    }
-    
-    setIsLoading(true);
     try {
-      await handleLogin(identifier.trim(), password.trim());
+      await login(email, password);
     } catch (error: any) {
-      console.error("Login error:", error);
-      // Let useAuthLogin handle the error messages
-    } finally {
-      setIsLoading(false);
+      toast.error("Erreur lors de la connexion", {
+        description: error.message
+      });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="identifier">Email ou numéro de téléphone</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="identifier"
-          type="text"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="votre@email.com"
           required
-          placeholder="votre@email.com ou +237 6XX XX XX XX"
-          disabled={isLoading}
-          className="transition-all duration-200"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="password">Mot de passe</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </div>
 
-      {!isResettingPassword && (
-        <div className="space-y-2">
-          <Label htmlFor="password">Mot de passe</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-            disabled={isLoading}
-            minLength={6}
-            className="transition-all duration-200"
-          />
-        </div>
-      )}
-
-      <Button 
-        type="submit" 
-        className="w-full relative" 
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center">
-            <LoadingIndicator size="sm" className="mr-2" />
-            Chargement...
-          </span>
-        ) : (
-          isResettingPassword 
-            ? "Envoyer les instructions"
-            : "Se connecter"
-        )}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Connexion..." : "Se connecter"}
       </Button>
-
-      <button
-        type="button"
-        onClick={() => setIsResettingPassword(!isResettingPassword)}
-        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 w-full text-center transition-colors duration-200"
-        disabled={isLoading}
-      >
-        {isResettingPassword 
-          ? "Retour à la connexion" 
-          : "Mot de passe oublié ?"
-        }
-      </button>
     </form>
   );
 }

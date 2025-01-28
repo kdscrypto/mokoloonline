@@ -20,33 +20,34 @@ export function useConversation(listing: Listing, onClose: () => void) {
       }
 
       // Vérifier si une conversation existe déjà
-      const { data: existingConversation } = await supabase
+      const { data: existingConversations, error: queryError } = await supabase
         .from('conversations')
         .select('id')
         .eq('listing_id', listing.id)
         .eq('initiator_id', user.id)
-        .eq('recipient_id', listing.user_id)
-        .single();
+        .eq('recipient_id', listing.user_id);
 
-      if (existingConversation) {
+      if (queryError) {
+        throw queryError;
+      }
+
+      if (existingConversations && existingConversations.length > 0) {
         onClose();
         navigate(`/messages`);
         return;
       }
 
       // Créer une nouvelle conversation
-      const { data: newConversation, error } = await supabase
+      const { error: insertError } = await supabase
         .from('conversations')
         .insert({
           listing_id: listing.id,
           initiator_id: user.id,
           recipient_id: listing.user_id,
           status: 'active'
-        })
-        .select()
-        .single();
+        });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       onClose();
       navigate(`/messages`);
