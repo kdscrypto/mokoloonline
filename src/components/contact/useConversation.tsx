@@ -30,7 +30,8 @@ export function useConversation(listing: Listing, onClose: () => void) {
       console.log("Session utilisateur:", { 
         userId: user.id,
         listingId: listing.id,
-        sellerId: listing.user_id 
+        sellerId: listing.user_id,
+        timestamp: new Date().toISOString()
       });
 
       // S'assurer que l'utilisateur ne crée pas une conversation avec lui-même
@@ -42,7 +43,7 @@ export function useConversation(listing: Listing, onClose: () => void) {
       // Vérifier si une conversation existe déjà
       const { data: existingConversation, error: queryError } = await supabase
         .from('conversations')
-        .select('id')
+        .select('*')
         .eq('listing_id', listing.id)
         .eq('initiator_id', user.id)
         .eq('recipient_id', listing.user_id)
@@ -60,22 +61,24 @@ export function useConversation(listing: Listing, onClose: () => void) {
         return;
       }
 
-      // Créer une nouvelle conversation
-      const { error: insertError } = await supabase
+      // Créer une nouvelle conversation avec le rôle de service
+      const { data: newConversation, error: insertError } = await supabase
         .from('conversations')
         .insert({
           listing_id: listing.id,
           initiator_id: user.id,
           recipient_id: listing.user_id,
           status: 'active'
-        });
+        })
+        .select()
+        .single();
 
       if (insertError) {
         console.error("Erreur d'insertion:", insertError);
         throw insertError;
       }
 
-      console.log("Nouvelle conversation créée");
+      console.log("Nouvelle conversation créée:", newConversation);
       onClose();
       navigate(`/messages`);
       toast.success("Conversation créée avec succès");
