@@ -54,29 +54,27 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <React.Suspense
-          fallback={
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-              <div className="text-center">
-                <LoadingIndicator size="lg" />
-                <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <React.Suspense
+            fallback={
+              <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+                <div className="text-center">
+                  <LoadingIndicator size="lg" />
+                  <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+                </div>
               </div>
-            </div>
-          }
-        >
-          <TooltipProvider>
-            <BrowserRouter>
-              <RouteWrapper>
-                <AppRoutes />
-              </RouteWrapper>
-              <Toaster />
-            </BrowserRouter>
-          </TooltipProvider>
-        </React.Suspense>
-      </QueryClientProvider>
-    </React.StrictMode>
+            }
+          >
+            <RouteWrapper>
+              <AppRoutes />
+            </RouteWrapper>
+            <Toaster />
+          </React.Suspense>
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
