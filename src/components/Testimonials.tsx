@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const testimonials = [
   {
@@ -23,17 +24,21 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const isMobile = useIsMobile();
+
   return (
-    <section className="py-16 relative overflow-hidden">
+    <section className="py-12 sm:py-16 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 pointer-events-none" />
-      <div className="container relative">
-        <h2 className="text-3xl font-bold text-center mb-12 gradient-text">Ce que disent nos utilisateurs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="container relative px-4 sm:px-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 gradient-text">
+          Ce que disent nos utilisateurs
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="glass-effect hover-card">
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 px-4 sm:px-6">
                 <div className="flex flex-col items-center text-center gap-4">
-                  <Avatar className="h-16 w-16 ring-2 ring-primary/20 ring-offset-2">
+                  <Avatar className={`${isMobile ? 'h-14 w-14' : 'h-16 w-16'} ring-2 ring-primary/20 ring-offset-2`}>
                     <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                     <AvatarFallback>{testimonial.name.split(' ')[0][0]}</AvatarFallback>
                   </Avatar>
@@ -41,7 +46,9 @@ export function Testimonials() {
                     <p className="font-medium gradient-text">{testimonial.name}</p>
                     <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                   </div>
-                  <p className="text-muted-foreground italic">{testimonial.content}</p>
+                  <p className="text-muted-foreground italic text-sm sm:text-base">
+                    {testimonial.content}
+                  </p>
                 </div>
               </CardContent>
             </Card>

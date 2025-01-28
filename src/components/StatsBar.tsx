@@ -1,29 +1,24 @@
 import { Users, ShoppingBag, BadgeCheck, MessageSquare } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function StatsBar() {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="w-full bg-primary/5 py-12">
-      <div className="container grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div className="flex flex-col items-center">
-          <Users className="h-8 w-8 text-primary mb-2" />
-          <span className="text-3xl font-bold">1,234</span>
-          <span className="text-muted-foreground">Utilisateurs inscrits</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <ShoppingBag className="h-8 w-8 text-primary mb-2" />
-          <span className="text-3xl font-bold">5,678</span>
-          <span className="text-muted-foreground">Annonces publiées</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <BadgeCheck className="h-8 w-8 text-primary mb-2" />
-          <span className="text-3xl font-bold">890</span>
-          <span className="text-muted-foreground">Vendeurs vérifiés</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <MessageSquare className="h-8 w-8 text-primary mb-2" />
-          <span className="text-3xl font-bold">15K+</span>
-          <span className="text-muted-foreground">Avis clients</span>
-        </div>
+    <div className="w-full bg-primary/5 py-8 sm:py-12">
+      <div className="container grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
+        {[
+          { icon: Users, label: "Utilisateurs inscrits", value: "1,234" },
+          { icon: ShoppingBag, label: "Annonces publiées", value: "5,678" },
+          { icon: BadgeCheck, label: "Vendeurs vérifiés", value: "890" },
+          { icon: MessageSquare, label: "Avis clients", value: "15K+" }
+        ].map(({ icon: Icon, label, value }) => (
+          <div key={label} className="flex flex-col items-center text-center">
+            <Icon className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'} text-primary mb-2`} />
+            <span className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>{value}</span>
+            <span className="text-muted-foreground text-sm sm:text-base">{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

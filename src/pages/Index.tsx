@@ -9,6 +9,7 @@ import { RegularListings } from "@/components/RegularListings";
 import { usePerformanceMonitoring } from "@/utils/performance/performance-monitor";
 import { GoogleAd } from "@/components/ads/GoogleAd";
 import { Helmet } from "react-helmet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -16,6 +17,7 @@ const Index: React.FC = () => {
   usePerformanceMonitoring("home");
   const [selectedCategory, setSelectedCategory] = React.useState("Tous");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const isMobile = useIsMobile();
 
   return (
     <React.Fragment>
@@ -30,10 +32,10 @@ const Index: React.FC = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-white to-secondary/5">
         <main className="w-full">
-          <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-col gap-10">              
-              <section aria-label="Recherche et filtres" className="space-y-8">
-                <div className="max-w-2xl mx-auto">
+          <div className="max-w-[2000px] mx-auto py-4 sm:py-8">
+            <div className="flex flex-col gap-6 sm:gap-10">              
+              <section aria-label="Recherche et filtres" className="space-y-6 sm:space-y-8">
+                <div className="max-w-2xl mx-auto w-full">
                   <SearchBar onSearch={setSearchQuery} />
                 </div>
                 <CategoryFilter onCategoryChange={setSelectedCategory} />
@@ -42,20 +44,20 @@ const Index: React.FC = () => {
               <section aria-label="Publicité" className="w-full flex justify-center my-4">
                 <GoogleAd 
                   slot="1234567890" 
-                  className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                  className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm mx-4 sm:mx-0"
                 />
               </section>
 
-              <section aria-label="Annonces VIP">
+              <section aria-label="Annonces VIP" className="px-4 sm:px-6">
                 <VipListings />
               </section>
               
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
                 <section aria-label="Toutes les annonces" className="lg:col-span-3">
                   <RegularListings 
                     selectedCategory={selectedCategory}
                     searchQuery={searchQuery}
-                    itemsPerPage={ITEMS_PER_PAGE}
+                    itemsPerPage={isMobile ? 6 : ITEMS_PER_PAGE}
                   />
                 </section>
                 <aside className="hidden lg:block">
@@ -77,7 +79,7 @@ const Index: React.FC = () => {
         <section aria-label="Publicité bas de page" className="w-full flex justify-center my-8">
           <GoogleAd 
             slot="5432109876" 
-            className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+            className="w-full max-w-4xl h-[90px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm mx-4 sm:mx-0"
           />
         </section>
         

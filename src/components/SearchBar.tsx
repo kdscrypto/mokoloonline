@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import DOMPurify from 'dompurify';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -9,6 +10,7 @@ interface SearchBarProps {
 
 export function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
+  const isMobile = useIsMobile();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
@@ -18,10 +20,21 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <div className="relative group">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-primary transition-colors duration-200" />
+    <div className="relative group px-4 sm:px-0">
+      <Search className={`
+        absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 
+        ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}
+        text-gray-400 group-hover:text-primary transition-colors duration-200
+      `} />
       <Input
-        className="pl-10 pr-4 h-12 w-full rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 hover:border-primary/50 focus:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
+        className={`
+          pl-12 sm:pl-10 pr-4 
+          ${isMobile ? 'h-14 text-lg' : 'h-12 text-base'}
+          w-full rounded-full bg-white/80 backdrop-blur-sm 
+          border border-gray-200 hover:border-primary/50 
+          focus:border-primary transition-all duration-200 
+          shadow-sm hover:shadow-md
+        `}
         placeholder="Rechercher une annonce..."
         value={query}
         onChange={handleSearch}

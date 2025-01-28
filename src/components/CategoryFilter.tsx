@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const categories = [
   "Tous",
@@ -15,14 +16,22 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ onCategoryChange }: CategoryFilterProps) {
+  const isMobile = useIsMobile();
+
   return (
     <div className="relative w-full">
-      <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide snap-x snap-mandatory">
+      <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide snap-x snap-mandatory px-4 sm:px-0">
         {categories.map((category) => (
           <Button
             key={category}
             variant="outline"
-            className="whitespace-nowrap rounded-full snap-start shrink-0 bg-white/80 backdrop-blur-sm hover:bg-primary/10 hover:text-primary transition-all duration-200 border-gray-200 hover:border-primary/50"
+            className={`
+              whitespace-nowrap rounded-full snap-start shrink-0 
+              bg-white/80 backdrop-blur-sm hover:bg-primary/10 
+              hover:text-primary transition-all duration-200 
+              border-gray-200 hover:border-primary/50
+              ${isMobile ? 'text-sm px-4 py-2' : ''}
+            `}
             onClick={() => onCategoryChange(category)}
           >
             {category}
