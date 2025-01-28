@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle } from "lucide-react";
 import type { Listing } from "@/integrations/supabase/types/listing";
+import { useNavigate } from "react-router-dom";
 
 interface ListingDetailsProps {
   listing: Listing;
@@ -8,6 +9,7 @@ interface ListingDetailsProps {
 }
 
 export function ListingDetails({ listing, onContactClick }: ListingDetailsProps) {
+  const navigate = useNavigate();
   const sellerName = listing.profiles?.username || listing.profiles?.full_name || "Utilisateur inconnu";
 
   return (
@@ -46,7 +48,7 @@ export function ListingDetails({ listing, onContactClick }: ListingDetailsProps)
         <Button 
           variant="outline"
           className="w-full"
-          onClick={onContactClick}
+          onClick={() => navigate("/messages")}
         >
           <MessageCircle className="mr-2 h-4 w-4" />
           Messagerie interne
