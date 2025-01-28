@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteWrapper } from "@/components/layout/RouteWrapper";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 const AppContent: React.FC = () => {
   React.useEffect(() => {
@@ -69,9 +70,11 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <TooltipProvider>
-      <AppContent />
-    </TooltipProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AppContent />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
