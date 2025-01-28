@@ -63,29 +63,31 @@ const Index: React.FC = () => {
                 />
               </section>
 
-              <Suspense fallback={<ListingsLoadingState />}>
-                <section aria-label="Annonces VIP" className="px-4 sm:px-6">
+              <section aria-label="Annonces VIP" className="px-4 sm:px-6">
+                <Suspense fallback={<ListingsLoadingState />}>
                   <VipListings />
-                </section>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
-                  <section aria-label="Toutes les annonces" className="lg:col-span-3">
+                </Suspense>
+              </section>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 px-4 sm:px-6">
+                <section aria-label="Toutes les annonces" className="lg:col-span-3">
+                  <Suspense fallback={<ListingsLoadingState />}>
                     <RegularListings 
                       selectedCategory={selectedCategory}
                       searchQuery={searchQuery}
                       itemsPerPage={isMobile ? 6 : ITEMS_PER_PAGE}
                     />
-                  </section>
-                  <aside className="hidden lg:block">
-                    <div className="sticky top-4">
-                      <GoogleAd 
-                        slot="0987654321" 
-                        className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
-                      />
-                    </div>
-                  </aside>
-                </div>
-              </Suspense>
+                  </Suspense>
+                </section>
+                <aside className="hidden lg:block">
+                  <div className="sticky top-4">
+                    <GoogleAd 
+                      slot="0987654321" 
+                      className="w-[300px] h-[600px] bg-white/80 backdrop-blur-sm rounded-lg shadow-sm"
+                    />
+                  </div>
+                </aside>
+              </div>
             </div>
           </div>
 
