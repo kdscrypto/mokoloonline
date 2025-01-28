@@ -42,6 +42,7 @@ export function ContactDialog({ open, onOpenChange, listing }: ContactDialogProp
         .single();
 
       if (existingConversation) {
+        onOpenChange(false);
         navigate(`/messages`);
         return;
       }
@@ -60,6 +61,7 @@ export function ContactDialog({ open, onOpenChange, listing }: ContactDialogProp
 
       if (error) throw error;
 
+      onOpenChange(false);
       navigate(`/messages`);
       toast.success("Conversation créée");
     } catch (error: any) {
