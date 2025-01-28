@@ -8,11 +8,13 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { SellerProfile } from "@/components/seller/SellerProfile";
 import { SecurityGuidelines } from "@/components/listing/SecurityGuidelines";
+import { ContactDialog } from "@/components/contact/ContactDialog";
 
 export default function ListingDetail() {
   const { id } = useParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -132,6 +134,15 @@ export default function ListingDetail() {
                         WhatsApp
                       </Button>
                     )}
+
+                    <Button 
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setIsContactOpen(true)}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Messagerie interne
+                    </Button>
                   </div>
                 </>
               ) : (
@@ -167,6 +178,12 @@ export default function ListingDetail() {
           <SellerProfile sellerId={listing.user_id} listingId={id} />
         )}
       </div>
+
+      <ContactDialog 
+        open={isContactOpen}
+        onOpenChange={setIsContactOpen}
+        listing={listing}
+      />
     </div>
   );
 }
