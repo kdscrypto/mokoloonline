@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -9,6 +9,12 @@ import { fr } from "date-fns/locale";
 interface ConversationsListProps {
   selectedConversationId: string | null;
   onSelectConversation: (id: string) => void;
+}
+
+interface ParticipantInfo {
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
 }
 
 export function ConversationsList({ selectedConversationId, onSelectConversation }: ConversationsListProps) {
@@ -25,7 +31,7 @@ export function ConversationsList({ selectedConversationId, onSelectConversation
           listing:listings(title),
           initiator:profiles!conversations_initiator_id_fkey(username, full_name, avatar_url),
           recipient:profiles!conversations_recipient_id_fkey(username, full_name, avatar_url),
-          messages:messages(id, created_at, read)
+          messages:messages(id, created_at, read, sender_id)
         `)
         .or(`initiator_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('updated_at', { ascending: false });
@@ -67,15 +73,14 @@ export function ConversationsList({ selectedConversationId, onSelectConversation
     };
   }, [refetch]);
 
-  const getOtherParticipant = async (conversation: any) => {
+  const getOtherParticipant = async (conversation: any): Promise<ParticipantInfo> => {
     const { data: { user } } = await supabase.auth.getUser();
     return conversation.initiator_id === user?.id ? conversation.recipient : conversation.initiator;
   };
 
-  const getUnreadCount = async (conversation: any) => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const getUnreadCount = async (conversation: any, userId: string): Promise<number> => {
     return conversation.messages?.filter(
-      (m: any) => !m.read && m.sender_id !== user?.id
+      (m: any) => !m.read && m.sender_id !== userId
     ).length || 0;
   };
 
@@ -87,8 +92,13 @@ export function ConversationsList({ selectedConversationId, onSelectConversation
       <ScrollArea className="h-[600px]">
         <div className="space-y-1">
           {conversations.map((conversation: any) => {
-            const otherParticipant = getOtherParticipant(conversation);
-            const unreadCount = getUnreadCount(conversation);
+            const otherParticipant = conversation.initiator_id === conversation.user_id 
+              ? conversation.recipient 
+              : conversation.initiator;
+            
+            const unreadCount = conversation.messages?.filter(
+              (m: any) => !m.read && m.sender_id !== conversation.user_id
+            ).length || 0;
             
             return (
               <button
