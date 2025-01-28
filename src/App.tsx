@@ -11,6 +11,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster />
       <BrowserRouter>
         <TooltipProvider>
           <React.Suspense
@@ -27,7 +28,6 @@ const App = () => {
               <AppRoutes />
             </RouteWrapper>
           </React.Suspense>
-          <Toaster />
         </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
