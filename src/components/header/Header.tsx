@@ -33,39 +33,47 @@ export const Header = () => {
   };
 
   return (
-    <header className="w-full bg-white/80 backdrop-blur-sm border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full animate-pulse" />
-              <img
-                src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png"
-                alt="Logo"
-                className="w-8 h-8 relative z-10 transition-transform duration-300 group-hover:scale-110"
-              />
-            </div>
-            <span className="text-lg font-bold gradient-text hidden sm:inline">
-              Mokolo Online
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-2 sm:gap-4">
-            <AuthButtons />
-            <Button 
-              onClick={handleCreateListing}
-              className="whitespace-nowrap"
-              size="sm"
-              disabled={isLoading}
-            >
-              <Plus className="mr-2 h-3 w-3" /> Publier
-            </Button>
-            <Link to="/about">
-              <Button variant="ghost" size="sm" className="whitespace-nowrap">
-                À propos
-              </Button>
-            </Link>
+    <header 
+      className="relative flex justify-between items-center rounded-2xl p-6 shadow-lg overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 -z-10" />
+      
+      <div className="flex items-center gap-4 shrink-0 pl-0">
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary blur-lg opacity-20 rounded-full animate-pulse" />
+            <img
+              src="/lovable-uploads/e3b929be-d96d-4470-869a-739d4e330db4.png"
+              alt="Logo"
+              className="w-10 h-10 relative z-10 animate-float transition-transform duration-300 group-hover:scale-110"
+            />
           </div>
+          <span className="text-xl font-bold gradient-text animate-float transition-all duration-300 group-hover:text-primary">
+            Mokolo Online
+          </span>
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide px-2 py-1 -mx-2 relative z-10">
+        <div className="flex items-center gap-4 min-w-max">
+          <AuthButtons />
+          <Button 
+            onClick={handleCreateListing}
+            className="rounded-full hover:scale-105 transition-transform duration-300 shadow-lg whitespace-nowrap"
+            size="sm"
+            disabled={isLoading}
+          >
+            <Plus className="mr-2 h-3 w-3" /> Publier une annonce
+          </Button>
+          <Link to="/about" className="ml-4">
+            <Button variant="ghost" size="sm" className="rounded-full whitespace-nowrap">
+              À propos
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

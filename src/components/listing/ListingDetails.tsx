@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle } from "lucide-react";
 import type { Listing } from "@/integrations/supabase/types/listing";
 import { useNavigate } from "react-router-dom";
-import { useTransition } from "react";
 
 interface ListingDetailsProps {
   listing: Listing;
@@ -11,7 +10,6 @@ interface ListingDetailsProps {
 
 export function ListingDetails({ listing, onContactClick }: ListingDetailsProps) {
   const navigate = useNavigate();
-  const [isPending, startTransition] = useTransition();
   const sellerName = listing.profiles?.username || listing.profiles?.full_name || "Utilisateur inconnu";
 
   return (
@@ -30,11 +28,7 @@ export function ListingDetails({ listing, onContactClick }: ListingDetailsProps)
         </h3>
         
         {listing.phone && (
-          <Button 
-            className="w-full" 
-            onClick={() => window.location.href = `tel:${listing.phone}`}
-            disabled={isPending}
-          >
+          <Button className="w-full" onClick={() => window.location.href = `tel:${listing.phone}`}>
             <Phone className="mr-2 h-4 w-4" />
             {listing.phone}
           </Button>
@@ -44,10 +38,7 @@ export function ListingDetails({ listing, onContactClick }: ListingDetailsProps)
           <Button 
             variant="secondary" 
             className="w-full"
-            onClick={() => startTransition(() => {
-              window.open(`https://wa.me/${listing.whatsapp.replace(/\D/g, '')}`, '_blank');
-            })}
-            disabled={isPending}
+            onClick={() => window.open(`https://wa.me/${listing.whatsapp.replace(/\D/g, '')}`, '_blank')}
           >
             <MessageCircle className="mr-2 h-4 w-4" />
             WhatsApp
