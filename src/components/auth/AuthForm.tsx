@@ -33,9 +33,15 @@ export function AuthForm() {
   return (
     <div className="space-y-6">
       {isLogin ? (
-        <LoginForm isLoading={isLoading} setIsLoading={setIsLoading} />
+        <LoginForm 
+          isLoading={isLoading} 
+          setIsLoading={setIsLoading} 
+        />
       ) : (
-        <SignUpForm isLoading={isLoading} setIsLoading={setIsLoading} />
+        <SignUpForm 
+          isLoading={isLoading} 
+          setIsLoading={setIsLoading} 
+        />
       )}
       
       <button
