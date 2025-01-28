@@ -12,11 +12,7 @@ export const RouteWrapper: FC<RouteWrapperProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!isAuthPage && (
-        <div className="container mx-auto px-4 py-4">
-          <Header />
-        </div>
-      )}
+      {!isAuthPage && <Header />}
       <main className="flex-1">
         {children}
       </main>
