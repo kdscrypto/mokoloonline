@@ -43,8 +43,13 @@ export default function ListingDetail() {
         .select(`
           *,
           profiles:profiles!listings_user_id_fkey (
+            id,
             full_name,
-            username
+            username,
+            avatar_url,
+            city,
+            phone,
+            created_at
           )
         `)
         .eq('id', id)
