@@ -10,29 +10,27 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider delayDuration={0}>
-            <React.Suspense
-              fallback={
-                <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
-                  <div className="text-center">
-                    <LoadingIndicator size="lg" />
-                    <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
-                  </div>
-                </div>
-              }
-            >
-              <RouteWrapper>
-                <AppRoutes />
-              </RouteWrapper>
-              <Toaster />
-            </React.Suspense>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <React.Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-50">
+              <div className="text-center">
+                <LoadingIndicator size="lg" />
+                <p className="mt-4 text-sm text-gray-500">Chargement en cours...</p>
+              </div>
+            </div>
+          }
+        >
+          <TooltipProvider>
+            <RouteWrapper>
+              <AppRoutes />
+            </RouteWrapper>
           </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+          <Toaster />
+        </React.Suspense>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
