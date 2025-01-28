@@ -30,7 +30,7 @@ const HowItWorks = lazyLoad(() => import("@/pages/HowItWorks"));
 const Security = lazyLoad(() => import("@/pages/Security"));
 const Moderation = lazyLoad(() => import("@/pages/Moderation"));
 
-const routes = {
+export const routes = {
   index: {
     path: "/",
     component: Index,
@@ -114,5 +114,3 @@ export function AppRoutes() {
     </Routes>
   );
 }
-
-export { routes };
